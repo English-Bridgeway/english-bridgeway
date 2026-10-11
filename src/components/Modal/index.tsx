@@ -39,8 +39,8 @@ export function Modal({ open, onClose, title, children, className, hideTitle }: 
 
   if (!open) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-[10vh]">
-      <div className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-[10vh]">
+      <div className="fixed inset-0 bg-ink-900/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
       <div ref={panel} role="dialog" aria-modal="true" aria-label={title} className={cn("relative w-full max-w-xl animate-fade-in rounded-2xl bg-white shadow-lift", className)}>
         {!hideTitle && (
           <div className="flex items-center justify-between border-b border-line px-5 py-4">

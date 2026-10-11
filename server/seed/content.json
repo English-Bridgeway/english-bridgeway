@@ -1,0 +1,4468 @@
+{
+  "site": {
+    "name": "English-Bridgeway",
+    "tagline": "Improve your English. Speak with confidence.",
+    "description": "Learn grammar, build vocabulary, practise spoken English and test your knowledge with simple, practical lessons.",
+    "url": "https://www.englishbridgeway.example",
+    "email": "hello@englishbridgeway.example",
+    "whatsapp": "+91 98765 43210",
+    "whatsappLink": "https://wa.me/919876543210",
+    "location": "Pune, Maharashtra, India",
+    "hours": "Mon to Sat, 9:00 a.m. to 7:00 p.m. IST",
+    "social": {
+      "youtube": "https://www.youtube.com/",
+      "instagram": "https://www.instagram.com/",
+      "facebook": "https://www.facebook.com/",
+      "linkedin": "https://www.linkedin.com/"
+    },
+    "stats": [
+      {
+        "label": "Lessons",
+        "value": "500+",
+        "icon": "BookOpen"
+      },
+      {
+        "label": "Vocabulary words",
+        "value": "1,000+",
+        "icon": "Languages"
+      },
+      {
+        "label": "Quizzes",
+        "value": "100+",
+        "icon": "ListChecks"
+      },
+      {
+        "label": "Courses",
+        "value": "20+",
+        "icon": "GraduationCap"
+      }
+    ]
+  },
+  "collections": {
+    "grammarTopics": [
+      {
+        "id": "tenses",
+        "title": "Tenses",
+        "summary": "Talk about the past, present and future correctly, from present simple to future perfect.",
+        "level": "Beginner",
+        "icon": "Clock"
+      },
+      {
+        "id": "nouns",
+        "title": "Nouns",
+        "summary": "Names of people, places and things: countable, uncountable, singular and plural.",
+        "level": "Beginner",
+        "icon": "Box"
+      },
+      {
+        "id": "pronouns",
+        "title": "Pronouns",
+        "summary": "Use I, me, my, mine and other pronouns without repeating nouns.",
+        "level": "Beginner",
+        "icon": "User"
+      },
+      {
+        "id": "verbs",
+        "title": "Verbs",
+        "summary": "Action and state verbs, helping verbs, modals and irregular forms.",
+        "level": "Beginner",
+        "icon": "Zap"
+      },
+      {
+        "id": "adjectives",
+        "title": "Adjectives",
+        "summary": "Describe people and things, and compare them with -er, -est, more and most.",
+        "level": "Beginner",
+        "icon": "Palette"
+      },
+      {
+        "id": "adverbs",
+        "title": "Adverbs",
+        "summary": "Say how, when, where and how often something happens.",
+        "level": "Intermediate",
+        "icon": "Gauge"
+      },
+      {
+        "id": "articles",
+        "title": "Articles",
+        "summary": "Choose between a, an, the and no article with the sound rule.",
+        "level": "Beginner",
+        "icon": "Type"
+      },
+      {
+        "id": "prepositions",
+        "title": "Prepositions",
+        "summary": "In, on, at, for, since and more for time, place and movement.",
+        "level": "Intermediate",
+        "icon": "MapPin"
+      },
+      {
+        "id": "conjunctions",
+        "title": "Conjunctions",
+        "summary": "Join ideas with and, but, so, because, although and unless.",
+        "level": "Intermediate",
+        "icon": "Link"
+      },
+      {
+        "id": "sentence-formation",
+        "title": "Sentence Formation",
+        "summary": "Build statements, negatives and questions in the right word order.",
+        "level": "Beginner",
+        "icon": "AlignLeft"
+      },
+      {
+        "id": "active-passive",
+        "title": "Active & Passive Voice",
+        "summary": "Change the focus of a sentence from the doer to the action.",
+        "level": "Advanced",
+        "icon": "Repeat"
+      },
+      {
+        "id": "direct-indirect",
+        "title": "Direct & Indirect Speech",
+        "summary": "Report what other people said, with the right tense and pronoun changes.",
+        "level": "Advanced",
+        "icon": "MessageSquareQuote"
+      }
+    ],
+    "grammarLessons": [
+      {
+        "id": "present-simple",
+        "topicId": "tenses",
+        "title": "Present Simple Tense",
+        "level": "Beginner",
+        "minutes": 12,
+        "description": "Learn the present simple tense: structure, positive and negative sentences, questions, examples and common mistakes.",
+        "definition": "The present simple tense describes habits, routines, general truths and fixed schedules. It is the tense you use most when talking about yourself and your daily life.",
+        "rules": [
+          "With I, you, we and they, use the base verb: I work, they play.",
+          "With he, she, it or one person, add -s or -es: she works, he watches.",
+          "Verbs ending in consonant + y change y to -ies: study → studies.",
+          "For negatives and questions, use do or does with the base verb. Never add -s twice.",
+          "Common time words: always, usually, often, sometimes, never, every day, on Mondays."
+        ],
+        "sections": [
+          {
+            "heading": "Positive sentences",
+            "structure": "Subject + base verb (+ s/es) + object",
+            "examples": [
+              {
+                "sentence": "I drink tea every morning."
+              },
+              {
+                "sentence": "She works in a hospital.",
+                "note": "he / she / it → add -s"
+              },
+              {
+                "sentence": "The train leaves at 7:30 a.m.",
+                "note": "fixed schedule"
+              },
+              {
+                "sentence": "Water boils at 100°C.",
+                "note": "general truth"
+              }
+            ]
+          },
+          {
+            "heading": "Negative sentences",
+            "structure": "Subject + do not / does not + base verb",
+            "examples": [
+              {
+                "sentence": "I don't eat meat."
+              },
+              {
+                "sentence": "He doesn't like cold weather.",
+                "note": "does already shows he/she/it, so like has no -s"
+              },
+              {
+                "sentence": "They don't live in Mumbai."
+              }
+            ]
+          },
+          {
+            "heading": "Questions",
+            "structure": "Do / Does + subject + base verb?",
+            "examples": [
+              {
+                "sentence": "Do you speak Hindi? Yes, I do."
+              },
+              {
+                "sentence": "Does she play the guitar? No, she doesn't."
+              },
+              {
+                "sentence": "Where do they work?",
+                "note": "Wh- word comes first"
+              }
+            ]
+          },
+          {
+            "heading": "Spelling of he / she / it forms",
+            "body": "Most verbs add -s. Verbs ending in -s, -sh, -ch, -x or -o add -es. Consonant + y becomes -ies. Have is irregular: he has.",
+            "examples": [
+              {
+                "sentence": "play → plays, read → reads"
+              },
+              {
+                "sentence": "watch → watches, go → goes, fix → fixes"
+              },
+              {
+                "sentence": "study → studies, carry → carries"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "She go to college by bus.",
+            "right": "She goes to college by bus.",
+            "why": "With she, add -es to go."
+          },
+          {
+            "wrong": "Does he works here?",
+            "right": "Does he work here?",
+            "why": "After does, use the base verb."
+          },
+          {
+            "wrong": "I am knowing the answer.",
+            "right": "I know the answer.",
+            "why": "Know is a state verb; it is not used in the continuous form."
+          },
+          {
+            "wrong": "He don't like coffee.",
+            "right": "He doesn't like coffee.",
+            "why": "Use does not with he, she and it."
+          }
+        ],
+        "practice": [
+          {
+            "id": "ps-1",
+            "type": "mcq",
+            "prompt": "She ___ to school every day.",
+            "options": [
+              "go",
+              "goes",
+              "going",
+              "gone"
+            ],
+            "answer": "goes",
+            "explanation": "She takes the -es form: she goes."
+          },
+          {
+            "id": "ps-2",
+            "type": "fill",
+            "prompt": "My brother ___ (not / like) spicy food.",
+            "answer": [
+              "doesn't like",
+              "does not like"
+            ],
+            "explanation": "Negative with he/she/it: does not + base verb."
+          },
+          {
+            "id": "ps-3",
+            "type": "mcq",
+            "prompt": "___ your parents live in Delhi?",
+            "options": [
+              "Do",
+              "Does",
+              "Are",
+              "Is"
+            ],
+            "answer": "Do",
+            "explanation": "Parents is plural (they), so use do."
+          },
+          {
+            "id": "ps-4",
+            "type": "fill",
+            "prompt": "Riya ___ (study) English every evening.",
+            "answer": [
+              "studies"
+            ],
+            "explanation": "Consonant + y → -ies: studies."
+          }
+        ]
+      },
+      {
+        "id": "present-continuous",
+        "topicId": "tenses",
+        "title": "Present Continuous Tense",
+        "level": "Beginner",
+        "minutes": 10,
+        "description": "Use the present continuous for actions happening now and temporary situations, with clear examples and practice.",
+        "definition": "The present continuous describes actions happening right now, temporary situations and fixed future plans.",
+        "rules": [
+          "Form it with am / is / are + verb-ing.",
+          "Use it for now: now, right now, at the moment, look!, listen!",
+          "Use it for temporary situations: I'm staying with my aunt this month.",
+          "Use it for future arrangements: We're meeting the client tomorrow.",
+          "State verbs (know, like, want, believe) are not normally used in the continuous."
+        ],
+        "sections": [
+          {
+            "heading": "Positive sentences",
+            "structure": "Subject + am/is/are + verb-ing",
+            "examples": [
+              {
+                "sentence": "I am reading a novel."
+              },
+              {
+                "sentence": "Look! It's raining."
+              },
+              {
+                "sentence": "They are building a new metro line."
+              }
+            ]
+          },
+          {
+            "heading": "Negatives and questions",
+            "structure": "Subject + am/is/are + not + verb-ing  ·  Am/Is/Are + subject + verb-ing?",
+            "examples": [
+              {
+                "sentence": "She isn't working today."
+              },
+              {
+                "sentence": "Are you listening to me?"
+              },
+              {
+                "sentence": "What are you cooking?"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "I am wanting a new phone.",
+            "right": "I want a new phone.",
+            "why": "Want is a state verb."
+          },
+          {
+            "wrong": "She cooking dinner now.",
+            "right": "She is cooking dinner now.",
+            "why": "The helping verb is/am/are is required."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pc-1",
+            "type": "mcq",
+            "prompt": "Listen! The baby ___.",
+            "options": [
+              "cries",
+              "is crying",
+              "cry",
+              "cried"
+            ],
+            "answer": "is crying",
+            "explanation": "“Listen!” shows it is happening now."
+          },
+          {
+            "id": "pc-2",
+            "type": "fill",
+            "prompt": "We ___ (watch) a movie right now.",
+            "answer": [
+              "are watching",
+              "'re watching"
+            ],
+            "explanation": "We + are + watching."
+          }
+        ]
+      },
+      {
+        "id": "past-simple",
+        "topicId": "tenses",
+        "title": "Past Simple Tense",
+        "level": "Beginner",
+        "minutes": 12,
+        "description": "Learn the past simple tense with regular and irregular verbs, negatives, questions and common mistakes.",
+        "definition": "The past simple describes completed actions at a specific time in the past.",
+        "rules": [
+          "Regular verbs add -ed: work → worked, play → played.",
+          "Irregular verbs have special forms: go → went, eat → ate, buy → bought.",
+          "Negatives and questions use did + base verb: I didn't go. Did you go?",
+          "Common time words: yesterday, last week, in 2019, two days ago."
+        ],
+        "sections": [
+          {
+            "heading": "Positive sentences",
+            "structure": "Subject + V2 (past form)",
+            "examples": [
+              {
+                "sentence": "We visited Jaipur last year."
+              },
+              {
+                "sentence": "He bought a new laptop yesterday."
+              }
+            ]
+          },
+          {
+            "heading": "Negatives and questions",
+            "structure": "Subject + did not + base verb  ·  Did + subject + base verb?",
+            "examples": [
+              {
+                "sentence": "I didn't see him at the party."
+              },
+              {
+                "sentence": "Did you finish the report?"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "I didn't went to office.",
+            "right": "I didn't go to the office.",
+            "why": "After did, use the base verb."
+          },
+          {
+            "wrong": "I have seen him yesterday.",
+            "right": "I saw him yesterday.",
+            "why": "Finished time (yesterday) takes the past simple."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pas-1",
+            "type": "fill",
+            "prompt": "Yesterday she ___ (go) to the market.",
+            "answer": [
+              "went"
+            ],
+            "explanation": "Go is irregular: went."
+          },
+          {
+            "id": "pas-2",
+            "type": "mcq",
+            "prompt": "___ you call your mother last night?",
+            "options": [
+              "Do",
+              "Did",
+              "Does",
+              "Have"
+            ],
+            "answer": "Did",
+            "explanation": "Past simple question: Did + subject + base verb."
+          }
+        ]
+      },
+      {
+        "id": "present-perfect",
+        "topicId": "tenses",
+        "title": "Present Perfect Tense",
+        "level": "Intermediate",
+        "minutes": 14,
+        "description": "Understand the present perfect: have/has + past participle, since and for, and when not to use it.",
+        "definition": "The present perfect connects the past with the present: life experiences, recent actions with a present result, and situations that started in the past and continue now.",
+        "rules": [
+          "Form it with have / has + past participle (V3).",
+          "Use since with a point in time (since 2020) and for with a period (for three years).",
+          "Use already, yet, just, ever and never with this tense.",
+          "Do not use it with finished time words like yesterday or last year."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "structure": "Subject + have/has + V3",
+            "examples": [
+              {
+                "sentence": "I have lived in Pune since 2018."
+              },
+              {
+                "sentence": "She has just finished her exam."
+              },
+              {
+                "sentence": "Have you ever been to Kerala?"
+              },
+              {
+                "sentence": "We haven't received the parcel yet."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "I am living here since five years.",
+            "right": "I have lived here for five years.",
+            "why": "Use present perfect with for/since; five years is a period, so use for."
+          },
+          {
+            "wrong": "She has went home.",
+            "right": "She has gone home.",
+            "why": "Use the past participle (gone), not the past form (went)."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pp-1",
+            "type": "mcq",
+            "prompt": "They ___ in Bengaluru since 2019.",
+            "options": [
+              "live",
+              "lived",
+              "have lived",
+              "are living"
+            ],
+            "answer": "have lived",
+            "explanation": "Since + point in time → present perfect."
+          },
+          {
+            "id": "pp-2",
+            "type": "fill",
+            "prompt": "I ___ (already / eat) lunch.",
+            "answer": [
+              "have already eaten",
+              "'ve already eaten"
+            ],
+            "explanation": "have + already + eaten."
+          }
+        ]
+      },
+      {
+        "id": "countable-uncountable",
+        "topicId": "nouns",
+        "title": "Countable and Uncountable Nouns",
+        "level": "Beginner",
+        "minutes": 10,
+        "description": "Learn the difference between countable and uncountable nouns, with much/many, some/any and common mistakes.",
+        "definition": "Countable nouns can be counted (one book, two books). Uncountable nouns cannot be counted and have no plural (water, advice, information).",
+        "rules": [
+          "Countable nouns take a/an in the singular and -s in the plural.",
+          "Uncountable nouns never take a/an or -s.",
+          "Use many with countable and much with uncountable nouns.",
+          "Use a piece of, a cup of, a glass of to count uncountable things."
+        ],
+        "sections": [
+          {
+            "heading": "Common uncountable nouns",
+            "body": "advice, information, luggage, furniture, news, money, water, rice, bread, homework, equipment, traffic."
+          },
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "How many students are in your class?"
+              },
+              {
+                "sentence": "How much money do you need?"
+              },
+              {
+                "sentence": "Can I give you a piece of advice?"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "She gave me many informations.",
+            "right": "She gave me a lot of information.",
+            "why": "Information is uncountable."
+          },
+          {
+            "wrong": "I have a lot of homeworks.",
+            "right": "I have a lot of homework.",
+            "why": "Homework is uncountable."
+          }
+        ],
+        "practice": [
+          {
+            "id": "cu-1",
+            "type": "mcq",
+            "prompt": "How ___ luggage do you have?",
+            "options": [
+              "many",
+              "much",
+              "a",
+              "few"
+            ],
+            "answer": "much",
+            "explanation": "Luggage is uncountable, so use much."
+          },
+          {
+            "id": "cu-2",
+            "type": "fill",
+            "prompt": "The plural of child is ___.",
+            "answer": [
+              "children"
+            ],
+            "explanation": "Irregular plural."
+          }
+        ]
+      },
+      {
+        "id": "plural-nouns",
+        "topicId": "nouns",
+        "title": "Singular and Plural Nouns",
+        "level": "Beginner",
+        "minutes": 8,
+        "description": "Spelling rules for plural nouns, including -s, -es, -ies and irregular plurals like children and people.",
+        "definition": "A singular noun means one; a plural noun means more than one. Most plurals add -s, but there are some spelling rules and irregular forms.",
+        "rules": [
+          "Most nouns add -s: car → cars.",
+          "Nouns ending in -s, -x, -ch, -sh add -es: bus → buses, box → boxes.",
+          "Consonant + y becomes -ies: city → cities.",
+          "Irregular: man → men, woman → women, child → children, person → people, foot → feet."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "There are three churches in this area."
+              },
+              {
+                "sentence": "Two women and five children are waiting."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "Many peoples came.",
+            "right": "Many people came.",
+            "why": "People is already plural."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pn-1",
+            "type": "fill",
+            "prompt": "One box, two ___.",
+            "answer": [
+              "boxes"
+            ],
+            "explanation": "-x → -es."
+          }
+        ]
+      },
+      {
+        "id": "personal-pronouns",
+        "topicId": "pronouns",
+        "title": "Subject, Object and Possessive Pronouns",
+        "level": "Beginner",
+        "minutes": 10,
+        "description": "Master I/me/my/mine, he/him/his and other pronouns with clear tables and examples.",
+        "definition": "Pronouns replace nouns so we do not repeat them. Their form changes depending on their job in the sentence.",
+        "rules": [
+          "Subject pronouns do the action: I, you, he, she, it, we, they.",
+          "Object pronouns receive the action: me, you, him, her, it, us, them.",
+          "Possessive adjectives come before a noun: my, your, his, her, its, our, their.",
+          "Possessive pronouns stand alone: mine, yours, his, hers, ours, theirs."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "She called me yesterday."
+              },
+              {
+                "sentence": "This is my bag. That one is yours."
+              },
+              {
+                "sentence": "The company changed its logo.",
+                "note": "its has no apostrophe"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "Me and Rahul went shopping.",
+            "right": "Rahul and I went shopping.",
+            "why": "Use the subject pronoun I, and put yourself last."
+          },
+          {
+            "wrong": "The dog wagged it's tail.",
+            "right": "The dog wagged its tail.",
+            "why": "It's means it is."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pr-1",
+            "type": "mcq",
+            "prompt": "This book is ___.",
+            "options": [
+              "my",
+              "me",
+              "mine",
+              "I"
+            ],
+            "answer": "mine",
+            "explanation": "Possessive pronoun stands alone at the end."
+          }
+        ]
+      },
+      {
+        "id": "modal-verbs",
+        "topicId": "verbs",
+        "title": "Modal Verbs: can, should, must",
+        "level": "Beginner",
+        "minutes": 11,
+        "description": "Use can, could, should, must and might for ability, advice, rules and possibility.",
+        "definition": "Modal verbs are helping verbs that add meaning such as ability, permission, advice, obligation or possibility.",
+        "rules": [
+          "A modal is followed by the base verb with no to: She can swim.",
+          "Modals never take -s: He should rest (not shoulds).",
+          "Questions put the modal first: Can you help me?",
+          "Negatives add not: You mustn't smoke here."
+        ],
+        "sections": [
+          {
+            "heading": "Meanings",
+            "examples": [
+              {
+                "sentence": "I can speak three languages.",
+                "note": "ability"
+              },
+              {
+                "sentence": "Could you open the window, please?",
+                "note": "polite request"
+              },
+              {
+                "sentence": "You should drink more water.",
+                "note": "advice"
+              },
+              {
+                "sentence": "Passengers must wear seat belts.",
+                "note": "rule"
+              },
+              {
+                "sentence": "It might rain later.",
+                "note": "possibility"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "She can to drive.",
+            "right": "She can drive.",
+            "why": "No to after a modal."
+          }
+        ],
+        "practice": [
+          {
+            "id": "mv-1",
+            "type": "mcq",
+            "prompt": "You look tired. You ___ go to bed early.",
+            "options": [
+              "should",
+              "can",
+              "might",
+              "would"
+            ],
+            "answer": "should",
+            "explanation": "Should gives advice."
+          }
+        ]
+      },
+      {
+        "id": "irregular-verbs",
+        "topicId": "verbs",
+        "title": "Irregular Verbs You Need First",
+        "level": "Beginner",
+        "minutes": 15,
+        "description": "The 30 most useful irregular verbs with base, past and past participle forms and example sentences.",
+        "definition": "Irregular verbs do not form the past with -ed. You need to learn their past (V2) and past participle (V3) forms.",
+        "rules": [
+          "Learn verbs in groups that change the same way.",
+          "Practise all three forms together: go – went – gone.",
+          "Use V2 for past simple and V3 after have/has/had."
+        ],
+        "sections": [
+          {
+            "heading": "Same in all forms",
+            "body": "cut – cut – cut, put – put – put, let – let – let, cost – cost – cost"
+          },
+          {
+            "heading": "V2 and V3 the same",
+            "body": "buy – bought – bought, teach – taught – taught, find – found – found, make – made – made"
+          },
+          {
+            "heading": "All different",
+            "body": "go – went – gone, eat – ate – eaten, write – wrote – written, speak – spoke – spoken, see – saw – seen"
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "I have wrote the email.",
+            "right": "I have written the email.",
+            "why": "After have, use V3 (written)."
+          }
+        ],
+        "practice": [
+          {
+            "id": "iv-1",
+            "type": "fill",
+            "prompt": "Past participle of “speak”: I have ___ to the manager.",
+            "answer": [
+              "spoken"
+            ],
+            "explanation": "speak – spoke – spoken."
+          }
+        ]
+      },
+      {
+        "id": "comparatives",
+        "topicId": "adjectives",
+        "title": "Comparatives and Superlatives",
+        "level": "Beginner",
+        "minutes": 10,
+        "description": "Compare things with -er/-est and more/most, including irregular forms like better and best.",
+        "definition": "Use comparatives to compare two things and superlatives to compare three or more.",
+        "rules": [
+          "Short adjectives add -er / -est: tall → taller → the tallest.",
+          "Long adjectives use more / most: expensive → more expensive → the most expensive.",
+          "Irregular: good → better → best, bad → worse → worst, far → farther → farthest.",
+          "Use than after a comparative: Delhi is bigger than Pune."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "This phone is cheaper than that one."
+              },
+              {
+                "sentence": "Mount Everest is the highest mountain in the world."
+              },
+              {
+                "sentence": "Her English is better than mine."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "He is more taller than me.",
+            "right": "He is taller than me.",
+            "why": "Don't use more with -er."
+          }
+        ],
+        "practice": [
+          {
+            "id": "ad-1",
+            "type": "mcq",
+            "prompt": "This is the ___ day of my life.",
+            "options": [
+              "good",
+              "better",
+              "best",
+              "most good"
+            ],
+            "answer": "best",
+            "explanation": "Superlative of good is best."
+          }
+        ]
+      },
+      {
+        "id": "adverbs-of-frequency",
+        "topicId": "adverbs",
+        "title": "Adverbs of Frequency",
+        "level": "Beginner",
+        "minutes": 8,
+        "description": "Always, usually, often, sometimes, rarely, never: what they mean and where they go in a sentence.",
+        "definition": "Adverbs of frequency tell us how often something happens.",
+        "rules": [
+          "Put them before the main verb: I often walk to work.",
+          "Put them after be: She is always on time.",
+          "Sometimes can also go at the start: Sometimes I cook."
+        ],
+        "sections": [
+          {
+            "heading": "From 100% to 0%",
+            "body": "always (100%) → usually → often → sometimes → rarely → never (0%)"
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "I go always to the gym.",
+            "right": "I always go to the gym.",
+            "why": "Frequency adverbs go before the main verb."
+          }
+        ],
+        "practice": [
+          {
+            "id": "af-1",
+            "type": "mcq",
+            "prompt": "Choose the correct order.",
+            "options": [
+              "She is late never.",
+              "She never is late.",
+              "She is never late.",
+              "Never she is late."
+            ],
+            "answer": "She is never late.",
+            "explanation": "After the verb be."
+          }
+        ]
+      },
+      {
+        "id": "a-an-the",
+        "topicId": "articles",
+        "title": "A, An and The",
+        "level": "Beginner",
+        "minutes": 10,
+        "description": "Choose between a, an, the and no article using the vowel-sound rule, with examples and common mistakes.",
+        "definition": "A and an mean one or any. The means a specific thing both speakers know about.",
+        "rules": [
+          "Use a before a consonant sound: a book, a university.",
+          "Use an before a vowel sound: an apple, an hour, an MBA.",
+          "Use the for something specific or unique: the sun, the book on the table.",
+          "Use no article for general plurals and uncountables: I love music."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "She is an engineer.",
+                "note": "jobs need a/an"
+              },
+              {
+                "sentence": "I saw a dog. The dog was very friendly.",
+                "note": "first mention a, then the"
+              },
+              {
+                "sentence": "Life is beautiful.",
+                "note": "general idea, no article"
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "He is engineer.",
+            "right": "He is an engineer.",
+            "why": "Jobs need a/an."
+          },
+          {
+            "wrong": "The honesty is important.",
+            "right": "Honesty is important.",
+            "why": "Abstract ideas in general take no article."
+          }
+        ],
+        "practice": [
+          {
+            "id": "ar-1",
+            "type": "mcq",
+            "prompt": "She is ___ honest person.",
+            "options": [
+              "a",
+              "an",
+              "the",
+              "no article"
+            ],
+            "answer": "an",
+            "explanation": "Silent h: an honest."
+          },
+          {
+            "id": "ar-2",
+            "type": "fill",
+            "prompt": "___ sun rises in the east.",
+            "answer": [
+              "the"
+            ],
+            "explanation": "Unique things take the."
+          }
+        ]
+      },
+      {
+        "id": "in-on-at",
+        "topicId": "prepositions",
+        "title": "In, On and At for Time and Place",
+        "level": "Beginner",
+        "minutes": 10,
+        "description": "Learn when to use in, on and at for time and place with a simple big-to-small rule.",
+        "definition": "In, on and at show time and place. Think of them as moving from big (in) to specific (at).",
+        "rules": [
+          "Time: in for months, years, seasons (in May); on for days and dates (on Monday); at for clock times (at 6 p.m.).",
+          "Place: in for enclosed spaces and cities (in the room, in Chennai); on for surfaces (on the table); at for points (at the bus stop).",
+          "Fixed phrases: at night, in the morning, on the weekend (US) / at the weekend (UK)."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "My birthday is on 14 March."
+              },
+              {
+                "sentence": "The meeting is at 3:30."
+              },
+              {
+                "sentence": "She lives in Hyderabad."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "See you in Monday.",
+            "right": "See you on Monday.",
+            "why": "Days take on."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pre-1",
+            "type": "mcq",
+            "prompt": "The class starts ___ 9 o'clock.",
+            "options": [
+              "in",
+              "on",
+              "at",
+              "by"
+            ],
+            "answer": "at",
+            "explanation": "Clock times take at."
+          }
+        ]
+      },
+      {
+        "id": "linking-words",
+        "topicId": "conjunctions",
+        "title": "And, But, So, Because",
+        "level": "Beginner",
+        "minutes": 8,
+        "description": "Join sentences with and, but, so and because to sound more fluent.",
+        "definition": "Conjunctions join words and ideas. These four are the most common in everyday English.",
+        "rules": [
+          "and adds information",
+          "but shows contrast",
+          "so shows a result",
+          "because gives a reason"
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "I was hungry, so I made a sandwich."
+              },
+              {
+                "sentence": "The hotel was small but clean."
+              },
+              {
+                "sentence": "She stayed home because she was ill."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "Because I was tired. I slept early.",
+            "right": "I slept early because I was tired.",
+            "why": "A because-clause needs a main clause."
+          }
+        ],
+        "practice": [
+          {
+            "id": "cj-1",
+            "type": "fill",
+            "prompt": "It was raining, ___ we took an umbrella.",
+            "answer": [
+              "so"
+            ],
+            "explanation": "Result → so."
+          }
+        ]
+      },
+      {
+        "id": "word-order",
+        "topicId": "sentence-formation",
+        "title": "Basic Word Order (S + V + O)",
+        "level": "Beginner",
+        "minutes": 9,
+        "description": "Build correct English sentences with subject–verb–object order, and form negatives and questions.",
+        "definition": "Most English sentences follow Subject + Verb + Object. Place and time usually come at the end.",
+        "rules": [
+          "Statement: Ravi drinks tea every morning.",
+          "Negative: Ravi doesn't drink tea.",
+          "Yes/No question: Does Ravi drink tea?",
+          "Wh- question: What does Ravi drink?"
+        ],
+        "sections": [
+          {
+            "heading": "Order of extra information",
+            "body": "Subject + Verb + Object + Place + Time: I met my friends at the café yesterday."
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "Where you are going?",
+            "right": "Where are you going?",
+            "why": "In questions, the helping verb comes before the subject."
+          }
+        ],
+        "practice": [
+          {
+            "id": "wo-1",
+            "type": "mcq",
+            "prompt": "Choose the correct sentence.",
+            "options": [
+              "I every day read the newspaper.",
+              "I read the newspaper every day.",
+              "Read I the newspaper every day.",
+              "The newspaper I read every day."
+            ],
+            "answer": "I read the newspaper every day.",
+            "explanation": "S + V + O + time."
+          }
+        ]
+      },
+      {
+        "id": "passive-voice-basics",
+        "topicId": "active-passive",
+        "title": "Passive Voice Basics",
+        "level": "Intermediate",
+        "minutes": 13,
+        "description": "Learn how to form the passive voice in different tenses and when to use it.",
+        "definition": "In the passive voice, the object of the action becomes the subject. We use it when the action is more important than who did it.",
+        "rules": [
+          "Form: be + past participle (V3).",
+          "Present: The rooms are cleaned every day.",
+          "Past: The bridge was built in 1990.",
+          "Add by + doer only when it is important: The novel was written by R. K. Narayan."
+        ],
+        "sections": [
+          {
+            "heading": "Active → Passive",
+            "examples": [
+              {
+                "sentence": "Active: Someone stole my bike. → Passive: My bike was stolen."
+              },
+              {
+                "sentence": "Active: They will announce the results. → Passive: The results will be announced."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "The letter was wrote yesterday.",
+            "right": "The letter was written yesterday.",
+            "why": "Use V3 after be."
+          }
+        ],
+        "practice": [
+          {
+            "id": "pv-1",
+            "type": "fill",
+            "prompt": "English ___ (speak) all over the world.",
+            "answer": [
+              "is spoken"
+            ],
+            "explanation": "Present passive: is + spoken."
+          }
+        ]
+      },
+      {
+        "id": "reported-statements",
+        "topicId": "direct-indirect",
+        "title": "Reported Statements",
+        "level": "Advanced",
+        "minutes": 14,
+        "description": "Change direct speech to indirect speech with the right tense shifts and pronoun changes.",
+        "definition": "Indirect (reported) speech tells someone what another person said, without quoting their exact words.",
+        "rules": [
+          "The tense usually moves one step back: am → was, will → would, has done → had done.",
+          "Pronouns change to fit the reporter: “I am tired,” she said → She said she was tired.",
+          "Time words change: today → that day, tomorrow → the next day.",
+          "Say + (that); tell + person + (that)."
+        ],
+        "sections": [
+          {
+            "heading": "Examples",
+            "examples": [
+              {
+                "sentence": "“I live in Goa.” → He said he lived in Goa."
+              },
+              {
+                "sentence": "“I will call you.” → She told me she would call me."
+              }
+            ]
+          }
+        ],
+        "mistakes": [
+          {
+            "wrong": "He said me that he was busy.",
+            "right": "He told me that he was busy.",
+            "why": "Tell takes a person; say does not."
+          }
+        ],
+        "practice": [
+          {
+            "id": "rs-1",
+            "type": "mcq",
+            "prompt": "“I am hungry,” said Arjun. → Arjun said that he ___ hungry.",
+            "options": [
+              "is",
+              "was",
+              "were",
+              "has been"
+            ],
+            "answer": "was",
+            "explanation": "am → was."
+          }
+        ]
+      }
+    ],
+    "vocabularyWords": [
+      {
+        "id": "errand",
+        "word": "errand",
+        "pronunciation": "/ˈer.ənd/",
+        "partOfSpeech": "noun",
+        "meaning": "A short trip to do a small job, such as buying something or posting a letter.",
+        "examples": [
+          "I need to run a few errands before dinner.",
+          "She sent her son on an errand to the pharmacy."
+        ],
+        "synonyms": [
+          "task",
+          "chore"
+        ],
+        "antonyms": [],
+        "related": [
+          "chore",
+          "to-do list",
+          "run errands"
+        ],
+        "level": "Beginner",
+        "category": "Daily English"
+      },
+      {
+        "id": "commute",
+        "word": "commute",
+        "pronunciation": "/kəˈmjuːt/",
+        "partOfSpeech": "verb",
+        "meaning": "To travel regularly between your home and your place of work or study.",
+        "examples": [
+          "I commute to the office by metro.",
+          "His daily commute takes an hour each way."
+        ],
+        "synonyms": [
+          "travel",
+          "journey"
+        ],
+        "antonyms": [],
+        "related": [
+          "commuter",
+          "rush hour",
+          "local train"
+        ],
+        "level": "Beginner",
+        "category": "Daily English"
+      },
+      {
+        "id": "punctual",
+        "word": "punctual",
+        "pronunciation": "/ˈpʌŋk.tʃu.əl/",
+        "partOfSpeech": "adjective",
+        "meaning": "Arriving or doing something at exactly the expected time.",
+        "examples": [
+          "Our teacher is always punctual.",
+          "Please be punctual for the interview."
+        ],
+        "synonyms": [
+          "on time",
+          "prompt"
+        ],
+        "antonyms": [
+          "late",
+          "unpunctual"
+        ],
+        "related": [
+          "punctuality",
+          "deadline",
+          "schedule"
+        ],
+        "level": "Intermediate",
+        "category": "Daily English"
+      },
+      {
+        "id": "negotiate",
+        "word": "negotiate",
+        "pronunciation": "/nəˈɡəʊ.ʃi.eɪt/",
+        "partOfSpeech": "verb",
+        "meaning": "To discuss something formally in order to reach an agreement.",
+        "examples": [
+          "We negotiated a better price with the supplier.",
+          "The union is negotiating a new contract."
+        ],
+        "synonyms": [
+          "bargain",
+          "discuss"
+        ],
+        "antonyms": [
+          "dictate"
+        ],
+        "related": [
+          "negotiation",
+          "deal",
+          "compromise"
+        ],
+        "level": "Intermediate",
+        "category": "Business"
+      },
+      {
+        "id": "revenue",
+        "word": "revenue",
+        "pronunciation": "/ˈrev.ən.juː/",
+        "partOfSpeech": "noun",
+        "meaning": "The total income a company receives from its business activities.",
+        "examples": [
+          "The company's revenue grew by 20% this year.",
+          "Advertising is their main source of revenue."
+        ],
+        "synonyms": [
+          "income",
+          "earnings"
+        ],
+        "antonyms": [
+          "expenditure"
+        ],
+        "related": [
+          "profit",
+          "turnover",
+          "quarter"
+        ],
+        "level": "Advanced",
+        "category": "Business"
+      },
+      {
+        "id": "deadline",
+        "word": "deadline",
+        "pronunciation": "/ˈded.laɪn/",
+        "partOfSpeech": "noun",
+        "meaning": "The latest time or date by which something must be finished.",
+        "examples": [
+          "The deadline for applications is 30 June.",
+          "We worked late to meet the deadline."
+        ],
+        "synonyms": [
+          "due date",
+          "time limit"
+        ],
+        "antonyms": [],
+        "related": [
+          "extension",
+          "submit",
+          "on time"
+        ],
+        "level": "Beginner",
+        "category": "Business"
+      },
+      {
+        "id": "itinerary",
+        "word": "itinerary",
+        "pronunciation": "/aɪˈtɪn.ər.ər.i/",
+        "partOfSpeech": "noun",
+        "meaning": "A detailed plan of a journey, including places and times.",
+        "examples": [
+          "Our itinerary includes two days in Udaipur.",
+          "The travel agent emailed me the itinerary."
+        ],
+        "synonyms": [
+          "schedule",
+          "route"
+        ],
+        "antonyms": [],
+        "related": [
+          "booking",
+          "sightseeing",
+          "trip"
+        ],
+        "level": "Intermediate",
+        "category": "Travel"
+      },
+      {
+        "id": "luggage",
+        "word": "luggage",
+        "pronunciation": "/ˈlʌɡ.ɪdʒ/",
+        "partOfSpeech": "noun",
+        "meaning": "The bags and suitcases you carry when you travel.",
+        "examples": [
+          "Please do not leave your luggage unattended.",
+          "How much luggage can I take on the flight?"
+        ],
+        "synonyms": [
+          "baggage",
+          "bags"
+        ],
+        "antonyms": [],
+        "related": [
+          "suitcase",
+          "check-in",
+          "carry-on"
+        ],
+        "level": "Beginner",
+        "category": "Travel"
+      },
+      {
+        "id": "destination",
+        "word": "destination",
+        "pronunciation": "/ˌdes.tɪˈneɪ.ʃən/",
+        "partOfSpeech": "noun",
+        "meaning": "The place someone is travelling to.",
+        "examples": [
+          "Goa is a popular holiday destination.",
+          "We reached our destination after six hours."
+        ],
+        "synonyms": [
+          "end point",
+          "goal"
+        ],
+        "antonyms": [
+          "origin",
+          "starting point"
+        ],
+        "related": [
+          "journey",
+          "arrive",
+          "route"
+        ],
+        "level": "Beginner",
+        "category": "Travel"
+      },
+      {
+        "id": "curriculum",
+        "word": "curriculum",
+        "pronunciation": "/kəˈrɪk.jə.ləm/",
+        "partOfSpeech": "noun",
+        "meaning": "The subjects and content taught in a school, college or course.",
+        "examples": [
+          "Coding is now part of the school curriculum.",
+          "The curriculum covers grammar and speaking."
+        ],
+        "synonyms": [
+          "syllabus",
+          "programme"
+        ],
+        "antonyms": [],
+        "related": [
+          "subject",
+          "module",
+          "lesson plan"
+        ],
+        "level": "Intermediate",
+        "category": "Education"
+      },
+      {
+        "id": "revise",
+        "word": "revise",
+        "pronunciation": "/rɪˈvaɪz/",
+        "partOfSpeech": "verb",
+        "meaning": "To study again something you have already learned, especially before an exam.",
+        "examples": [
+          "I need to revise for my English test.",
+          "She revises a little every evening."
+        ],
+        "synonyms": [
+          "review",
+          "go over"
+        ],
+        "antonyms": [
+          "neglect"
+        ],
+        "related": [
+          "revision",
+          "exam",
+          "notes"
+        ],
+        "level": "Beginner",
+        "category": "Education"
+      },
+      {
+        "id": "diligent",
+        "word": "diligent",
+        "pronunciation": "/ˈdɪl.ɪ.dʒənt/",
+        "partOfSpeech": "adjective",
+        "meaning": "Showing care and steady effort in your work or studies.",
+        "examples": [
+          "Diligent students practise every day.",
+          "He is a diligent and reliable employee."
+        ],
+        "synonyms": [
+          "hard-working",
+          "careful"
+        ],
+        "antonyms": [
+          "lazy",
+          "careless"
+        ],
+        "related": [
+          "diligence",
+          "effort",
+          "dedication"
+        ],
+        "level": "Advanced",
+        "category": "Education"
+      },
+      {
+        "id": "delicious",
+        "word": "delicious",
+        "pronunciation": "/dɪˈlɪʃ.əs/",
+        "partOfSpeech": "adjective",
+        "meaning": "Having a very pleasant taste or smell.",
+        "examples": [
+          "This biryani is delicious!",
+          "The bakery sells delicious cakes."
+        ],
+        "synonyms": [
+          "tasty",
+          "mouth-watering"
+        ],
+        "antonyms": [
+          "tasteless",
+          "bland"
+        ],
+        "related": [
+          "flavour",
+          "recipe",
+          "taste"
+        ],
+        "level": "Beginner",
+        "category": "Food"
+      },
+      {
+        "id": "ingredient",
+        "word": "ingredient",
+        "pronunciation": "/ɪnˈɡriː.di.ənt/",
+        "partOfSpeech": "noun",
+        "meaning": "One of the foods used to make a dish.",
+        "examples": [
+          "The main ingredients are rice, lentils and spices.",
+          "Check the ingredients if you have an allergy."
+        ],
+        "synonyms": [
+          "component",
+          "element"
+        ],
+        "antonyms": [],
+        "related": [
+          "recipe",
+          "spice",
+          "measure"
+        ],
+        "level": "Intermediate",
+        "category": "Food"
+      },
+      {
+        "id": "appetite",
+        "word": "appetite",
+        "pronunciation": "/ˈæp.ɪ.taɪt/",
+        "partOfSpeech": "noun",
+        "meaning": "The feeling of wanting to eat.",
+        "examples": [
+          "Walking in the fresh air gave me an appetite.",
+          "He has lost his appetite since he got sick."
+        ],
+        "synonyms": [
+          "hunger"
+        ],
+        "antonyms": [
+          "fullness"
+        ],
+        "related": [
+          "appetiser",
+          "craving",
+          "hungry"
+        ],
+        "level": "Intermediate",
+        "category": "Food"
+      },
+      {
+        "id": "download",
+        "word": "download",
+        "pronunciation": "/ˌdaʊnˈləʊd/",
+        "partOfSpeech": "verb",
+        "meaning": "To copy data or a file from the internet to your device.",
+        "examples": [
+          "Download the app to practise offline.",
+          "The file is too large to download."
+        ],
+        "synonyms": [
+          "save",
+          "transfer"
+        ],
+        "antonyms": [
+          "upload"
+        ],
+        "related": [
+          "install",
+          "file",
+          "update"
+        ],
+        "level": "Beginner",
+        "category": "Technology"
+      },
+      {
+        "id": "device",
+        "word": "device",
+        "pronunciation": "/dɪˈvaɪs/",
+        "partOfSpeech": "noun",
+        "meaning": "A machine or tool made for a particular purpose, such as a phone or tablet.",
+        "examples": [
+          "Please switch off all electronic devices.",
+          "You can use English-Bridgeway on any device."
+        ],
+        "synonyms": [
+          "gadget",
+          "appliance"
+        ],
+        "antonyms": [],
+        "related": [
+          "smartphone",
+          "tablet",
+          "charger"
+        ],
+        "level": "Beginner",
+        "category": "Technology"
+      },
+      {
+        "id": "innovative",
+        "word": "innovative",
+        "pronunciation": "/ˈɪn.ə.veɪ.tɪv/",
+        "partOfSpeech": "adjective",
+        "meaning": "Using new methods or ideas.",
+        "examples": [
+          "The startup has an innovative approach to learning.",
+          "We need innovative solutions to this problem."
+        ],
+        "synonyms": [
+          "creative",
+          "original"
+        ],
+        "antonyms": [
+          "traditional",
+          "conventional"
+        ],
+        "related": [
+          "innovation",
+          "invent",
+          "technology"
+        ],
+        "level": "Advanced",
+        "category": "Technology"
+      },
+      {
+        "id": "grateful",
+        "word": "grateful",
+        "pronunciation": "/ˈɡreɪt.fəl/",
+        "partOfSpeech": "adjective",
+        "meaning": "Feeling or showing thanks for something someone has done.",
+        "examples": [
+          "I'm grateful for your help.",
+          "We are grateful to all our volunteers."
+        ],
+        "synonyms": [
+          "thankful",
+          "appreciative"
+        ],
+        "antonyms": [
+          "ungrateful"
+        ],
+        "related": [
+          "gratitude",
+          "thank",
+          "appreciate"
+        ],
+        "level": "Beginner",
+        "category": "Emotions"
+      },
+      {
+        "id": "anxious",
+        "word": "anxious",
+        "pronunciation": "/ˈæŋk.ʃəs/",
+        "partOfSpeech": "adjective",
+        "meaning": "Worried and nervous about something that might happen.",
+        "examples": [
+          "She felt anxious before her interview.",
+          "Don't be anxious; you're well prepared."
+        ],
+        "synonyms": [
+          "nervous",
+          "worried"
+        ],
+        "antonyms": [
+          "calm",
+          "relaxed"
+        ],
+        "related": [
+          "anxiety",
+          "stress",
+          "tense"
+        ],
+        "level": "Intermediate",
+        "category": "Emotions"
+      },
+      {
+        "id": "overwhelmed",
+        "word": "overwhelmed",
+        "pronunciation": "/ˌəʊ.vəˈwelmd/",
+        "partOfSpeech": "adjective",
+        "meaning": "Feeling that you have too much to deal with.",
+        "examples": [
+          "I felt overwhelmed by the amount of work.",
+          "She was overwhelmed with joy at the news."
+        ],
+        "synonyms": [
+          "swamped",
+          "overcome"
+        ],
+        "antonyms": [
+          "unaffected"
+        ],
+        "related": [
+          "overwhelming",
+          "pressure",
+          "burnout"
+        ],
+        "level": "Advanced",
+        "category": "Emotions"
+      },
+      {
+        "id": "sibling",
+        "word": "sibling",
+        "pronunciation": "/ˈsɪb.lɪŋ/",
+        "partOfSpeech": "noun",
+        "meaning": "A brother or sister.",
+        "examples": [
+          "I have two siblings, a brother and a sister.",
+          "Siblings often argue but stay close."
+        ],
+        "synonyms": [
+          "brother or sister"
+        ],
+        "antonyms": [],
+        "related": [
+          "twin",
+          "cousin",
+          "relative"
+        ],
+        "level": "Beginner",
+        "category": "Family"
+      },
+      {
+        "id": "in-laws",
+        "word": "in-laws",
+        "pronunciation": "/ˈɪn.lɔːz/",
+        "partOfSpeech": "noun",
+        "meaning": "The parents and relatives of your husband or wife.",
+        "examples": [
+          "We're visiting my in-laws this weekend.",
+          "She gets along well with her in-laws."
+        ],
+        "synonyms": [
+          "relatives by marriage"
+        ],
+        "antonyms": [],
+        "related": [
+          "mother-in-law",
+          "spouse",
+          "wedding"
+        ],
+        "level": "Intermediate",
+        "category": "Family"
+      },
+      {
+        "id": "upbringing",
+        "word": "upbringing",
+        "pronunciation": "/ˈʌpˌbrɪŋ.ɪŋ/",
+        "partOfSpeech": "noun",
+        "meaning": "The way a child is cared for and taught while growing up.",
+        "examples": [
+          "He had a strict but loving upbringing.",
+          "Our upbringing shapes our values."
+        ],
+        "synonyms": [
+          "childhood",
+          "raising"
+        ],
+        "antonyms": [],
+        "related": [
+          "raise",
+          "parenting",
+          "values"
+        ],
+        "level": "Advanced",
+        "category": "Family"
+      },
+      {
+        "id": "colleague",
+        "word": "colleague",
+        "pronunciation": "/ˈkɒl.iːɡ/",
+        "partOfSpeech": "noun",
+        "meaning": "A person you work with.",
+        "examples": [
+          "My colleague helped me with the presentation.",
+          "I had lunch with a few colleagues."
+        ],
+        "synonyms": [
+          "co-worker",
+          "teammate"
+        ],
+        "antonyms": [],
+        "related": [
+          "team",
+          "manager",
+          "office"
+        ],
+        "level": "Beginner",
+        "category": "Work"
+      },
+      {
+        "id": "promotion",
+        "word": "promotion",
+        "pronunciation": "/prəˈməʊ.ʃən/",
+        "partOfSpeech": "noun",
+        "meaning": "A move to a higher position or rank at work.",
+        "examples": [
+          "She got a promotion after two years.",
+          "Hard work led to his promotion."
+        ],
+        "synonyms": [
+          "advancement",
+          "upgrade"
+        ],
+        "antonyms": [
+          "demotion"
+        ],
+        "related": [
+          "appraisal",
+          "raise",
+          "career"
+        ],
+        "level": "Intermediate",
+        "category": "Work"
+      },
+      {
+        "id": "delegate",
+        "word": "delegate",
+        "pronunciation": "/ˈdel.ɪ.ɡeɪt/",
+        "partOfSpeech": "verb",
+        "meaning": "To give part of your work or responsibility to someone else.",
+        "examples": [
+          "A good manager knows how to delegate.",
+          "I delegated the report to my assistant."
+        ],
+        "synonyms": [
+          "assign",
+          "entrust"
+        ],
+        "antonyms": [
+          "retain"
+        ],
+        "related": [
+          "delegation",
+          "responsibility",
+          "team lead"
+        ],
+        "level": "Advanced",
+        "category": "Work"
+      }
+    ],
+    "spokenLessons": [
+      {
+        "id": "introducing-yourself",
+        "category": "Introductions",
+        "title": "Introducing Yourself",
+        "level": "Beginner",
+        "minutes": 8,
+        "situation": "Meeting a new classmate on the first day of an English course.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Priya",
+            "text": "Hi, what's your name?"
+          },
+          {
+            "speaker": "B",
+            "name": "Rahul",
+            "text": "Hi, my name is Rahul. Nice to meet you."
+          },
+          {
+            "speaker": "A",
+            "name": "Priya",
+            "text": "Nice to meet you too. I'm Priya. Where are you from?"
+          },
+          {
+            "speaker": "B",
+            "name": "Rahul",
+            "text": "I'm from Nashik, but I live in Pune now. I work as a software tester."
+          },
+          {
+            "speaker": "A",
+            "name": "Priya",
+            "text": "Oh, interesting! Why are you learning English?"
+          },
+          {
+            "speaker": "B",
+            "name": "Rahul",
+            "text": "I want to speak more confidently in meetings. How about you?"
+          },
+          {
+            "speaker": "A",
+            "name": "Priya",
+            "text": "I'm preparing for job interviews. I hope we can practise together!"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Nice to meet you.",
+            "meaning": "A polite thing to say when you meet someone for the first time."
+          },
+          {
+            "phrase": "I'm from … but I live in … now.",
+            "meaning": "Say where you grew up and where you live."
+          },
+          {
+            "phrase": "I work as a …",
+            "meaning": "Say your job."
+          },
+          {
+            "phrase": "How about you?",
+            "meaning": "Return the question to keep the conversation going."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "confidently",
+            "meaning": "without feeling nervous"
+          },
+          {
+            "phrase": "prepare for",
+            "meaning": "get ready for"
+          }
+        ],
+        "activity": [
+          "Record a 30-second introduction with your name, city, job or studies and one hobby.",
+          "Replace “Myself Rahul” with “I'm Rahul” every time you introduce yourself this week."
+        ]
+      },
+      {
+        "id": "greeting-friends",
+        "category": "Greetings",
+        "title": "Greeting People at Different Times",
+        "level": "Beginner",
+        "minutes": 6,
+        "situation": "Meeting a neighbour in the morning and an old friend in the evening.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Mrs Kulkarni",
+            "text": "Good morning, Aman! Off to college?"
+          },
+          {
+            "speaker": "B",
+            "name": "Aman",
+            "text": "Good morning, aunty! Yes, I have an early class today."
+          },
+          {
+            "speaker": "A",
+            "name": "Mrs Kulkarni",
+            "text": "Have a good day!"
+          },
+          {
+            "speaker": "B",
+            "name": "Aman",
+            "text": "Thank you, you too!"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Good morning / afternoon / evening.",
+            "meaning": "Formal greetings by time of day."
+          },
+          {
+            "phrase": "Long time no see!",
+            "meaning": "Informal: you haven't met for a long time."
+          },
+          {
+            "phrase": "How's it going?",
+            "meaning": "Casual way to ask how someone is."
+          },
+          {
+            "phrase": "Have a good day!",
+            "meaning": "A friendly way to say goodbye."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "neighbour",
+            "meaning": "a person who lives near you"
+          }
+        ],
+        "activity": [
+          "Greet three people today using a different greeting each time.",
+          "Remember: “Good night” is only for saying goodbye at night."
+        ]
+      },
+      {
+        "id": "calling-a-clinic",
+        "category": "Phone Conversations",
+        "title": "Booking a Doctor's Appointment",
+        "level": "Beginner",
+        "minutes": 9,
+        "situation": "Calling a clinic to book an appointment.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Receptionist",
+            "text": "Good afternoon, City Clinic. How can I help you?"
+          },
+          {
+            "speaker": "B",
+            "name": "Sunil",
+            "text": "Hello, I'd like to book an appointment with Dr Mehta, please."
+          },
+          {
+            "speaker": "A",
+            "name": "Receptionist",
+            "text": "Sure. May I know who's calling?"
+          },
+          {
+            "speaker": "B",
+            "name": "Sunil",
+            "text": "This is Sunil Rao."
+          },
+          {
+            "speaker": "A",
+            "name": "Receptionist",
+            "text": "Thank you, Mr Rao. Is Thursday at 11 a.m. okay for you?"
+          },
+          {
+            "speaker": "B",
+            "name": "Sunil",
+            "text": "Yes, that works. Thanks a lot."
+          },
+          {
+            "speaker": "A",
+            "name": "Receptionist",
+            "text": "You're welcome. See you on Thursday. Goodbye!"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "I'd like to book an appointment.",
+            "meaning": "Polite way to ask for a time to visit."
+          },
+          {
+            "phrase": "May I know who's calling?",
+            "meaning": "Polite way to ask the caller's name."
+          },
+          {
+            "phrase": "This is …",
+            "meaning": "How you say your name on the phone."
+          },
+          {
+            "phrase": "Could you hold for a moment?",
+            "meaning": "Please wait on the line."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "appointment",
+            "meaning": "a fixed time to meet someone"
+          },
+          {
+            "phrase": "reschedule",
+            "meaning": "change to another time"
+          }
+        ],
+        "activity": [
+          "Role-play the call with a friend. Swap roles.",
+          "Practise saying your phone number in pairs of digits: 98-76-54-32-10."
+        ]
+      },
+      {
+        "id": "buying-clothes",
+        "category": "Shopping",
+        "title": "Buying Clothes",
+        "level": "Beginner",
+        "minutes": 8,
+        "situation": "Shopping for a shirt in a clothing store.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Shopkeeper",
+            "text": "Hello! Are you looking for anything in particular?"
+          },
+          {
+            "speaker": "B",
+            "name": "Neha",
+            "text": "Yes, I'm looking for a cotton shirt. Do you have this in medium?"
+          },
+          {
+            "speaker": "A",
+            "name": "Shopkeeper",
+            "text": "Yes, here you go. The trial room is on the left."
+          },
+          {
+            "speaker": "B",
+            "name": "Neha",
+            "text": "It fits well. How much is it?"
+          },
+          {
+            "speaker": "A",
+            "name": "Shopkeeper",
+            "text": "It's 899 rupees."
+          },
+          {
+            "speaker": "B",
+            "name": "Neha",
+            "text": "Is there any discount? Okay, I'll take it. Can I pay by UPI?"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Do you have this in …?",
+            "meaning": "Ask for another size or colour."
+          },
+          {
+            "phrase": "How much is it? / How much are these?",
+            "meaning": "Ask the price (singular / plural)."
+          },
+          {
+            "phrase": "I'll take it.",
+            "meaning": "I decide to buy it."
+          },
+          {
+            "phrase": "Can I pay by card / UPI?",
+            "meaning": "Ask about payment."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "trial room",
+            "meaning": "a room in a shop to try clothes (also: fitting room)"
+          },
+          {
+            "phrase": "discount",
+            "meaning": "a lower price"
+          }
+        ],
+        "activity": [
+          "Next time you shop, ask one question in English.",
+          "Write five sentences asking for different sizes and colours."
+        ]
+      },
+      {
+        "id": "ordering-food",
+        "category": "Restaurant",
+        "title": "Ordering Food at a Restaurant",
+        "level": "Beginner",
+        "minutes": 8,
+        "situation": "Ordering dinner and asking for the bill.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Waiter",
+            "text": "Good evening! Are you ready to order?"
+          },
+          {
+            "speaker": "B",
+            "name": "Karan",
+            "text": "Yes, could I have the paneer tikka and two butter rotis, please?"
+          },
+          {
+            "speaker": "A",
+            "name": "Waiter",
+            "text": "Sure. Anything to drink?"
+          },
+          {
+            "speaker": "B",
+            "name": "Karan",
+            "text": "A fresh lime soda, please. Not too sweet."
+          },
+          {
+            "speaker": "A",
+            "name": "Waiter",
+            "text": "Of course. It'll be ready in fifteen minutes."
+          },
+          {
+            "speaker": "B",
+            "name": "Karan",
+            "text": "Thanks. And could we get the bill after that?"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Could I have …, please?",
+            "meaning": "Polite way to order."
+          },
+          {
+            "phrase": "What do you recommend?",
+            "meaning": "Ask for a suggestion."
+          },
+          {
+            "phrase": "Not too spicy / sweet, please.",
+            "meaning": "Ask for a change."
+          },
+          {
+            "phrase": "Could we get the bill, please?",
+            "meaning": "Ask to pay."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "starter",
+            "meaning": "a small dish before the main course"
+          },
+          {
+            "phrase": "bill",
+            "meaning": "the paper that shows how much to pay (US: check)"
+          }
+        ],
+        "activity": [
+          "Practise ordering your favourite meal out loud.",
+          "Learn the names of five dishes in English."
+        ]
+      },
+      {
+        "id": "at-the-airport",
+        "category": "Travel",
+        "title": "Checking In at the Airport",
+        "level": "Intermediate",
+        "minutes": 9,
+        "situation": "Checking in for a domestic flight.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Agent",
+            "text": "Good morning. May I see your ID and booking, please?"
+          },
+          {
+            "speaker": "B",
+            "name": "Meera",
+            "text": "Here you are. I'm flying to Bengaluru."
+          },
+          {
+            "speaker": "A",
+            "name": "Agent",
+            "text": "Thank you. Do you have any bags to check in?"
+          },
+          {
+            "speaker": "B",
+            "name": "Meera",
+            "text": "Just this one suitcase. Could I have a window seat, please?"
+          },
+          {
+            "speaker": "A",
+            "name": "Agent",
+            "text": "Yes. Here's your boarding pass. Boarding starts at 9:15 from gate 22."
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "I'm flying to …",
+            "meaning": "Say your destination."
+          },
+          {
+            "phrase": "Could I have a window / aisle seat?",
+            "meaning": "Ask for a seat."
+          },
+          {
+            "phrase": "Which gate do I go to?",
+            "meaning": "Ask for directions in the airport."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "boarding pass",
+            "meaning": "the ticket you show to get on the plane"
+          },
+          {
+            "phrase": "check in",
+            "meaning": "register for a flight or hotel"
+          }
+        ],
+        "activity": [
+          "Write your own check-in dialogue for a train journey.",
+          "Practise saying times: 9:15 = nine fifteen / quarter past nine."
+        ]
+      },
+      {
+        "id": "team-meeting",
+        "category": "Office English",
+        "title": "Speaking Up in a Team Meeting",
+        "level": "Intermediate",
+        "minutes": 10,
+        "situation": "Sharing an update and asking for help in a weekly meeting.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Manager",
+            "text": "Okay, let's start. Anjali, could you give us a quick update?"
+          },
+          {
+            "speaker": "B",
+            "name": "Anjali",
+            "text": "Sure. The design is complete, and we're testing it this week."
+          },
+          {
+            "speaker": "A",
+            "name": "Manager",
+            "text": "Great. Any blockers?"
+          },
+          {
+            "speaker": "B",
+            "name": "Anjali",
+            "text": "Yes, we're waiting for the final content. Could someone share it by Wednesday?"
+          },
+          {
+            "speaker": "A",
+            "name": "Manager",
+            "text": "I'll follow up on that today. Thanks, Anjali."
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Could you give us a quick update?",
+            "meaning": "Ask for progress."
+          },
+          {
+            "phrase": "We're on track.",
+            "meaning": "Work is going as planned."
+          },
+          {
+            "phrase": "I'll follow up on that.",
+            "meaning": "I will check and take action."
+          },
+          {
+            "phrase": "Could I add something?",
+            "meaning": "Politely join the discussion."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "blocker",
+            "meaning": "something stopping progress"
+          },
+          {
+            "phrase": "deadline",
+            "meaning": "the latest time to finish"
+          }
+        ],
+        "activity": [
+          "Prepare a three-sentence update about your work or studies.",
+          "Say it out loud and time yourself: aim for 30 seconds."
+        ]
+      },
+      {
+        "id": "tell-me-about-yourself",
+        "category": "Interview English",
+        "title": "Answering “Tell Me About Yourself”",
+        "level": "Intermediate",
+        "minutes": 12,
+        "situation": "The first question in a job interview.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Interviewer",
+            "text": "Thanks for coming in. Could you tell me a little about yourself?"
+          },
+          {
+            "speaker": "B",
+            "name": "Rohit",
+            "text": "Of course. I'm a commerce graduate with two years of experience in customer support."
+          },
+          {
+            "speaker": "B",
+            "name": "Rohit",
+            "text": "In my current role, I handle about forty customer queries a day and train new team members."
+          },
+          {
+            "speaker": "B",
+            "name": "Rohit",
+            "text": "I'm now looking for a role where I can grow into team leadership, which is why this position interests me."
+          },
+          {
+            "speaker": "A",
+            "name": "Interviewer",
+            "text": "That's a clear summary. What do you enjoy most about support work?"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "I'm a … with … years of experience in …",
+            "meaning": "Open with who you are professionally."
+          },
+          {
+            "phrase": "In my current role, I …",
+            "meaning": "Describe what you do now."
+          },
+          {
+            "phrase": "I'm now looking for …",
+            "meaning": "Explain your goal."
+          },
+          {
+            "phrase": "That's why this position interests me.",
+            "meaning": "Connect your goal to the job."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "graduate",
+            "meaning": "a person with a university degree"
+          },
+          {
+            "phrase": "query",
+            "meaning": "a question or request"
+          }
+        ],
+        "activity": [
+          "Write your answer using the Past → Present → Future structure.",
+          "Practise until you can say it in about one minute without reading."
+        ]
+      },
+      {
+        "id": "asking-for-directions",
+        "category": "Asking Questions",
+        "title": "Asking for Directions",
+        "level": "Beginner",
+        "minutes": 7,
+        "situation": "Finding a metro station in a new city.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Tourist",
+            "text": "Excuse me, could you tell me how to get to the metro station?"
+          },
+          {
+            "speaker": "B",
+            "name": "Local",
+            "text": "Sure. Go straight and take the second left. It's next to the bank."
+          },
+          {
+            "speaker": "A",
+            "name": "Tourist",
+            "text": "Is it far from here?"
+          },
+          {
+            "speaker": "B",
+            "name": "Local",
+            "text": "No, it's about a five-minute walk."
+          },
+          {
+            "speaker": "A",
+            "name": "Tourist",
+            "text": "Thank you so much!"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Excuse me, could you tell me …?",
+            "meaning": "Polite way to start a question to a stranger."
+          },
+          {
+            "phrase": "How do I get to …?",
+            "meaning": "Ask the way."
+          },
+          {
+            "phrase": "Is it far from here?",
+            "meaning": "Ask about distance."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "go straight",
+            "meaning": "continue in the same direction"
+          },
+          {
+            "phrase": "opposite",
+            "meaning": "on the other side, facing"
+          }
+        ],
+        "activity": [
+          "Give directions from your home to the nearest shop in English."
+        ]
+      },
+      {
+        "id": "polite-requests",
+        "category": "Making Requests",
+        "title": "Making Polite Requests",
+        "level": "Beginner",
+        "minutes": 7,
+        "situation": "Asking a colleague for help.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Divya",
+            "text": "Hi Arjun, could you do me a favour?"
+          },
+          {
+            "speaker": "B",
+            "name": "Arjun",
+            "text": "Sure, what do you need?"
+          },
+          {
+            "speaker": "A",
+            "name": "Divya",
+            "text": "Would you mind checking this email before I send it?"
+          },
+          {
+            "speaker": "B",
+            "name": "Arjun",
+            "text": "Not at all. Send it over."
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "Could you …?",
+            "meaning": "Polite request."
+          },
+          {
+            "phrase": "Would you mind + verb-ing?",
+            "meaning": "Very polite request."
+          },
+          {
+            "phrase": "Not at all.",
+            "meaning": "Answer to “Would you mind…?” meaning yes, I'll help."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "do someone a favour",
+            "meaning": "help someone"
+          }
+        ],
+        "activity": [
+          "Change five direct commands (“Send me the file”) into polite requests."
+        ]
+      },
+      {
+        "id": "giving-opinions",
+        "category": "Expressing Opinions",
+        "title": "Giving Your Opinion",
+        "level": "Intermediate",
+        "minutes": 9,
+        "situation": "Discussing online and offline classes with a friend.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Sana",
+            "text": "What do you think about online classes?"
+          },
+          {
+            "speaker": "B",
+            "name": "Vikram",
+            "text": "In my opinion, they're convenient, but I miss talking to classmates."
+          },
+          {
+            "speaker": "A",
+            "name": "Sana",
+            "text": "I see your point. Personally, I prefer a mix of both."
+          },
+          {
+            "speaker": "B",
+            "name": "Vikram",
+            "text": "That makes sense. Recorded lessons are great for revision."
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "In my opinion, …",
+            "meaning": "Introduce your view."
+          },
+          {
+            "phrase": "I see your point, but …",
+            "meaning": "Disagree politely."
+          },
+          {
+            "phrase": "That makes sense.",
+            "meaning": "Agree with a reason."
+          },
+          {
+            "phrase": "Personally, I prefer …",
+            "meaning": "Give a personal preference."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "convenient",
+            "meaning": "easy and suitable"
+          }
+        ],
+        "activity": [
+          "Give your opinion on three topics: social media, working from home, learning with apps."
+        ]
+      },
+      {
+        "id": "small-talk-weather",
+        "category": "Daily Conversations",
+        "title": "Small Talk About the Weather",
+        "level": "Beginner",
+        "minutes": 6,
+        "situation": "Chatting with a colleague while waiting for the lift.",
+        "dialogue": [
+          {
+            "speaker": "A",
+            "name": "Pooja",
+            "text": "It's so humid today, isn't it?"
+          },
+          {
+            "speaker": "B",
+            "name": "Nikhil",
+            "text": "Yes, it is! I think it'll rain this evening."
+          },
+          {
+            "speaker": "A",
+            "name": "Pooja",
+            "text": "I hope so. The heat has been unbearable this week."
+          },
+          {
+            "speaker": "B",
+            "name": "Nikhil",
+            "text": "Don't forget your umbrella, then!"
+          }
+        ],
+        "phrases": [
+          {
+            "phrase": "…, isn't it?",
+            "meaning": "A question tag that invites agreement."
+          },
+          {
+            "phrase": "I think it'll rain.",
+            "meaning": "Make a prediction."
+          },
+          {
+            "phrase": "I hope so.",
+            "meaning": "Say you want something to happen."
+          }
+        ],
+        "vocabulary": [
+          {
+            "phrase": "humid",
+            "meaning": "hot and wet air"
+          },
+          {
+            "phrase": "unbearable",
+            "meaning": "too unpleasant to accept"
+          }
+        ],
+        "activity": [
+          "Start one small-talk conversation in English today."
+        ]
+      }
+    ],
+    "quizCategories": [
+      {
+        "id": "grammar",
+        "title": "Grammar",
+        "description": "Mixed questions on nouns, pronouns, verbs and adjectives.",
+        "icon": "BookOpen"
+      },
+      {
+        "id": "vocabulary",
+        "title": "Vocabulary",
+        "description": "Meanings, synonyms and opposites of useful words.",
+        "icon": "Languages"
+      },
+      {
+        "id": "tenses",
+        "title": "Tenses",
+        "description": "Present, past and future forms in real sentences.",
+        "icon": "Clock"
+      },
+      {
+        "id": "articles",
+        "title": "Articles",
+        "description": "A, an, the or no article?",
+        "icon": "Type"
+      },
+      {
+        "id": "prepositions",
+        "title": "Prepositions",
+        "description": "In, on, at, for, since and more.",
+        "icon": "MapPin"
+      },
+      {
+        "id": "sentence-making",
+        "title": "Sentence Making",
+        "description": "Word order, questions, negatives and linking words.",
+        "icon": "AlignLeft"
+      },
+      {
+        "id": "spoken-english",
+        "title": "Spoken English",
+        "description": "Choose the most natural thing to say.",
+        "icon": "MessagesSquare"
+      }
+    ],
+    "quizzes": [
+      {
+        "id": "grammar-essentials",
+        "categoryId": "grammar",
+        "title": "Grammar Essentials",
+        "level": "Beginner",
+        "minutes": 8,
+        "questions": [
+          {
+            "id": "q1",
+            "type": "mcq",
+            "prompt": "She ___ to school every day.",
+            "options": [
+              "go",
+              "goes",
+              "going",
+              "gone"
+            ],
+            "answer": "goes",
+            "explanation": "Present simple with she adds -es: she goes."
+          },
+          {
+            "id": "q2",
+            "type": "fill",
+            "prompt": "I ___ a student.",
+            "answer": [
+              "am"
+            ],
+            "explanation": "With I, the verb be is am."
+          },
+          {
+            "id": "q3",
+            "type": "mcq",
+            "prompt": "This bag is ___.",
+            "options": [
+              "my",
+              "me",
+              "mine",
+              "I"
+            ],
+            "answer": "mine",
+            "explanation": "A possessive pronoun stands alone: mine."
+          },
+          {
+            "id": "q4",
+            "type": "mcq",
+            "prompt": "Which word is an adjective?",
+            "options": [
+              "quickly",
+              "beautiful",
+              "run",
+              "happiness"
+            ],
+            "answer": "beautiful",
+            "explanation": "Adjectives describe nouns: a beautiful garden."
+          },
+          {
+            "id": "q5",
+            "type": "fill",
+            "prompt": "The plural of “woman” is ___.",
+            "answer": [
+              "women"
+            ],
+            "explanation": "Irregular plural: woman → women."
+          },
+          {
+            "id": "q6",
+            "type": "mcq",
+            "prompt": "He ___ swim very well.",
+            "options": [
+              "can",
+              "cans",
+              "can to",
+              "is can"
+            ],
+            "answer": "can",
+            "explanation": "Modal verbs take no -s and no to."
+          },
+          {
+            "id": "q7",
+            "type": "mcq",
+            "prompt": "Rahul and ___ went to the market.",
+            "options": [
+              "me",
+              "I",
+              "myself",
+              "mine"
+            ],
+            "answer": "I",
+            "explanation": "Use the subject pronoun I in the subject position."
+          },
+          {
+            "id": "q8",
+            "type": "fill",
+            "prompt": "My house is ___ (big) than yours.",
+            "answer": [
+              "bigger"
+            ],
+            "explanation": "Short adjective + -er; double the final consonant: bigger."
+          },
+          {
+            "id": "q9",
+            "type": "mcq",
+            "prompt": "Choose the correct sentence.",
+            "options": [
+              "She don't like tea.",
+              "She doesn't likes tea.",
+              "She doesn't like tea.",
+              "She not like tea."
+            ],
+            "answer": "She doesn't like tea.",
+            "explanation": "Negative: does not + base verb."
+          },
+          {
+            "id": "q10",
+            "type": "mcq",
+            "prompt": "How ___ information do you need?",
+            "options": [
+              "many",
+              "much",
+              "few",
+              "a"
+            ],
+            "answer": "much",
+            "explanation": "Information is uncountable."
+          }
+        ]
+      },
+      {
+        "id": "everyday-words",
+        "categoryId": "vocabulary",
+        "title": "Everyday Words",
+        "level": "Beginner",
+        "minutes": 7,
+        "questions": [
+          {
+            "id": "q11",
+            "type": "mcq",
+            "prompt": "“Punctual” means…",
+            "options": [
+              "very polite",
+              "always on time",
+              "very fast",
+              "hard-working"
+            ],
+            "answer": "always on time",
+            "explanation": "A punctual person arrives at the expected time."
+          },
+          {
+            "id": "q12",
+            "type": "mcq",
+            "prompt": "The opposite of “delicious” is…",
+            "options": [
+              "tasty",
+              "bland",
+              "sweet",
+              "spicy"
+            ],
+            "answer": "bland",
+            "explanation": "Bland means without much flavour."
+          },
+          {
+            "id": "q13",
+            "type": "fill",
+            "prompt": "A detailed plan for a trip is an ___.",
+            "answer": [
+              "itinerary"
+            ],
+            "explanation": "Itinerary: places and times for a journey."
+          },
+          {
+            "id": "q14",
+            "type": "mcq",
+            "prompt": "Choose the synonym of “grateful”.",
+            "options": [
+              "angry",
+              "thankful",
+              "tired",
+              "proud"
+            ],
+            "answer": "thankful",
+            "explanation": "Grateful and thankful mean the same."
+          },
+          {
+            "id": "q15",
+            "type": "fill",
+            "prompt": "A brother or sister is called a ___.",
+            "answer": [
+              "sibling"
+            ],
+            "explanation": "Sibling is a neutral word for brother or sister."
+          },
+          {
+            "id": "q16",
+            "type": "mcq",
+            "prompt": "A person you work with is a…",
+            "options": [
+              "neighbour",
+              "colleague",
+              "relative",
+              "customer"
+            ],
+            "answer": "colleague",
+            "explanation": "Colleague = co-worker."
+          },
+          {
+            "id": "q17",
+            "type": "mcq",
+            "prompt": "The opposite of “download” is…",
+            "options": [
+              "install",
+              "upload",
+              "delete",
+              "save"
+            ],
+            "answer": "upload",
+            "explanation": "Upload = send from your device to the internet."
+          },
+          {
+            "id": "q18",
+            "type": "fill",
+            "prompt": "I felt ___ (worried and nervous) before the exam.",
+            "answer": [
+              "anxious",
+              "nervous"
+            ],
+            "explanation": "Anxious means worried and nervous."
+          },
+          {
+            "id": "q19",
+            "type": "mcq",
+            "prompt": "To study again before an exam is to…",
+            "options": [
+              "revise",
+              "remove",
+              "relax",
+              "repeat"
+            ],
+            "answer": "revise",
+            "explanation": "In British and Indian English, revise means study again."
+          },
+          {
+            "id": "q20",
+            "type": "mcq",
+            "prompt": "Which word means “a move to a higher job”?",
+            "options": [
+              "promotion",
+              "deadline",
+              "meeting",
+              "salary"
+            ],
+            "answer": "promotion",
+            "explanation": "Promotion = advancement at work."
+          }
+        ]
+      },
+      {
+        "id": "present-tenses",
+        "categoryId": "tenses",
+        "title": "Present Tenses",
+        "level": "Beginner",
+        "minutes": 8,
+        "questions": [
+          {
+            "id": "q21",
+            "type": "mcq",
+            "prompt": "Look! The children ___ in the garden.",
+            "options": [
+              "play",
+              "played",
+              "are playing",
+              "have played"
+            ],
+            "answer": "are playing",
+            "explanation": "“Look!” shows the action is happening now."
+          },
+          {
+            "id": "q22",
+            "type": "fill",
+            "prompt": "My father ___ (read) the newspaper every morning.",
+            "answer": [
+              "reads"
+            ],
+            "explanation": "Habit with he/she: reads."
+          },
+          {
+            "id": "q23",
+            "type": "mcq",
+            "prompt": "I ___ my homework already.",
+            "options": [
+              "finish",
+              "finished",
+              "have finished",
+              "am finishing"
+            ],
+            "answer": "have finished",
+            "explanation": "Already goes with the present perfect."
+          },
+          {
+            "id": "q24",
+            "type": "mcq",
+            "prompt": "Water ___ at 100°C.",
+            "options": [
+              "boil",
+              "boils",
+              "is boiling",
+              "boiled"
+            ],
+            "answer": "boils",
+            "explanation": "General truth: present simple."
+          },
+          {
+            "id": "q25",
+            "type": "fill",
+            "prompt": "We ___ (live) here since 2015.",
+            "answer": [
+              "have lived",
+              "have been living",
+              "'ve lived"
+            ],
+            "explanation": "Since + point in time → present perfect."
+          },
+          {
+            "id": "q26",
+            "type": "mcq",
+            "prompt": "___ she work on Saturdays?",
+            "options": [
+              "Do",
+              "Does",
+              "Is",
+              "Has"
+            ],
+            "answer": "Does",
+            "explanation": "Question with she: Does + base verb."
+          },
+          {
+            "id": "q27",
+            "type": "mcq",
+            "prompt": "I ___ understand this word.",
+            "options": [
+              "am not",
+              "don't",
+              "doesn't",
+              "not"
+            ],
+            "answer": "don't",
+            "explanation": "Negative with I: do not."
+          },
+          {
+            "id": "q28",
+            "type": "fill",
+            "prompt": "Please be quiet. The baby ___ (sleep).",
+            "answer": [
+              "is sleeping",
+              "'s sleeping"
+            ],
+            "explanation": "Happening now: present continuous."
+          }
+        ]
+      },
+      {
+        "id": "past-and-future",
+        "categoryId": "tenses",
+        "title": "Past and Future",
+        "level": "Intermediate",
+        "minutes": 8,
+        "questions": [
+          {
+            "id": "q29",
+            "type": "fill",
+            "prompt": "Yesterday he ___ (buy) a new phone.",
+            "answer": [
+              "bought"
+            ],
+            "explanation": "Buy is irregular: bought."
+          },
+          {
+            "id": "q30",
+            "type": "mcq",
+            "prompt": "We ___ a movie when the power went out.",
+            "options": [
+              "watched",
+              "were watching",
+              "are watching",
+              "watch"
+            ],
+            "answer": "were watching",
+            "explanation": "Interrupted past action → past continuous."
+          },
+          {
+            "id": "q31",
+            "type": "mcq",
+            "prompt": "By next June, I ___ here for five years.",
+            "options": [
+              "will work",
+              "will have worked",
+              "work",
+              "am working"
+            ],
+            "answer": "will have worked",
+            "explanation": "By + future time → future perfect."
+          },
+          {
+            "id": "q32",
+            "type": "fill",
+            "prompt": "Don't worry, I ___ (call) you tomorrow.",
+            "answer": [
+              "will call",
+              "'ll call"
+            ],
+            "explanation": "Promise about the future → will."
+          },
+          {
+            "id": "q33",
+            "type": "mcq",
+            "prompt": "___ you go to the party last night?",
+            "options": [
+              "Do",
+              "Did",
+              "Have",
+              "Were"
+            ],
+            "answer": "Did",
+            "explanation": "Past simple question: Did + base verb."
+          },
+          {
+            "id": "q34",
+            "type": "mcq",
+            "prompt": "The train ___ before we reached the station.",
+            "options": [
+              "left",
+              "had left",
+              "has left",
+              "leaves"
+            ],
+            "answer": "had left",
+            "explanation": "Earlier of two past actions → past perfect."
+          },
+          {
+            "id": "q35",
+            "type": "fill",
+            "prompt": "Look at those clouds. It ___ (rain).",
+            "answer": [
+              "is going to rain",
+              "'s going to rain"
+            ],
+            "explanation": "Prediction from evidence → going to."
+          },
+          {
+            "id": "q36",
+            "type": "mcq",
+            "prompt": "I ___ dinner at 8 p.m. yesterday.",
+            "options": [
+              "was having",
+              "am having",
+              "have had",
+              "will have"
+            ],
+            "answer": "was having",
+            "explanation": "In progress at a past time → past continuous."
+          }
+        ]
+      },
+      {
+        "id": "articles-basics",
+        "categoryId": "articles",
+        "title": "A, An or The?",
+        "level": "Beginner",
+        "minutes": 6,
+        "questions": [
+          {
+            "id": "q37",
+            "type": "mcq",
+            "prompt": "I saw ___ elephant at the zoo.",
+            "options": [
+              "a",
+              "an",
+              "the",
+              "no article"
+            ],
+            "answer": "an",
+            "explanation": "Vowel sound → an."
+          },
+          {
+            "id": "q38",
+            "type": "mcq",
+            "prompt": "She is ___ honest person.",
+            "options": [
+              "a",
+              "an",
+              "the",
+              "no article"
+            ],
+            "answer": "an",
+            "explanation": "The h is silent: an honest."
+          },
+          {
+            "id": "q39",
+            "type": "fill",
+            "prompt": "He wants to be ___ engineer.",
+            "answer": [
+              "an"
+            ],
+            "explanation": "Engineer starts with a vowel sound."
+          },
+          {
+            "id": "q40",
+            "type": "mcq",
+            "prompt": "___ sun rises in the east.",
+            "options": [
+              "A",
+              "An",
+              "The",
+              "No article"
+            ],
+            "answer": "The",
+            "explanation": "Unique things take the."
+          },
+          {
+            "id": "q41",
+            "type": "mcq",
+            "prompt": "My brother studies at ___ university in Delhi.",
+            "options": [
+              "a",
+              "an",
+              "the",
+              "no article"
+            ],
+            "answer": "a",
+            "explanation": "University begins with a “you” sound."
+          },
+          {
+            "id": "q42",
+            "type": "mcq",
+            "prompt": "I love ___ music.",
+            "options": [
+              "a",
+              "an",
+              "the",
+              "no article"
+            ],
+            "answer": "no article",
+            "explanation": "Music in general takes no article."
+          },
+          {
+            "id": "q43",
+            "type": "fill",
+            "prompt": "Can you close ___ door, please?",
+            "answer": [
+              "the"
+            ],
+            "explanation": "Both people know which door."
+          },
+          {
+            "id": "q44",
+            "type": "mcq",
+            "prompt": "He has ___ MBA from Pune.",
+            "options": [
+              "a",
+              "an",
+              "the",
+              "no article"
+            ],
+            "answer": "an",
+            "explanation": "MBA begins with the sound “em”."
+          }
+        ]
+      },
+      {
+        "id": "time-and-place",
+        "categoryId": "prepositions",
+        "title": "Time and Place",
+        "level": "Beginner",
+        "minutes": 6,
+        "questions": [
+          {
+            "id": "q45",
+            "type": "mcq",
+            "prompt": "The class starts ___ 9 o'clock.",
+            "options": [
+              "in",
+              "on",
+              "at",
+              "by"
+            ],
+            "answer": "at",
+            "explanation": "Clock times take at."
+          },
+          {
+            "id": "q46",
+            "type": "mcq",
+            "prompt": "My birthday is ___ 14 March.",
+            "options": [
+              "in",
+              "on",
+              "at",
+              "of"
+            ],
+            "answer": "on",
+            "explanation": "Dates take on."
+          },
+          {
+            "id": "q47",
+            "type": "fill",
+            "prompt": "She was born ___ 1998.",
+            "answer": [
+              "in"
+            ],
+            "explanation": "Years take in."
+          },
+          {
+            "id": "q48",
+            "type": "mcq",
+            "prompt": "The keys are ___ the table.",
+            "options": [
+              "in",
+              "on",
+              "at",
+              "over"
+            ],
+            "answer": "on",
+            "explanation": "Surfaces take on."
+          },
+          {
+            "id": "q49",
+            "type": "mcq",
+            "prompt": "I've known him ___ ten years.",
+            "options": [
+              "since",
+              "for",
+              "from",
+              "by"
+            ],
+            "answer": "for",
+            "explanation": "A period of time takes for."
+          },
+          {
+            "id": "q50",
+            "type": "fill",
+            "prompt": "Wait for me ___ the bus stop.",
+            "answer": [
+              "at"
+            ],
+            "explanation": "A point or location takes at."
+          },
+          {
+            "id": "q51",
+            "type": "mcq",
+            "prompt": "We usually go out ___ the weekend.",
+            "options": [
+              "in",
+              "on",
+              "at",
+              "by"
+            ],
+            "answer": "at",
+            "explanation": "British/Indian English: at the weekend (US: on the weekend)."
+          },
+          {
+            "id": "q52",
+            "type": "mcq",
+            "prompt": "He has worked here ___ 2020.",
+            "options": [
+              "for",
+              "since",
+              "in",
+              "from"
+            ],
+            "answer": "since",
+            "explanation": "A starting point in time takes since."
+          }
+        ]
+      },
+      {
+        "id": "build-sentences",
+        "categoryId": "sentence-making",
+        "title": "Build Correct Sentences",
+        "level": "Beginner",
+        "minutes": 7,
+        "questions": [
+          {
+            "id": "q53",
+            "type": "mcq",
+            "prompt": "Choose the correct word order.",
+            "options": [
+              "Coffee I drink every morning.",
+              "I drink coffee every morning.",
+              "I every morning drink coffee.",
+              "Drink I coffee every morning."
+            ],
+            "answer": "I drink coffee every morning.",
+            "explanation": "Subject + Verb + Object + Time."
+          },
+          {
+            "id": "q54",
+            "type": "mcq",
+            "prompt": "Make it a question: “She lives in Chennai.”",
+            "options": [
+              "She lives in Chennai?",
+              "Does she live in Chennai?",
+              "Does she lives in Chennai?",
+              "Lives she in Chennai?"
+            ],
+            "answer": "Does she live in Chennai?",
+            "explanation": "Does + subject + base verb."
+          },
+          {
+            "id": "q55",
+            "type": "fill",
+            "prompt": "Make it negative: “They play cricket.” → They ___ play cricket.",
+            "answer": [
+              "don't",
+              "do not"
+            ],
+            "explanation": "do not / don't + base verb."
+          },
+          {
+            "id": "q56",
+            "type": "mcq",
+            "prompt": "Which question is correct?",
+            "options": [
+              "Where you are going?",
+              "Where are you going?",
+              "Where you going are?",
+              "Where going you are?"
+            ],
+            "answer": "Where are you going?",
+            "explanation": "Wh- word + helping verb + subject + main verb."
+          },
+          {
+            "id": "q57",
+            "type": "fill",
+            "prompt": "I was tired, ___ I went to bed early.",
+            "answer": [
+              "so"
+            ],
+            "explanation": "So shows a result."
+          },
+          {
+            "id": "q58",
+            "type": "mcq",
+            "prompt": "I wanted to go out, ___ it was raining.",
+            "options": [
+              "because",
+              "so",
+              "but",
+              "and"
+            ],
+            "answer": "but",
+            "explanation": "But shows contrast."
+          },
+          {
+            "id": "q59",
+            "type": "mcq",
+            "prompt": "Choose the best sentence.",
+            "options": [
+              "Because I was late. I took a taxi.",
+              "I took a taxi because I was late.",
+              "I took a taxi. Because late.",
+              "Because late I took taxi."
+            ],
+            "answer": "I took a taxi because I was late.",
+            "explanation": "A because-clause must join a main clause."
+          }
+        ]
+      },
+      {
+        "id": "natural-replies",
+        "categoryId": "spoken-english",
+        "title": "Natural Replies",
+        "level": "Beginner",
+        "minutes": 6,
+        "questions": [
+          {
+            "id": "q60",
+            "type": "mcq",
+            "prompt": "Someone asks “How are you?” The most natural reply is…",
+            "options": [
+              "I am fine, and you?",
+              "Yes, I am.",
+              "I am good at English.",
+              "Thank you, bye."
+            ],
+            "answer": "I am fine, and you?",
+            "explanation": "Answer briefly and return the question."
+          },
+          {
+            "id": "q61",
+            "type": "mcq",
+            "prompt": "On the phone, how do you politely ask who is calling?",
+            "options": [
+              "Who are you?",
+              "May I know who's calling, please?",
+              "Tell your name.",
+              "What is your good name?"
+            ],
+            "answer": "May I know who's calling, please?",
+            "explanation": "Polite and natural."
+          },
+          {
+            "id": "q62",
+            "type": "fill",
+            "prompt": "In a shop: “How much ___ this shirt?”",
+            "answer": [
+              "is"
+            ],
+            "explanation": "Singular: How much is…?"
+          },
+          {
+            "id": "q63",
+            "type": "mcq",
+            "prompt": "Which is the best way to introduce yourself?",
+            "options": [
+              "Myself Rahul.",
+              "I'm Rahul. Nice to meet you.",
+              "Me Rahul.",
+              "Rahul is my name, I am."
+            ],
+            "answer": "I'm Rahul. Nice to meet you.",
+            "explanation": "“Myself Rahul” is a common mistake."
+          },
+          {
+            "id": "q64",
+            "type": "mcq",
+            "prompt": "You didn't hear what someone said. You say…",
+            "options": [
+              "What?",
+              "Sorry, could you say that again?",
+              "Repeat.",
+              "Again tell."
+            ],
+            "answer": "Sorry, could you say that again?",
+            "explanation": "Polite way to ask for repetition."
+          },
+          {
+            "id": "q65",
+            "type": "mcq",
+            "prompt": "Someone says “Thank you so much!” You reply…",
+            "options": [
+              "Okay.",
+              "You're welcome.",
+              "Yes.",
+              "Same to you."
+            ],
+            "answer": "You're welcome.",
+            "explanation": "Standard reply to thanks."
+          },
+          {
+            "id": "q66",
+            "type": "fill",
+            "prompt": "“Would you mind opening the window?” “Not at ___.”",
+            "answer": [
+              "all"
+            ],
+            "explanation": "“Not at all” means you're happy to help."
+          },
+          {
+            "id": "q67",
+            "type": "mcq",
+            "prompt": "To ask for a lower price politely, you might say…",
+            "options": [
+              "Give less.",
+              "Is there any discount?",
+              "Price is wrong.",
+              "Make it cheap."
+            ],
+            "answer": "Is there any discount?",
+            "explanation": "Polite and common in shops."
+          }
+        ]
+      }
+    ],
+    "courses": [
+      {
+        "id": "beginner-english",
+        "title": "Beginner English",
+        "description": "Start from the basics and finish able to introduce yourself, talk about your day and handle simple conversations with confidence.",
+        "level": "Beginner",
+        "duration": "30 Days",
+        "lessons": 40,
+        "icon": "Sprout",
+        "rating": 4.8,
+        "students": 12480,
+        "instructor": {
+          "name": "Ananya Deshpande",
+          "title": "CELTA-certified English trainer, 9 years teaching"
+        },
+        "outcomes": [
+          "Introduce yourself and talk about family, work and hobbies",
+          "Use the present simple and present continuous correctly",
+          "Ask and answer everyday questions",
+          "Understand slow, clear spoken English",
+          "Build a core vocabulary of 300 everyday words",
+          "Write short messages and emails"
+        ],
+        "curriculum": [
+          {
+            "title": "Week 1 · First steps",
+            "lessons": [
+              {
+                "title": "Greetings and goodbyes",
+                "minutes": 8,
+                "href": "/spoken-english/greeting-friends"
+              },
+              {
+                "title": "Introducing yourself",
+                "minutes": 8,
+                "href": "/spoken-english/introducing-yourself"
+              },
+              {
+                "title": "Singular and plural nouns",
+                "minutes": 8,
+                "href": "/grammar/nouns/plural-nouns"
+              },
+              {
+                "title": "A, an and the",
+                "minutes": 10,
+                "href": "/grammar/articles/a-an-the"
+              }
+            ]
+          },
+          {
+            "title": "Week 2 · My daily life",
+            "lessons": [
+              {
+                "title": "Present simple tense",
+                "minutes": 12,
+                "href": "/grammar/tenses/present-simple"
+              },
+              {
+                "title": "Adverbs of frequency",
+                "minutes": 8,
+                "href": "/grammar/adverbs/adverbs-of-frequency"
+              },
+              {
+                "title": "Small talk about the weather",
+                "minutes": 6,
+                "href": "/spoken-english/small-talk-weather"
+              },
+              {
+                "title": "Daily English vocabulary",
+                "minutes": 10,
+                "href": "/vocabulary"
+              }
+            ]
+          },
+          {
+            "title": "Week 3 · Right now",
+            "lessons": [
+              {
+                "title": "Present continuous tense",
+                "minutes": 10,
+                "href": "/grammar/tenses/present-continuous"
+              },
+              {
+                "title": "Pronouns: I, me, my, mine",
+                "minutes": 10,
+                "href": "/grammar/pronouns/personal-pronouns"
+              },
+              {
+                "title": "Asking for directions",
+                "minutes": 7,
+                "href": "/spoken-english/asking-for-directions"
+              }
+            ]
+          },
+          {
+            "title": "Week 4 · Out and about",
+            "lessons": [
+              {
+                "title": "Shopping for clothes",
+                "minutes": 8,
+                "href": "/spoken-english/buying-clothes"
+              },
+              {
+                "title": "Ordering food",
+                "minutes": 8,
+                "href": "/spoken-english/ordering-food"
+              },
+              {
+                "title": "Final quiz",
+                "minutes": 8,
+                "href": "/quiz/grammar/grammar-essentials"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "spoken-english-30-days",
+        "title": "Spoken English in 30 Days",
+        "description": "One speaking task every day built around real situations: greetings, phone calls, shopping, meetings and interviews.",
+        "level": "Beginner",
+        "duration": "30 Days",
+        "lessons": 30,
+        "price": 499,
+        "icon": "Mic",
+        "rating": 4.9,
+        "students": 18230,
+        "instructor": {
+          "name": "Rohan Mathew",
+          "title": "Communication coach and former BPO trainer"
+        },
+        "outcomes": [
+          "Start and keep a conversation going",
+          "Speak on the phone politely and clearly",
+          "Order, shop and travel in English",
+          "Share updates in work meetings",
+          "Answer common interview questions",
+          "Reduce hesitation with daily shadowing practice"
+        ],
+        "curriculum": [
+          {
+            "title": "Days 1–7 · Everyday basics",
+            "lessons": [
+              {
+                "title": "Greetings",
+                "minutes": 6,
+                "href": "/spoken-english/greeting-friends"
+              },
+              {
+                "title": "Introducing yourself",
+                "minutes": 8,
+                "href": "/spoken-english/introducing-yourself"
+              },
+              {
+                "title": "Small talk",
+                "minutes": 6,
+                "href": "/spoken-english/small-talk-weather"
+              },
+              {
+                "title": "Making polite requests",
+                "minutes": 7,
+                "href": "/spoken-english/polite-requests"
+              }
+            ]
+          },
+          {
+            "title": "Days 8–14 · Out and about",
+            "lessons": [
+              {
+                "title": "Asking for directions",
+                "minutes": 7,
+                "href": "/spoken-english/asking-for-directions"
+              },
+              {
+                "title": "Shopping",
+                "minutes": 8,
+                "href": "/spoken-english/buying-clothes"
+              },
+              {
+                "title": "At a restaurant",
+                "minutes": 8,
+                "href": "/spoken-english/ordering-food"
+              },
+              {
+                "title": "At the airport",
+                "minutes": 9,
+                "href": "/spoken-english/at-the-airport"
+              }
+            ]
+          },
+          {
+            "title": "Days 15–21 · Phone and office",
+            "lessons": [
+              {
+                "title": "Booking an appointment",
+                "minutes": 9,
+                "href": "/spoken-english/calling-a-clinic"
+              },
+              {
+                "title": "Team meetings",
+                "minutes": 10,
+                "href": "/spoken-english/team-meeting"
+              },
+              {
+                "title": "Giving opinions",
+                "minutes": 9,
+                "href": "/spoken-english/giving-opinions"
+              }
+            ]
+          },
+          {
+            "title": "Days 22–30 · Confidence",
+            "lessons": [
+              {
+                "title": "Tell me about yourself",
+                "minutes": 12,
+                "href": "/spoken-english/tell-me-about-yourself"
+              },
+              {
+                "title": "Spoken English quiz",
+                "minutes": 6,
+                "href": "/quiz/spoken-english/natural-replies"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "grammar-basics",
+        "title": "Grammar Basics",
+        "description": "The grammar that makes the biggest difference to how correct you sound, explained simply with a quiz after every unit.",
+        "level": "Beginner",
+        "duration": "20 Days",
+        "lessons": 25,
+        "icon": "BookOpenCheck",
+        "rating": 4.7,
+        "students": 9640,
+        "instructor": {
+          "name": "Ananya Deshpande",
+          "title": "CELTA-certified English trainer, 9 years teaching"
+        },
+        "outcomes": [
+          "Choose the right tense for past, present and future",
+          "Use articles and prepositions correctly",
+          "Form questions and negatives without mistakes",
+          "Use modal verbs for advice, ability and rules",
+          "Join ideas with linking words",
+          "Spot and fix the most common grammar errors"
+        ],
+        "curriculum": [
+          {
+            "title": "Unit 1 · Words",
+            "lessons": [
+              {
+                "title": "Countable and uncountable nouns",
+                "minutes": 10,
+                "href": "/grammar/nouns/countable-uncountable"
+              },
+              {
+                "title": "Pronouns",
+                "minutes": 10,
+                "href": "/grammar/pronouns/personal-pronouns"
+              },
+              {
+                "title": "Articles",
+                "minutes": 10,
+                "href": "/grammar/articles/a-an-the"
+              }
+            ]
+          },
+          {
+            "title": "Unit 2 · Tenses",
+            "lessons": [
+              {
+                "title": "Present simple",
+                "minutes": 12,
+                "href": "/grammar/tenses/present-simple"
+              },
+              {
+                "title": "Present continuous",
+                "minutes": 10,
+                "href": "/grammar/tenses/present-continuous"
+              },
+              {
+                "title": "Past simple",
+                "minutes": 12,
+                "href": "/grammar/tenses/past-simple"
+              },
+              {
+                "title": "Present perfect",
+                "minutes": 14,
+                "href": "/grammar/tenses/present-perfect"
+              }
+            ]
+          },
+          {
+            "title": "Unit 3 · Building sentences",
+            "lessons": [
+              {
+                "title": "Word order",
+                "minutes": 9,
+                "href": "/grammar/sentence-formation/word-order"
+              },
+              {
+                "title": "Linking words",
+                "minutes": 8,
+                "href": "/grammar/conjunctions/linking-words"
+              },
+              {
+                "title": "In, on and at",
+                "minutes": 10,
+                "href": "/grammar/prepositions/in-on-at"
+              },
+              {
+                "title": "Unit quiz",
+                "minutes": 8,
+                "href": "/quiz/tenses/present-tenses"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "vocabulary-mastery",
+        "title": "English Vocabulary Mastery",
+        "description": "Learn 1,000 high-frequency words by theme, with pronunciation, collocations and spaced review so the words stay with you.",
+        "level": "Intermediate",
+        "duration": "30 Days",
+        "lessons": 50,
+        "icon": "Library",
+        "rating": 4.8,
+        "students": 7315,
+        "instructor": {
+          "name": "Farah Khan",
+          "title": "Lexicographer and IELTS vocabulary specialist"
+        },
+        "outcomes": [
+          "Learn words in themes: work, travel, food, emotions and more",
+          "Pronounce new words with correct stress",
+          "Use synonyms and opposites to vary your speech",
+          "Remember words with spaced review",
+          "Understand common collocations like “make a decision”",
+          "Describe feelings and opinions precisely"
+        ],
+        "curriculum": [
+          {
+            "title": "Week 1 · Daily life",
+            "lessons": [
+              {
+                "title": "Daily English words",
+                "minutes": 10,
+                "href": "/vocabulary"
+              },
+              {
+                "title": "Family words",
+                "minutes": 10,
+                "href": "/vocabulary/sibling"
+              },
+              {
+                "title": "Food words",
+                "minutes": 10,
+                "href": "/vocabulary/ingredient"
+              }
+            ]
+          },
+          {
+            "title": "Week 2 · Work and study",
+            "lessons": [
+              {
+                "title": "Workplace words",
+                "minutes": 10,
+                "href": "/vocabulary/colleague"
+              },
+              {
+                "title": "Business words",
+                "minutes": 10,
+                "href": "/vocabulary/negotiate"
+              },
+              {
+                "title": "Education words",
+                "minutes": 10,
+                "href": "/vocabulary/curriculum"
+              }
+            ]
+          },
+          {
+            "title": "Week 3 · Feelings and ideas",
+            "lessons": [
+              {
+                "title": "Emotion words",
+                "minutes": 10,
+                "href": "/vocabulary/anxious"
+              },
+              {
+                "title": "Technology words",
+                "minutes": 10,
+                "href": "/vocabulary/innovative"
+              },
+              {
+                "title": "Vocabulary quiz",
+                "minutes": 7,
+                "href": "/quiz/vocabulary/everyday-words"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "blogPosts": [
+      {
+        "slug": "10-common-english-mistakes",
+        "title": "10 Common English Mistakes You Should Avoid",
+        "excerpt": "From “Myself Rahul” to “discuss about”, these everyday errors are easy to fix once you know the correct version.",
+        "category": "Common Mistakes",
+        "author": "Ananya Deshpande",
+        "date": "2026-10-02",
+        "readingMinutes": 6,
+        "cover": {
+          "from": "#0f3d3e",
+          "to": "#1f6e70",
+          "icon": "AlertTriangle"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "Many common mistakes come from translating directly from Hindi, Marathi, Tamil or other languages. The good news: once you notice them, they are easy to fix. Here are ten we hear every week, with the correct version."
+          },
+          {
+            "type": "pairs",
+            "items": [
+              {
+                "term": "Myself Priya. → I'm Priya.",
+                "detail": "“Myself” is not used to introduce yourself. Say “I'm Priya” or “My name is Priya”."
+              },
+              {
+                "term": "We discussed about the plan. → We discussed the plan.",
+                "detail": "Discuss already includes the meaning of “about”."
+              },
+              {
+                "term": "I am having two brothers. → I have two brothers.",
+                "detail": "Have (for possession) is a state verb and isn't used in the continuous."
+              },
+              {
+                "term": "He is elder than me. → He is older than me.",
+                "detail": "Use elder only before a noun: my elder brother."
+              },
+              {
+                "term": "I will revert back. → I will get back to you.",
+                "detail": "Revert means return to a previous state; “back” repeats the meaning."
+              },
+              {
+                "term": "Today morning → This morning",
+                "detail": "We say this morning, this afternoon, tonight."
+              },
+              {
+                "term": "She is knowing French. → She knows French.",
+                "detail": "Know is a state verb."
+              },
+              {
+                "term": "Return back the book. → Return the book.",
+                "detail": "Return already means give back."
+              },
+              {
+                "term": "I passed out of college in 2020. → I graduated in 2020.",
+                "detail": "“Pass out” usually means to faint!"
+              },
+              {
+                "term": "What is your good name? → May I know your name?",
+                "detail": "“Good name” is a direct translation and sounds unusual to most English speakers."
+              }
+            ]
+          },
+          {
+            "type": "tip",
+            "text": "Pick two mistakes from this list each week and listen for them in your own speech. Correct yourself out loud."
+          }
+        ]
+      },
+      {
+        "slug": "50-useful-daily-phrases",
+        "title": "50 Useful English Phrases for Daily Conversation",
+        "excerpt": "Ready-to-use phrases for greetings, small talk, requests, agreeing, disagreeing and saying goodbye.",
+        "category": "Spoken English",
+        "author": "Rohan Mathew",
+        "date": "2026-09-28",
+        "readingMinutes": 8,
+        "cover": {
+          "from": "#155a5c",
+          "to": "#3f8b8d",
+          "icon": "MessagesSquare"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "You don't need thousands of words to have a good conversation. You need the right phrases at the right time. Here are fifty, grouped by situation."
+          },
+          {
+            "type": "h2",
+            "text": "Greetings and small talk"
+          },
+          {
+            "type": "list",
+            "items": [
+              "How's it going?",
+              "Long time no see!",
+              "How have you been?",
+              "What have you been up to?",
+              "It's so hot today, isn't it?",
+              "How was your weekend?",
+              "Nice to see you again.",
+              "What a lovely day!"
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Asking for help and making requests"
+          },
+          {
+            "type": "list",
+            "items": [
+              "Could you help me with this?",
+              "Would you mind waiting a moment?",
+              "Do you have a minute?",
+              "Could you do me a favour?",
+              "Can I ask you something?",
+              "Sorry to bother you, but…",
+              "Could you say that again, please?",
+              "What does … mean?",
+              "How do you spell that?",
+              "Could you speak a bit more slowly?"
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Agreeing and disagreeing"
+          },
+          {
+            "type": "list",
+            "items": [
+              "I totally agree.",
+              "That's a good point.",
+              "Exactly!",
+              "I see what you mean.",
+              "I'm not so sure about that.",
+              "I see your point, but…",
+              "That makes sense.",
+              "Fair enough.",
+              "I couldn't agree more.",
+              "I don't think so, because…"
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Reacting to news"
+          },
+          {
+            "type": "list",
+            "items": [
+              "That's great news!",
+              "Congratulations!",
+              "Oh no, I'm sorry to hear that.",
+              "Really? That's surprising.",
+              "Good for you!",
+              "What a relief!",
+              "That sounds exciting.",
+              "No way!",
+              "I'm so happy for you.",
+              "That's a shame."
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Ending a conversation"
+          },
+          {
+            "type": "list",
+            "items": [
+              "It was nice talking to you.",
+              "I should get going.",
+              "Let's catch up soon.",
+              "Take care!",
+              "See you later!",
+              "Talk to you soon.",
+              "Have a great day!",
+              "Keep in touch.",
+              "Say hi to your family for me.",
+              "Thanks for your time."
+            ]
+          },
+          {
+            "type": "tip",
+            "text": "Choose five phrases you like and use each one at least once this week."
+          }
+        ]
+      },
+      {
+        "slug": "improve-english-speaking-skills",
+        "title": "How to Improve Your English Speaking Skills",
+        "excerpt": "Seven practical habits that build fluency, even if you don't have anyone to practise with.",
+        "category": "Learning Tips",
+        "author": "Rohan Mathew",
+        "date": "2026-09-24",
+        "readingMinutes": 7,
+        "cover": {
+          "from": "#6e4a05",
+          "to": "#b37a0b",
+          "icon": "Mic"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "Speaking is a skill, like cycling or cooking. You improve by doing it, a little every day. These habits work even if you live in a place where you rarely hear English."
+          },
+          {
+            "type": "h2",
+            "text": "1. Shadow native speakers"
+          },
+          {
+            "type": "p",
+            "text": "Play a short clip from a podcast or video. Pause after each sentence and repeat it, copying the rhythm and intonation. Five minutes a day makes a noticeable difference within a month."
+          },
+          {
+            "type": "h2",
+            "text": "2. Think in English"
+          },
+          {
+            "type": "p",
+            "text": "Describe what you're doing in your head: “I'm making tea. I'm adding ginger.” This trains your brain to produce English without translating."
+          },
+          {
+            "type": "h2",
+            "text": "3. Learn phrases, not single words"
+          },
+          {
+            "type": "p",
+            "text": "Learn “make a decision” instead of “decision”, and “pay attention to” instead of “attention”. Phrases come out whole when you speak."
+          },
+          {
+            "type": "h2",
+            "text": "4. Record yourself"
+          },
+          {
+            "type": "p",
+            "text": "Record a one-minute talk about your day. Listen back and note one thing to improve. Keep the recordings to hear your progress."
+          },
+          {
+            "type": "h2",
+            "text": "5. Don't wait to be perfect"
+          },
+          {
+            "type": "p",
+            "text": "Fluency comes before accuracy. Speak, make mistakes, and correct them later. People care more about understanding you than about perfect grammar."
+          },
+          {
+            "type": "h2",
+            "text": "6. Find a speaking partner"
+          },
+          {
+            "type": "p",
+            "text": "A friend, a colleague or an online group. Agree to speak only English for fifteen minutes."
+          },
+          {
+            "type": "h2",
+            "text": "7. Prepare for real situations"
+          },
+          {
+            "type": "p",
+            "text": "Before a phone call, interview or meeting, write down three phrases you will need and practise them out loud."
+          },
+          {
+            "type": "tip",
+            "text": "Start the Spoken English in 30 Days course for a ready-made daily plan."
+          }
+        ]
+      },
+      {
+        "slug": "common-english-idioms",
+        "title": "Common English Idioms and Their Meanings",
+        "excerpt": "Twelve idioms you'll hear at work and with friends, with simple meanings and example sentences.",
+        "category": "Idioms",
+        "author": "Farah Khan",
+        "date": "2026-09-20",
+        "readingMinutes": 5,
+        "cover": {
+          "from": "#0b2b2c",
+          "to": "#155a5c",
+          "icon": "Sparkles"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "Idioms are phrases whose meaning isn't clear from the individual words. Native speakers use them all the time, so knowing the common ones helps you understand conversations, films and emails."
+          },
+          {
+            "type": "pairs",
+            "items": [
+              {
+                "term": "Break the ice",
+                "detail": "Start a conversation in an awkward situation. “He told a joke to break the ice.”"
+              },
+              {
+                "term": "A piece of cake",
+                "detail": "Very easy. “The test was a piece of cake.”"
+              },
+              {
+                "term": "On the same page",
+                "detail": "Agreeing or understanding together. “Let's meet so we're all on the same page.”"
+              },
+              {
+                "term": "Hit the nail on the head",
+                "detail": "Say exactly the right thing. “You hit the nail on the head.”"
+              },
+              {
+                "term": "Call it a day",
+                "detail": "Stop working. “It's 7 p.m. Let's call it a day.”"
+              },
+              {
+                "term": "Under the weather",
+                "detail": "Feeling a little ill. “I'm a bit under the weather today.”"
+              },
+              {
+                "term": "Once in a blue moon",
+                "detail": "Very rarely. “We eat out once in a blue moon.”"
+              },
+              {
+                "term": "Back to square one",
+                "detail": "Start again. “The plan failed, so we're back to square one.”"
+              },
+              {
+                "term": "Cost an arm and a leg",
+                "detail": "Be very expensive. “That phone cost an arm and a leg.”"
+              },
+              {
+                "term": "Get the hang of",
+                "detail": "Learn how to do something. “You'll get the hang of it soon.”"
+              },
+              {
+                "term": "Beat around the bush",
+                "detail": "Avoid saying something directly. “Stop beating around the bush.”"
+              },
+              {
+                "term": "Let the cat out of the bag",
+                "detail": "Reveal a secret by mistake. “She let the cat out of the bag about the party.”"
+              }
+            ]
+          },
+          {
+            "type": "tip",
+            "text": "Use idioms in informal speech, but keep them out of formal writing like reports and applications."
+          }
+        ]
+      },
+      {
+        "slug": "since-vs-for",
+        "title": "Since vs For: The Simple Rule",
+        "excerpt": "Two small words that cause big confusion. One rule fixes it forever.",
+        "category": "Grammar",
+        "author": "Ananya Deshpande",
+        "date": "2026-09-16",
+        "readingMinutes": 4,
+        "cover": {
+          "from": "#1f6e70",
+          "to": "#74b0b1",
+          "icon": "Clock"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "Both since and for are used with the present perfect to talk about how long something has continued. The difference is simple."
+          },
+          {
+            "type": "pairs",
+            "items": [
+              {
+                "term": "since + a point in time",
+                "detail": "since 2019, since Monday, since 8 a.m., since I was a child"
+              },
+              {
+                "term": "for + a length of time",
+                "detail": "for three years, for two hours, for a long time, for ages"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "items": [
+              "I have lived here since 2019.",
+              "I have lived here for seven years.",
+              "She has been waiting since 10 o'clock.",
+              "She has been waiting for an hour."
+            ]
+          },
+          {
+            "type": "tip",
+            "text": "Ask yourself: can I point to it on a calendar or clock? If yes, use since."
+          }
+        ]
+      },
+      {
+        "slug": "learn-new-words-and-remember-them",
+        "title": "How to Learn New Words and Actually Remember Them",
+        "excerpt": "Spaced review, personal sentences and five words a day: a method that keeps vocabulary in long-term memory.",
+        "category": "Vocabulary",
+        "author": "Farah Khan",
+        "date": "2026-09-12",
+        "readingMinutes": 5,
+        "cover": {
+          "from": "#b37a0b",
+          "to": "#f4b740",
+          "icon": "Brain"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "Most learners forget new words within a week. That's not a memory problem; it's a method problem. Try this instead."
+          },
+          {
+            "type": "list",
+            "items": [
+              "Learn five words a day, not fifty.",
+              "Say each word out loud and copy the stress.",
+              "Write one sentence about your own life with each word.",
+              "Review after 1 day, 3 days, 7 days and 21 days.",
+              "Use the word in a real conversation or message within a week."
+            ]
+          },
+          {
+            "type": "tip",
+            "text": "Tap the heart on any word in the Vocabulary section to save it to your favourites for review."
+          }
+        ]
+      },
+      {
+        "slug": "english-tips-for-online-meetings",
+        "title": "English Tips for Online Meetings",
+        "excerpt": "Phrases to join, interrupt politely, handle a bad connection and end a video call professionally.",
+        "category": "English Tips",
+        "author": "Rohan Mathew",
+        "date": "2026-09-08",
+        "readingMinutes": 5,
+        "cover": {
+          "from": "#0f4849",
+          "to": "#3f8b8d",
+          "icon": "Video"
+        },
+        "content": [
+          {
+            "type": "p",
+            "text": "Video calls bring their own challenges: delays, frozen screens and people talking at the same time. These phrases help you stay calm and professional."
+          },
+          {
+            "type": "h2",
+            "text": "Joining and starting"
+          },
+          {
+            "type": "list",
+            "items": [
+              "Can everyone hear me okay?",
+              "Shall we get started?",
+              "Sorry I'm a few minutes late."
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Interrupting politely"
+          },
+          {
+            "type": "list",
+            "items": [
+              "Sorry to interrupt, but…",
+              "Could I just add something here?",
+              "Can I come back to that point?"
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Technical problems"
+          },
+          {
+            "type": "list",
+            "items": [
+              "You're on mute.",
+              "Sorry, you broke up for a second. Could you repeat that?",
+              "I think my connection is unstable. I'll turn off my video."
+            ]
+          },
+          {
+            "type": "h2",
+            "text": "Ending the call"
+          },
+          {
+            "type": "list",
+            "items": [
+              "I think that covers everything.",
+              "I'll send a summary by email.",
+              "Thanks, everyone. Have a good day!"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

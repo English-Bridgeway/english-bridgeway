@@ -15,4 +15,11 @@ export const storage = {
       /* ignore */
     }
   },
+  remove(key: string) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
+  },
 };

@@ -1,5 +1,20 @@
-// Site-wide settings. Change the name, contact details and links here.
-export const site = {
+// Site-wide settings. These are the defaults; the admin panel (Settings → Site) can
+// override every field, and the saved values are applied at start-up (see data/content.ts).
+export interface SiteSettings {
+  name: string;
+  tagline: string;
+  description: string;
+  url: string;
+  email: string;
+  whatsapp: string;
+  whatsappLink: string;
+  location: string;
+  hours: string;
+  social: { youtube: string; instagram: string; facebook: string; linkedin: string };
+  stats: { label: string; value: string; icon: string }[];
+}
+
+export const site: SiteSettings = {
   name: "English-Bridgeway",
   tagline: "Improve your English. Speak with confidence.",
   description:
@@ -23,7 +38,7 @@ export const site = {
     { label: "Quizzes", value: "100+", icon: "ListChecks" },
     { label: "Courses", value: "20+", icon: "GraduationCap" },
   ],
-} as const;
+};
 
 export const mainNav = [
   { label: "Home", to: "/" },

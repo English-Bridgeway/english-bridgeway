@@ -1,6 +1,8 @@
 # English-Bridgeway
 
-A modern English-learning platform frontend built with **React 19, TypeScript, Vite, React Router, Tailwind CSS v4 and Lucide icons**.
+A modern English-learning platform built with **React 19, TypeScript, Vite, React Router, Tailwind CSS v4 and Lucide icons**,
+with an **admin panel** that manages every lesson, word, quiz, course and blog post, and **Cashfree** payments for paid courses.
+The backend in `server/` is **Express + TypeScript + PostgreSQL (Sequelize)**, following the same patterns as Inveon Events.
 
 ## Getting started
 
@@ -13,6 +15,52 @@ npm run preview    # serve the production build
 
 `npm run build:preview` makes a portable build (relative paths + hash routing) that runs from any folder or an embedded preview.
 
+Without `VITE_API_BASE` the site runs in **demo mode**: the admin panel (`/admin`, demo login filled in), checkout and the contact
+form all work, but data is kept in the browser only. Connect the API (below) for real use.
+
+## Admin panel (`/admin`)
+
+| Section | What it does |
+|---|---|
+| Dashboard | Revenue, paid and pending orders, unread messages, content counts, recent activity |
+| Content | Add, edit, hide/publish, reorder and delete grammar topics and lessons, vocabulary, spoken English lessons, quiz categories, quizzes (with questions), courses (price, curriculum) and blog posts |
+| Orders & payments | Every course order with Cashfree payment ID and UTR, status filters, search, "Check" against Cashfree, refunds, CSV export |
+| Messages | Contact form inbox: read, reply by email, archive, delete |
+| Site settings | Site name, tagline, contact details, social links, home-page numbers |
+| Payment gateway | Turn payments on/off, sandbox or production, Cashfree App ID and Secret key (stored encrypted), key test, webhook URL |
+| Admins | Owners (everything) and editors (content, orders, messages); add, disable, reset passwords |
+| Activity log | Every sign-in and change, with who did it |
+
+## Backend and payments (`server/`)
+
+```bash
+# 1. PostgreSQL (or use your own server)
+docker compose -f server/docker-compose.yml up -d
+
+# 2. API
+cd server
+cp .env.example .env      # set DATABASE_URL, JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD, PUBLIC_SITE_URL, API_PUBLIC_URL
+npm install
+npm run dev               # http://localhost:4000 — creates tables, loads the built-in content, creates the first admin
+
+# 3. Website pointed at the API
+cd ..
+echo "VITE_API_BASE=http://localhost:4000/api" > .env
+npm run dev               # open http://localhost:5173/admin
+```
+
+- **Content** lives in the `content_items` table. On first start the API loads `server/seed/content.json`, which is generated
+  from `src/data/*.ts` by `npm run export-content`. After that, the admin panel is the source of truth.
+- **Payments:** a course with a price shows a Buy button. The API creates a Cashfree order (the price always comes from the
+  database), the browser opens Cashfree checkout, and Cashfree returns to `/payment/status`. The order is confirmed by asking
+  Cashfree's API, both on that return and from the signed webhook at `/api/webhooks/cashfree`, so a payment is never marked paid
+  on the browser's word. Add your keys in Admin → Payment gateway and the webhook URL in the Cashfree dashboard.
+- **Security:** admin passwords are bcrypt-hashed; sessions are signed JWTs kept in sessionStorage; sign-in is rate-limited;
+  the Cashfree secret is AES-256-GCM encrypted at rest and only ever shown masked; webhook signatures are checked on the raw body.
+- **Production:** `npm run build` in the root, then `cd server && npm run build && npm start`. The API serves the built site from
+  `dist/` too, so one Node process (behind Nginx/HTTPS) runs everything; build the site with `VITE_API_BASE=/api` in that case.
+- Add more admins in the panel, or from the terminal: `npm run create-admin -- you@example.com "Your Name" owner`.
+
 ## Project structure
 
 ```
@@ -23,28 +71,32 @@ src/
 ├── pages/        Home, Grammar (dashboard/topic/lesson), Vocabulary (list/detail), SpokenEnglish
 │                 (list/lesson), Quiz (categories/category/play), Courses (list/detail), Blog
 │                 (list/article), Contact, Dashboard, Search, Auth (Login/Register), NotFound
-├── data/         Mock data: grammar.ts, vocabulary.ts, spokenEnglish.ts, quizzes.ts, courses.ts,
-│                 blog.ts, dashboard.ts, site.ts (name, contact details, nav, stats)
+├── admin/        Admin panel: AdminApp (routes), pages/, schemas.ts (form definition per content type),
+│                 api/ (http client for server/, plus the in-browser demo backend)
+├── data/         Built-in content: grammar.ts, vocabulary.ts, spokenEnglish.ts, quizzes.ts, courses.ts,
+│                 blog.ts, site.ts; content.ts applies the admin-managed content over these at start-up
 ├── layouts/      MainLayout.tsx (navbar, footer, lazy-route Suspense)
 ├── routes/       AppRoutes.tsx (all routes, lazy loaded)
 ├── context/      AuthContext (auth placeholder), LearningContext (progress, favourites, scores, streak)
 ├── hooks/        usePageMeta (title, description, Open Graph), useDebounce
 ├── utils/        api.ts, search.ts, quiz.ts, speech.ts, storage.ts, sitemap.ts, format.ts, cn.ts
 └── types/        Shared TypeScript interfaces
+server/
+├── src/routes/   public.ts (content, orders, contact), admin.ts (admin API), webhooks.ts (Cashfree)
+├── src/services/ cashfree.ts, orders.ts, settings.ts (encrypted gateway keys), content.ts, auth.ts
+└── seed/         content.json (built-in content loaded into an empty database)
 ```
 
 ## Customising
 
-- **Site name, email, WhatsApp, location, social links, home-page stats:** `src/data/site.ts`
-- **Content:** edit the arrays in `src/data/*.ts`. Pages read only from these files.
+- **Site name, email, WhatsApp, location, social links, home-page stats:** Admin → Site settings (defaults in `src/data/site.ts`)
+- **Content:** Admin → Content. The arrays in `src/data/*.ts` are only the starting content.
 - **Colours and fonts:** the `@theme` block in `src/index.css`.
 
-## Connecting a backend later
+## Extending
 
-- **Data:** each `src/data/*.ts` file exports plain objects matching `src/types`. Replace them with API calls
-  (e.g. in a hook) without changing the components.
-- **Contact form:** set `VITE_CONTACT_ENDPOINT` in a `.env` file (Formspree URL or your API). Without it the
-  form runs in demo mode and does not deliver messages. See `src/utils/api.ts`.
+- **New content fields:** add the field to `src/types`, to the page that shows it, and to its form in `src/admin/schemas.ts`.
+- **Contact form:** messages go to the API and appear in Admin → Messages. See `src/utils/api.ts`.
 - **Auth:** implement `signIn`, `signUp` and `signOut` in `src/context/AuthContext.tsx`. Login, Register,
   Navbar and Dashboard already use that interface.
 - **Progress:** `src/context/LearningContext.tsx` stores progress in localStorage; swap the storage calls for

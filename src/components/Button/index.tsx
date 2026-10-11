@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "../../utils/cn";
 
-type Variant = "primary" | "secondary" | "outline" | "ghost" | "accent";
+type Variant = "primary" | "secondary" | "outline" | "ghost" | "accent" | "danger" | "danger-ghost";
 type Size = "sm" | "md" | "lg";
 
 const base =
@@ -13,6 +13,8 @@ const variants: Record<Variant, string> = {
   outline: "border border-line bg-white text-ink-800 hover:border-ink-300 hover:bg-ink-50",
   ghost: "text-ink-700 hover:bg-ink-50",
   accent: "bg-amber-400 text-ink-900 hover:bg-amber-300 shadow-sm",
+  danger: "bg-red-700 text-white hover:bg-red-800 shadow-sm",
+  "danger-ghost": "text-red-700 hover:bg-red-50",
 };
 const sizes: Record<Size, string> = {
   sm: "h-9 px-3.5 text-sm",

@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { BookOpen, Check, ChevronDown, CircleCheck, Clock, PlayCircle, Star, Users } from "lucide-react";
+import { BookOpen, Check, ChevronDown, CircleCheck, Clock, Lock, PlayCircle, Star, Users } from "lucide-react";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Badge, LevelBadge } from "../../components/Badge";
 import { Button } from "../../components/Button";
@@ -12,7 +12,10 @@ import { usePageMeta } from "../../hooks/usePageMeta";
 import { courses, getCourse } from "../../data/courses";
 import { useLearning } from "../../context/LearningContext";
 import { curriculumKey, useCourseProgress } from "./useCourseProgress";
-import { formatNumber } from "../../utils/format";
+import { formatNumber, formatPrice } from "../../utils/format";
+import { CheckoutDialog } from "../../components/CheckoutDialog";
+import { getPaymentsConfig, type PaymentsConfig } from "../../utils/api";
+import { hasPurchased } from "../../utils/purchases";
 import { cn } from "../../utils/cn";
 import NotFound from "../NotFound";
 
@@ -26,7 +29,14 @@ export default function CourseDetail() {
   const [open, setOpen] = useState<number[]>([0]);
   const { isLessonComplete, toggleLessonComplete } = useLearning();
   const progressFor = useCourseProgress();
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [payments, setPayments] = useState<PaymentsConfig | null>(null);
+  const price = course?.price ?? 0;
+  useEffect(() => {
+    if (price > 0) getPaymentsConfig().then(setPayments).catch(() => setPayments({ enabled: false, mode: "sandbox", demo: false }));
+  }, [price]);
   if (!course) return <NotFound />;
+  const locked = price > 0 && !hasPurchased(course.id);
 
   const progress = progressFor(course);
   const first = course.curriculum[0].lessons[0];
@@ -43,7 +53,7 @@ export default function CourseDetail() {
             <Breadcrumbs items={[{ label: "Courses", to: "/courses" }, { label: course.title }]} />
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <LevelBadge level={course.level} />
-              <Badge tone="amber">{course.price ? `₹${course.price}` : "Free"}</Badge>
+              <Badge tone="amber">{price ? formatPrice(price) : "Free"}</Badge>
             </div>
             <h1 className="mt-4 text-3xl font-bold text-white sm:text-5xl">{course.title}</h1>
             <p className="mt-4 max-w-2xl text-lg text-ink-100">{course.description}</p>
@@ -63,10 +73,28 @@ export default function CourseDetail() {
             <div className="mt-5">
               <ProgressBar value={progress.percent} label={`${progress.done} of ${progress.total} lessons done`} showValue />
             </div>
-            <Button to={(nextItem?.l.href ?? first.href) || "/courses"} className="mt-5 w-full" size="lg">
-              <PlayCircle className="h-5 w-5" aria-hidden="true" /> {progress.done ? "Continue course" : "Start course"}
-            </Button>
-            <p className="mt-3 text-center text-xs text-muted">Free · No sign-up needed · Progress saved on this device</p>
+            {locked ? (
+              payments?.enabled === false ? (
+                <>
+                  <Button to="/contact" className="mt-5 w-full" size="lg">Contact us to enrol</Button>
+                  <p className="mt-3 text-center text-xs text-muted">Online payment is not available right now.</p>
+                </>
+              ) : (
+                <>
+                  <Button className="mt-5 w-full" size="lg" onClick={() => setCheckoutOpen(true)} disabled={!payments}>
+                    <Lock className="h-5 w-5" aria-hidden="true" /> Buy course · {formatPrice(price)}
+                  </Button>
+                  <p className="mt-3 text-center text-xs text-muted">One-time payment · UPI, cards and net banking</p>
+                </>
+              )
+            ) : (
+              <>
+                <Button to={(nextItem?.l.href ?? first.href) || "/courses"} className="mt-5 w-full" size="lg">
+                  <PlayCircle className="h-5 w-5" aria-hidden="true" /> {progress.done ? "Continue course" : "Start course"}
+                </Button>
+                <p className="mt-3 text-center text-xs text-muted">{price ? "Enrolled" : "Free · No sign-up needed"} · Progress saved on this device</p>
+              </>
+            )}
           </Card>
         </div>
       </header>
@@ -141,6 +169,10 @@ export default function CourseDetail() {
           </Card>
         </aside>
       </div>
+
+      {payments && locked && (
+        <CheckoutDialog open={checkoutOpen} onClose={() => setCheckoutOpen(false)} course={{ id: course.id, title: course.title, price }} config={payments} />
+      )}
 
       <section className="container-page">
         <h2 className="text-xl font-semibold">Other courses</h2>

@@ -6,7 +6,7 @@ import { Icon } from "../Icon";
 import { Badge, LevelBadge } from "../Badge";
 import { ProgressBar } from "../ProgressBar";
 import { buttonClasses } from "../Button";
-import { formatNumber } from "../../utils/format";
+import { formatNumber, formatPrice } from "../../utils/format";
 
 const tints = ["from-ink-800 to-ink-500", "from-ink-700 to-ink-400", "from-amber-800 to-amber-600", "from-ink-900 to-ink-600"];
 
@@ -19,7 +19,7 @@ export function CourseCard({ course, index = 0, progress }: { course: Course; in
         <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/15 text-white backdrop-blur">
           <Icon name={course.icon} className="h-6 w-6" />
         </span>
-        <Badge tone={free ? "amber" : "neutral"} className="absolute left-5 top-5">{free ? "Free" : `₹${course.price}`}</Badge>
+        <Badge tone={free ? "amber" : "neutral"} className="absolute left-5 top-5">{free ? "Free" : formatPrice(course.price!)}</Badge>
       </div>
       <div className="flex flex-1 flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
