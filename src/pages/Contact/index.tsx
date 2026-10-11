@@ -84,7 +84,7 @@ export default function Contact() {
           {status === "sent" ? (
             <div className="py-6">
               <Alert tone="success" title={`Thank you, ${values.name.trim().split(" ")[0]}!`}>
-                {contactIsLive ? "Your message has been sent. We'll reply to " : "Your message is ready to send. Once the form is connected to an inbox, replies will go to "}
+                {contactIsLive ? "Your message has been sent. We'll reply to " : "Demo mode: your message was saved in this browser and appears in the admin panel's Messages. Replies would go to "}
                 <strong>{values.email}</strong>.
               </Alert>
               <Button className="mt-6" variant="outline" onClick={() => { setValues(empty); setStatus("idle"); }}>Send another message</Button>

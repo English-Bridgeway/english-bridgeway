@@ -52,6 +52,7 @@ export const courses: Course[] = [
     level: "Beginner",
     duration: "30 Days",
     lessons: 30,
+    price: 499,
     icon: "Mic",
     rating: 4.9,
     students: 18230,

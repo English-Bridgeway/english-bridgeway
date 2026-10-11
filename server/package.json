@@ -1,0 +1,35 @@
+{
+  "name": "english-bridgeway-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "English-Bridgeway backend: content API, admin panel API and Cashfree course payments (Express + TypeScript + PostgreSQL)",
+  "main": "dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "tsx --env-file-if-exists=.env watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file-if-exists=.env dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "create-admin": "tsx --env-file-if-exists=.env src/scripts/createAdmin.ts",
+    "seed": "tsx --env-file-if-exists=.env src/scripts/seed.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

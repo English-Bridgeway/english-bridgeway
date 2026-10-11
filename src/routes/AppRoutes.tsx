@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
 
@@ -24,10 +24,13 @@ const SearchPage = lazy(() => import("../pages/Search"));
 const Login = lazy(() => import("../pages/Auth/Login"));
 const Register = lazy(() => import("../pages/Auth/Register"));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const PaymentStatus = lazy(() => import("../pages/Payment/PaymentStatus"));
+const AdminApp = lazy(() => import("../admin/AdminApp"));
 
 export function AppRoutes() {
   return (
     <Routes>
+      <Route path="admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
       <Route element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="grammar" element={<Grammar />} />
@@ -49,6 +52,7 @@ export function AppRoutes() {
         <Route path="search" element={<SearchPage />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="payment/status" element={<PaymentStatus />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
