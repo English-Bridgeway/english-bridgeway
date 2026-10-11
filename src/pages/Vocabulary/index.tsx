@@ -64,7 +64,7 @@ export default function Vocabulary() {
             <div className="flex flex-wrap items-center gap-3">
               <Tabs options={levels} value={level} onChange={setLevel} label="Filter by difficulty" />
               <button type="button" aria-pressed={favOnly} onClick={() => setFavOnly((f) => !f)}
-                className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium", favOnly ? "border-red-200 bg-red-50 text-red-700" : "border-line bg-white text-muted hover:text-ink-800")}>
+                className={cn("inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium", favOnly ? "border-brand-sky bg-brand-sky text-white" : "border-line bg-white text-muted hover:text-ink-800")}>
                 <Heart className={cn("h-4 w-4", favOnly && "fill-current")} aria-hidden="true" /> Favourites ({favoriteWords.length})
               </button>
             </div>

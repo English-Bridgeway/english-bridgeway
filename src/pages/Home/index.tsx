@@ -37,27 +37,27 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-brand-primary text-white">
         <div className="container-page grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-20">
           <div>
             <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-sm font-medium text-ink-700 shadow-card">
               <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" /> Free lessons for every level
             </p>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.1] sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-4xl font-bold leading-[1.1] text-amber-400 sm:text-5xl lg:text-6xl">
               Improve Your English. <span className="highlight">Speak With Confidence.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-muted sm:text-xl">
+            <p className="mt-6 max-w-xl text-lg text-white/80 sm:text-xl">
               Learn grammar, build vocabulary, practice spoken English, and test your knowledge with simple, practical lessons.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button to="/courses/beginner-english" size="lg">
+              <Button to="/courses/beginner-english" size="lg" variant="accent">
                 Start Learning <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </Button>
-              <Button to="/courses" size="lg" variant="outline">Explore Courses</Button>
+              <Button to="/courses" size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white">Explore Courses</Button>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80">
               {["No sign-up needed", "Listen to every word", "Instant quiz feedback"].map((t) => (
-                <li key={t} className="flex items-center gap-1.5"><CircleCheck className="h-4 w-4 text-emerald-600" aria-hidden="true" />{t}</li>
+                <li key={t} className="flex items-center gap-1.5"><CircleCheck className="h-4 w-4 text-brand-sky" aria-hidden="true" />{t}</li>
               ))}
             </ul>
           </div>

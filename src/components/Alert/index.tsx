@@ -5,9 +5,9 @@ import { cn } from "../../utils/cn";
 type Tone = "info" | "success" | "warning" | "error";
 const styles: Record<Tone, string> = {
   info: "border-ink-200 bg-ink-50 text-ink-900",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  success: "border-brand-sky/25 bg-ink-50 text-ink-900",
   warning: "border-amber-300 bg-amber-50 text-amber-800",
-  error: "border-red-200 bg-red-50 text-red-900",
+  error: "border-amber-400 bg-amber-50 text-ink-900",
 };
 const icons = { info: Info, success: CircleCheck, warning: TriangleAlert, error: CircleX };
 

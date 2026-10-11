@@ -14,7 +14,7 @@ export function FavoriteButton({ wordId, word, withLabel }: { wordId: string; wo
       className={cn(
         "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border transition-colors",
         withLabel ? "h-9 px-3.5 text-sm font-medium" : "h-9 w-9",
-        on ? "border-red-200 bg-red-50 text-red-600" : "border-line bg-white text-muted hover:text-red-600",
+        on ? "border-danger/20 bg-danger/5 text-danger" : "border-line bg-white text-muted hover:text-danger",
       )}
     >
       <Heart className={cn("h-4 w-4", on && "fill-current")} aria-hidden="true" />

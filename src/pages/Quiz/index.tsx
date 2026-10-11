@@ -34,7 +34,7 @@ export default function Quiz() {
             const n = getQuizzesForCategory(c.id);
             return (
               <Card key={c.id} interactive className="group flex flex-col p-5">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700 group-hover:bg-ink-800 group-hover:text-white"><Icon name={c.icon} className="h-5 w-5" /></span>
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700 group-hover:bg-brand-primary group-hover:text-white"><Icon name={c.icon} className="h-5 w-5" /></span>
                 <h3 className="mt-4 text-lg font-semibold">
                   <Link to={`/quiz/${c.id}`} className="after:absolute after:inset-0 focus:outline-none">{c.title}</Link>
                 </h3>

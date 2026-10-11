@@ -5,7 +5,7 @@ export function HeroIllustration() {
   return (
     <div className="relative mx-auto aspect-[5/4] w-full max-w-lg select-none" aria-hidden="true">
       {/* backdrop */}
-      <div className="absolute inset-[6%] rounded-[2.5rem] bg-gradient-to-br from-ink-100 via-ink-50 to-amber-50" />
+      <div className="absolute inset-[6%] rounded-[2.5rem] bg-ink-100" />
       <div className="absolute left-[12%] top-[10%] font-display text-[7rem] font-bold leading-none text-ink-200/70 sm:text-[9rem]">Aa</div>
 
       {/* lesson card */}
@@ -19,7 +19,7 @@ export function HeroIllustration() {
 
       {/* chat bubbles */}
       <div className="absolute left-[4%] top-[44%] w-[52%] space-y-2">
-        <div className="w-fit rounded-2xl rounded-bl-md bg-ink-800 px-3.5 py-2 text-xs text-white shadow-card sm:text-sm">Hi, what's your name?</div>
+        <div className="w-fit rounded-2xl rounded-bl-md bg-brand-primary px-3.5 py-2 text-xs text-white shadow-card sm:text-sm">Hi, what's your name?</div>
         <div className="ml-auto w-fit rounded-2xl rounded-br-md bg-amber-100 px-3.5 py-2 text-xs text-ink-900 shadow-card sm:text-sm">I'm Rahul. Nice to meet you!</div>
       </div>
 
@@ -34,8 +34,8 @@ export function HeroIllustration() {
       </div>
 
       {/* quiz chip */}
-      <div className="absolute bottom-[14%] left-[10%] flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-3 py-2 shadow-card">
-        <CircleCheck className="h-4 w-4 text-emerald-600" />
+      <div className="absolute bottom-[14%] left-[10%] flex items-center gap-2 rounded-xl border border-brand-sky/25 bg-white px-3 py-2 shadow-card">
+        <CircleCheck className="h-4 w-4 text-brand-sky" />
         <span className="text-xs font-semibold text-ink-900">She <u className="decoration-amber-400 decoration-2">goes</u> to school.</span>
       </div>
 

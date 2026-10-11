@@ -47,7 +47,7 @@ export default function CourseDetail() {
 
   return (
     <>
-      <header className="bg-ink-900 text-white">
+      <header className="bg-brand-primary text-white">
         <div className="container-page grid gap-10 py-10 sm:py-14 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="min-w-0 [&_nav_a]:text-ink-200 [&_nav_a:hover]:text-white [&_nav_span[aria-current]]:text-white [&_ol]:text-ink-300">
             <Breadcrumbs items={[{ label: "Courses", to: "/courses" }, { label: course.title }]} />
@@ -55,7 +55,7 @@ export default function CourseDetail() {
               <LevelBadge level={course.level} />
               <Badge tone="amber">{price ? formatPrice(price) : "Free"}</Badge>
             </div>
-            <h1 className="mt-4 text-3xl font-bold text-white sm:text-5xl">{course.title}</h1>
+            <h1 className="mt-4 text-3xl font-bold text-amber-400 sm:text-5xl">{course.title}</h1>
             <p className="mt-4 max-w-2xl text-lg text-ink-100">{course.description}</p>
             <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-100">
               <li className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden="true" /> {course.rating} rating</li>
@@ -67,7 +67,7 @@ export default function CourseDetail() {
           </div>
 
           <Card className="self-start p-6 text-body">
-            <div className="grid h-32 place-items-center rounded-xl bg-gradient-to-br from-ink-700 to-ink-500 text-white">
+            <div className="grid h-32 place-items-center rounded-xl bg-brand-primary text-white">
               <Icon name={course.icon} className="h-12 w-12" />
             </div>
             <div className="mt-5">
@@ -105,7 +105,7 @@ export default function CourseDetail() {
             <h2 className="text-2xl font-semibold">What you'll learn</h2>
             <ul className="mt-5 grid gap-3 sm:grid-cols-2">
               {course.outcomes.map((o) => (
-                <li key={o} className="flex gap-2.5"><CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />{o}</li>
+                <li key={o} className="flex gap-2.5"><CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-sky" aria-hidden="true" />{o}</li>
               ))}
             </ul>
           </section>
@@ -138,7 +138,7 @@ export default function CourseDetail() {
                           <li key={l.title} className="flex items-center gap-3 px-4 py-3">
                             <button type="button" onClick={() => toggleLessonComplete(k)} aria-pressed={done}
                               aria-label={done ? `Mark “${l.title}” as not done` : `Mark “${l.title}” as done`}
-                              className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border", done ? "border-emerald-600 bg-emerald-600 text-white" : "border-line hover:border-ink-400")}>
+                              className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border", done ? "border-brand-sky bg-brand-sky text-white" : "border-line hover:border-ink-400")}>
                               {done && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
                             </button>
                             {l.href ? <Link to={l.href} className="min-w-0 flex-1 text-[0.95rem] hover:text-ink-600">{l.title}</Link> : <span className="min-w-0 flex-1">{l.title}</span>}

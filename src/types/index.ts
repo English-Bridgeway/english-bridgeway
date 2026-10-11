@@ -167,7 +167,7 @@ export interface BlogPost {
   author: string;
   date: string; // ISO yyyy-mm-dd
   readingMinutes: number;
-  cover: { from: string; to: string; icon: string }; // generated cover art, no image files needed
+  cover: { icon: string };
   content: BlogBlock[];
 }
 

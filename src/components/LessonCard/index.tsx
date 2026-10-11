@@ -14,7 +14,7 @@ export function LessonCard({ to, title, description, category, level, minutes, c
         {category && <Badge tone="ink">{category}</Badge>}
         {level && <LevelBadge level={level} />}
         {completed && (
-          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
+          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-brand-sky">
             <CircleCheck className="h-4 w-4" aria-hidden="true" /> Completed
           </span>
         )}

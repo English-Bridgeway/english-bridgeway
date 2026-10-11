@@ -47,7 +47,7 @@ export default function GrammarLesson() {
                 <li key={s.id}>
                   <Link to={`/grammar/${topic.id}/${s.id}`} aria-current={active ? "page" : undefined}
                     className={cn("flex items-start gap-2.5 rounded-xl px-3 py-2.5 text-sm", active ? "bg-white font-semibold text-ink-900 shadow-card ring-1 ring-line" : "text-muted hover:bg-white hover:text-ink-900")}>
-                    {complete ? <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-label="Completed" /> : <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center text-xs tabular-nums">{n + 1}</span>}
+                    {complete ? <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-sky" aria-label="Completed" /> : <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center text-xs tabular-nums">{n + 1}</span>}
                     {s.title}
                   </Link>
                 </li>
@@ -65,7 +65,7 @@ export default function GrammarLesson() {
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
             <LevelBadge level={lesson.level} />
             <span className="inline-flex items-center gap-1"><Clock className="h-4 w-4" aria-hidden="true" /> {lesson.minutes} min lesson</span>
-            {done && <span className="inline-flex items-center gap-1 font-semibold text-emerald-700"><CircleCheck className="h-4 w-4" aria-hidden="true" /> Completed</span>}
+            {done && <span className="inline-flex items-center gap-1 font-semibold text-brand-sky"><CircleCheck className="h-4 w-4" aria-hidden="true" /> Completed</span>}
           </div>
           <h1 className="mt-3 text-3xl font-bold sm:text-4xl">{lesson.title}</h1>
         </header>
@@ -117,8 +117,8 @@ export default function GrammarLesson() {
           <div className="mt-4 grid gap-3">
             {lesson.mistakes.map((m) => (
               <div key={m.wrong} className="rounded-2xl border border-line bg-white p-4">
-                <p className="flex items-start gap-2 text-red-700"><TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /><span><span className="sr-only">Incorrect: </span><s>{m.wrong}</s></span></p>
-                <p className="mt-1.5 flex items-start gap-2 font-semibold text-emerald-700"><CircleCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /><span><span className="sr-only">Correct: </span>{m.right}</span></p>
+                <p className="flex items-start gap-2 text-danger"><TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /><span><span className="sr-only">Incorrect: </span><s>{m.wrong}</s></span></p>
+                <p className="mt-1.5 flex items-start gap-2 font-semibold text-brand-sky"><CircleCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" /><span><span className="sr-only">Correct: </span>{m.right}</span></p>
                 <p className="mt-1.5 pl-6 text-sm text-muted">{m.why}</p>
               </div>
             ))}

@@ -73,7 +73,7 @@ export default function Contact() {
               </div>
             </Card>
           ))}
-          <div className="rounded-2xl bg-ink-800 p-5 text-white">
+          <div className="rounded-2xl bg-brand-primary p-5 text-white">
             <p className="font-semibold">Follow us</p>
             <p className="mt-1 text-sm text-ink-200">Daily phrases and quick grammar tips.</p>
             <SocialIcons className="mt-4" />
