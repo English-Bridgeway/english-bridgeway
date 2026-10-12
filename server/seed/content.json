@@ -3981,8 +3981,6 @@
         "date": "2026-10-02",
         "readingMinutes": 6,
         "cover": {
-          "from": "#0f3d3e",
-          "to": "#1f6e70",
           "icon": "AlertTriangle"
         },
         "content": [
@@ -4050,8 +4048,6 @@
         "date": "2026-09-28",
         "readingMinutes": 8,
         "cover": {
-          "from": "#155a5c",
-          "to": "#3f8b8d",
           "icon": "MessagesSquare"
         },
         "content": [
@@ -4167,8 +4163,6 @@
         "date": "2026-09-24",
         "readingMinutes": 7,
         "cover": {
-          "from": "#6e4a05",
-          "to": "#b37a0b",
           "icon": "Mic"
         },
         "content": [
@@ -4247,8 +4241,6 @@
         "date": "2026-09-20",
         "readingMinutes": 5,
         "cover": {
-          "from": "#0b2b2c",
-          "to": "#155a5c",
           "icon": "Sparkles"
         },
         "content": [
@@ -4324,8 +4316,6 @@
         "date": "2026-09-16",
         "readingMinutes": 4,
         "cover": {
-          "from": "#1f6e70",
-          "to": "#74b0b1",
           "icon": "Clock"
         },
         "content": [
@@ -4370,8 +4360,6 @@
         "date": "2026-09-12",
         "readingMinutes": 5,
         "cover": {
-          "from": "#b37a0b",
-          "to": "#f4b740",
           "icon": "Brain"
         },
         "content": [
@@ -4404,8 +4392,6 @@
         "date": "2026-09-08",
         "readingMinutes": 5,
         "cover": {
-          "from": "#0f4849",
-          "to": "#3f8b8d",
           "icon": "Video"
         },
         "content": [
