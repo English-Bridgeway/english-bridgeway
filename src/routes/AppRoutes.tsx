@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { MainLayout } from "../layouts/MainLayout";
+import { RequireAuth } from "../components/RequireAuth";
 
 // Every page is its own chunk, loaded on first visit.
 const Home = lazy(() => import("../pages/Home"));
@@ -24,6 +25,7 @@ const SearchPage = lazy(() => import("../pages/Search"));
 const Login = lazy(() => import("../pages/Auth/Login"));
 const Register = lazy(() => import("../pages/Auth/Register"));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const SpeakLive = lazy(() => import("../pages/SpeakLive"));
 const PaymentStatus = lazy(() => import("../pages/Payment/PaymentStatus"));
 const AdminApp = lazy(() => import("../admin/AdminApp"));
 
@@ -48,7 +50,8 @@ export function AppRoutes() {
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />
         <Route path="contact" element={<Contact />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+        <Route path="speak" element={<RequireAuth><SpeakLive /></RequireAuth>} />
         <Route path="search" element={<SearchPage />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

@@ -5,7 +5,7 @@ import { Card } from "../../components/Card";
 import { Button } from "../../components/Button";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { getOrderStatus, type PublicOrder } from "../../utils/api";
-import { recordPurchase } from "../../utils/purchases";
+import { useAuth } from "../../context/AuthContext";
 import { formatPrice } from "../../utils/format";
 import { site } from "../../data/site";
 
@@ -17,6 +17,7 @@ export default function PaymentStatus() {
   const [order, setOrder] = useState<PublicOrder | null>(null);
   const [error, setError] = useState("");
   const [checks, setChecks] = useState(0);
+  const { refresh } = useAuth();
 
   useEffect(() => {
     if (!orderId) { setError("No order was given."); return; }
@@ -25,11 +26,12 @@ export default function PaymentStatus() {
       .then((o) => {
         if (cancelled) return;
         setOrder(o);
-        if (o.status === "paid") recordPurchase(o.courseId, o.orderId);
+        // The paid course now shows as owned in the learner's account.
+        if (o.status === "paid") void refresh();
       })
       .catch((e) => !cancelled && setError(e instanceof Error ? e.message : "Could not check the payment."));
     return () => { cancelled = true; };
-  }, [orderId, checks]);
+  }, [orderId, checks, refresh]);
 
   // A just-finished UPI payment can take a few seconds to confirm.
   useEffect(() => {

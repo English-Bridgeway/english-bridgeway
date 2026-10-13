@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { Order, sequelize } from '../db';
+import { Order, sequelize, type Learner } from '../db';
 import { config } from '../config';
 import { getPaymentConfig, webhookUrl } from './settings';
 import { getPublishedItem } from './content';
@@ -17,6 +17,7 @@ export class OrderError extends Error {
 export function orderDto(o: Order) {
   return {
     orderId: o.orderId,
+    userId: o.userId,
     courseId: o.courseId,
     courseTitle: o.courseTitle,
     amount: o.amountPaise / 100,
@@ -44,14 +45,18 @@ function newOrderId(): string {
   return `EB-${Date.now().toString(36).toUpperCase()}-${crypto.randomBytes(6).toString('hex').toUpperCase()}`;
 }
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export async function createCourseOrder(input: { courseId?: unknown; name?: unknown; email?: unknown; phone?: unknown }) {
-  const name = typeof input.name === 'string' ? input.name.trim() : '';
-  const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
-  const phone = typeof input.phone === 'string' ? input.phone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '') : '';
+/**
+ * Starts a Cashfree checkout for a paid course, on behalf of a signed-in learner. The order is
+ * tied to the learner's account, and a paid order is what unlocks the course for them.
+ */
+export async function createCourseOrder(learner: Learner, input: { courseId?: unknown; name?: unknown; phone?: unknown }) {
+  const name = typeof input.name === 'string' && input.name.trim() ? input.name.trim() : learner.name;
+  // The receipt goes to the account's email; the browser cannot choose another one.
+  const email = learner.email;
+  const rawPhone = typeof input.phone === 'string' && input.phone.trim() ? input.phone : (learner.phone ?? '');
+  const phone = rawPhone.replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
   if (name.length < 2 || name.length > 120) throw new OrderError('Please enter your full name.');
-  if (!EMAIL.test(email) || email.length > 254) throw new OrderError('Please enter a valid email address.');
   if (!/^[6-9]\d{9}$/.test(phone)) throw new OrderError('Please enter a valid 10-digit mobile number.');
 
   const cfg = await getPaymentConfig();
@@ -63,10 +68,14 @@ export async function createCourseOrder(input: { courseId?: unknown; name?: unkn
   const price = Number(course.data.price ?? 0);
   if (!Number.isFinite(price) || price <= 0) throw new OrderError('This course is free. Just press Start course.');
   const title = String(course.data.title ?? course.key);
+  if (await Order.count({ where: { userId: learner.id, courseId: course.key, status: 'paid' } })) {
+    throw new OrderError('You already own this course.', 409);
+  }
 
   const orderId = newOrderId();
   const order = await Order.create({
     orderId,
+    userId: learner.id,
     courseId: course.key,
     courseTitle: title.slice(0, 200),
     amountPaise: Math.round(price * 100),
@@ -75,11 +84,13 @@ export async function createCourseOrder(input: { courseId?: unknown; name?: unkn
     customerPhone: phone,
   });
 
+  if (learner.phone !== phone) await learner.update({ phone });
+
   try {
     const cf = await cashfree.createOrder(cfg, {
       orderId,
       amountRupees: price,
-      customerId: `cust_${crypto.createHash('sha256').update(email).digest('hex').slice(0, 20)}`,
+      customerId: `learner_${learner.id.replace(/-/g, '')}`,
       name,
       email,
       phone,

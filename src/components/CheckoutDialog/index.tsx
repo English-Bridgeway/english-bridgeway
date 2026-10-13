@@ -7,13 +7,13 @@ import { Alert } from "../Alert";
 import { TextField } from "../FormField";
 import { startCoursePayment, type CheckoutCustomer, type PaymentsConfig } from "../../utils/api";
 import { formatPrice } from "../../utils/format";
+import { useAuth } from "../../context/AuthContext";
 
 type Errors = Partial<Record<keyof CheckoutCustomer, string>>;
 
 function validate(v: CheckoutCustomer): Errors {
   const e: Errors = {};
   if (v.name.trim().length < 2) e.name = "Please enter your full name.";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email.trim())) e.email = "Enter a valid email address.";
   if (!/^[6-9]\d{9}$/.test(v.phone.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, ""))) e.phone = "Enter a 10-digit Indian mobile number.";
   return e;
 }
@@ -26,7 +26,9 @@ export function CheckoutDialog({ open, onClose, course, config }: {
   config: PaymentsConfig;
 }) {
   const navigate = useNavigate();
-  const [values, setValues] = useState<CheckoutCustomer>({ name: "", email: "", phone: "" });
+  const { user, token } = useAuth();
+  // The order is placed for the signed-in account: its email gets the receipt.
+  const [values, setValues] = useState<CheckoutCustomer>({ name: user?.name ?? "", email: user?.email ?? "", phone: user?.phone ?? "" });
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState("");
@@ -44,7 +46,7 @@ export function CheckoutDialog({ open, onClose, course, config }: {
     setBusy(true);
     setFailure("");
     try {
-      const { demoOrderId } = await startCoursePayment(course, values);
+      const { demoOrderId } = await startCoursePayment(course, values, { token, userId: user?.id ?? null });
       if (demoOrderId) navigate(`/payment/status?order_id=${encodeURIComponent(demoOrderId)}`);
       // Live payments leave the page for Cashfree, which returns to /payment/status.
     } catch (err) {
@@ -67,7 +69,7 @@ export function CheckoutDialog({ open, onClose, course, config }: {
           <Alert tone="warning" title="Test mode">Payments use Cashfree's sandbox. Use Cashfree test cards or UPI; no real money moves.</Alert>
         )}
         <TextField id="co-name" label="Full name" autoComplete="name" value={values.name} onChange={set("name")} error={errors.name} />
-        <TextField id="co-email" label="Email" type="email" autoComplete="email" value={values.email} onChange={set("email")} error={errors.email} hint="Your receipt is sent here." />
+        <TextField id="co-email" label="Email" type="email" value={values.email} readOnly className="bg-ink-50 text-muted" hint="Your account email. The receipt is sent here." />
         <TextField id="co-phone" label="Mobile number" type="tel" inputMode="tel" autoComplete="tel" value={values.phone} onChange={set("phone")} error={errors.phone} />
         {failure && <Alert tone="error">{failure}</Alert>}
         <Button type="submit" size="lg" className="w-full" disabled={busy}>

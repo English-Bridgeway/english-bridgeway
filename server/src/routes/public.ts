@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { Message, Order } from '../db';
-import { asyncHandler, rateLimit } from '../middleware';
+import { asyncHandler, rateLimit, requireLearner } from '../middleware';
 import { publicBundle } from '../services/content';
 import { getPaymentConfig } from '../services/settings';
 import { createCourseOrder, publicOrderDto, syncOrder } from '../services/orders';
@@ -29,9 +29,10 @@ publicRouter.get(
 
 publicRouter.post(
   '/orders',
+  requireLearner,
   rateLimit({ windowMs: 10 * 60_000, max: 20 }),
   asyncHandler(async (req, res) => {
-    res.status(201).json(await createCourseOrder(req.body ?? {}));
+    res.status(201).json(await createCourseOrder(req.learner!, req.body ?? {}));
   }),
 );
 

@@ -20,8 +20,22 @@ export const config = {
   sessionHours: 12,
   publicSiteUrl: (process.env.PUBLIC_SITE_URL || 'http://localhost:5173').replace(/\/$/, ''),
   apiPublicUrl: (process.env.API_PUBLIC_URL || '').replace(/\/$/, ''),
-  corsOrigins: (process.env.CORS_ORIGIN || '')
+  corsOrigins: list(process.env.CORS_ORIGIN),
+  voice: {
+    // Public STUN servers let two browsers find each other's address. They are enough for
+    // most home and mobile networks; TURN (below) relays audio when a direct path is blocked.
+    stunUrls: process.env.STUN_URLS !== undefined ? list(process.env.STUN_URLS) : ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'],
+    // e.g. "turn:englishbridgeway.com:3478?transport=udp,turn:englishbridgeway.com:3478?transport=tcp"
+    turnUrls: list(process.env.TURN_URLS),
+    // The coturn static-auth-secret. Learners get short-lived usernames/passwords made from it.
+    turnSecret: process.env.TURN_SECRET || '',
+    maxRoomSize: Math.min(12, Math.max(2, Number(process.env.VOICE_MAX_ROOM_SIZE || 6))),
+  },
+};
+
+function list(value: string | undefined): string[] {
+  return (value || '')
     .split(',')
     .map((s) => s.trim())
-    .filter(Boolean),
-};
+    .filter(Boolean);
+}

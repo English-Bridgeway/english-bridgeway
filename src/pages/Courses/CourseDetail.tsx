@@ -15,7 +15,7 @@ import { curriculumKey, useCourseProgress } from "./useCourseProgress";
 import { formatNumber, formatPrice } from "../../utils/format";
 import { CheckoutDialog } from "../../components/CheckoutDialog";
 import { getPaymentsConfig, type PaymentsConfig } from "../../utils/api";
-import { hasPurchased } from "../../utils/purchases";
+import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../utils/cn";
 import NotFound from "../NotFound";
 
@@ -29,6 +29,7 @@ export default function CourseDetail() {
   const [open, setOpen] = useState<number[]>([0]);
   const { isLessonComplete, toggleLessonComplete } = useLearning();
   const progressFor = useCourseProgress();
+  const { isAuthenticated, hasCourse, ready } = useAuth();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [payments, setPayments] = useState<PaymentsConfig | null>(null);
   const price = course?.price ?? 0;
@@ -36,7 +37,7 @@ export default function CourseDetail() {
     if (price > 0) getPaymentsConfig().then(setPayments).catch(() => setPayments({ enabled: false, mode: "sandbox", demo: false }));
   }, [price]);
   if (!course) return <NotFound />;
-  const locked = price > 0 && !hasPurchased(course.id);
+  const locked = price > 0 && !hasCourse(course.id);
 
   const progress = progressFor(course);
   const first = course.curriculum[0].lessons[0];
@@ -79,9 +80,16 @@ export default function CourseDetail() {
                   <Button to="/contact" className="mt-5 w-full" size="lg">Contact us to enrol</Button>
                   <p className="mt-3 text-center text-xs text-muted">Online payment is not available right now.</p>
                 </>
+              ) : !isAuthenticated ? (
+                <>
+                  <Button to={`/login?next=${encodeURIComponent(`/courses/${course.id}`)}`} className="mt-5 w-full" size="lg">
+                    <Lock className="h-5 w-5" aria-hidden="true" /> Log in to buy · {formatPrice(price)}
+                  </Button>
+                  <p className="mt-3 text-center text-xs text-muted">The course is added to your account. <Link to={`/register?next=${encodeURIComponent(`/courses/${course.id}`)}`} className="font-semibold text-ink-700">New here? Sign up free</Link></p>
+                </>
               ) : (
                 <>
-                  <Button className="mt-5 w-full" size="lg" onClick={() => setCheckoutOpen(true)} disabled={!payments}>
+                  <Button className="mt-5 w-full" size="lg" onClick={() => setCheckoutOpen(true)} disabled={!payments || !ready}>
                     <Lock className="h-5 w-5" aria-hidden="true" /> Buy course · {formatPrice(price)}
                   </Button>
                   <p className="mt-3 text-center text-xs text-muted">One-time payment · UPI, cards and net banking</p>
@@ -92,7 +100,7 @@ export default function CourseDetail() {
                 <Button to={(nextItem?.l.href ?? first.href) || "/courses"} className="mt-5 w-full" size="lg">
                   <PlayCircle className="h-5 w-5" aria-hidden="true" /> {progress.done ? "Continue course" : "Start course"}
                 </Button>
-                <p className="mt-3 text-center text-xs text-muted">{price ? "Enrolled" : "Free · No sign-up needed"} · Progress saved on this device</p>
+                <p className="mt-3 text-center text-xs text-muted">{price ? "Enrolled · In your account" : "Free · No sign-up needed"} · Progress saved on this device</p>
               </>
             )}
           </Card>
@@ -170,7 +178,7 @@ export default function CourseDetail() {
         </aside>
       </div>
 
-      {payments && locked && (
+      {payments && locked && isAuthenticated && (
         <CheckoutDialog open={checkoutOpen} onClose={() => setCheckoutOpen(false)} course={{ id: course.id, title: course.title, price }} config={payments} />
       )}
 

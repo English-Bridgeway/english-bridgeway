@@ -8,7 +8,7 @@ export const API_BASE = raw ? raw.replace(/\/$/, "") : "";
 export const isLive = Boolean(API_BASE);
 
 export class HttpError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(message: string, public readonly status: number, public readonly field?: "name" | "email" | "password") {
     super(message);
   }
 }
@@ -27,6 +27,9 @@ export async function apiFetch<T>(path: string, init: RequestInit & { json?: unk
   });
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new HttpError((data as { message?: string }).message || `Request failed (${res.status})`, res.status);
+  if (!res.ok) {
+    const { message, field } = data as { message?: string; field?: HttpError["field"] };
+    throw new HttpError(message || `Request failed (${res.status})`, res.status, field);
+  }
   return data as T;
 }

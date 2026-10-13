@@ -43,6 +43,66 @@ put HTTPS in front of port 8080 (Caddy, Nginx or your host's load balancer), cha
 and add `https://www.example.com/api/webhooks/cashfree` as the webhook URL in Cashfree.
 Files: `Dockerfile` (website), `server/Dockerfile` (API), `docker/nginx.conf`, `docker-compose.yml`.
 
+### Deploying on a server (e.g. AWS EC2 with a host Nginx)
+
+```bash
+cd /var/www/english-bridgeway && git pull
+docker compose up -d --build                    # site + API + voice chat on :8080
+docker compose --profile turn up -d --build     # same, plus the TURN relay (recommended)
+```
+
+1. **HTTPS is required for voice chat.** Browsers only allow the microphone on `https://` (or localhost).
+   Keep certbot on the host Nginx in front of port 8080.
+2. **Let WebSockets through the host Nginx.** Voice chat uses `/api/socket.io/`. In the host site config:
+   ```nginx
+   location / {
+     proxy_pass http://127.0.0.1:8080;
+     proxy_http_version 1.1;
+     proxy_set_header Upgrade $http_upgrade;
+     proxy_set_header Connection "upgrade";
+     proxy_set_header Host $host;
+     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     proxy_set_header X-Forwarded-Proto $scheme;
+     proxy_read_timeout 1h;
+   }
+   ```
+   then `sudo nginx -t && sudo systemctl reload nginx`.
+3. **TURN relay (optional, recommended).** Without it, calls between two strict networks (some office/college Wi-Fi,
+   some mobile carriers) may stay on "Connecting…". In `.env` set `TURN_SECRET` (`openssl rand -hex 32`),
+   `TURN_URLS=turn:englishbridgeway.com:3478?transport=udp,turn:englishbridgeway.com:3478?transport=tcp` and
+   `TURN_EXTERNAL_IP` (the EC2 public IP, or leave empty to detect it), then start with `--profile turn`.
+   Open these in the EC2 security group: **3478 TCP+UDP** and **49160-49200 UDP**.
+
+| Port | Used by |
+| --- | --- |
+| 8080 (TCP, host only) | Website, API and voice chat WebSocket, behind the host Nginx on 80/443 |
+| 3478 (TCP+UDP) | TURN relay (only with `--profile turn`) |
+| 49160-49200 (UDP) | TURN relayed audio (only with `--profile turn`) |
+
+## Learner accounts and course payments
+
+- Learners sign up at `/register` and log in at `/login` (passwords bcrypt-hashed, 30-day sessions kept on the device,
+  rate-limited). `/dashboard` and `/speak` need an account; other lessons stay open to everyone.
+- Buying a paid course requires an account. The order is tied to that account and uses its email; when Cashfree confirms
+  the payment (return page or webhook) the course unlocks for that learner on every device. Refunded orders lock it again.
+- Cashfree runs in **sandbox (test) mode** by default. Use Cashfree's test cards/UPI there; switch to production in
+  Admin → Payment gateway when you go live.
+- API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/me` (profile and owned course ids), `GET /api/me/orders`,
+  `POST /api/me/logout-all`. `POST /api/orders` now needs the learner's `Authorization: Bearer` token.
+
+## Speak Live: voice chat (`/speak`)
+
+- **Learners online:** everyone logged in shows up while they are anywhere on the site. Press **Call** for a one-to-one call;
+  the other learner gets a ringing pop-up on whatever page they are on (Answer / Decline, rings for 40 seconds).
+- **Team rooms:** start a room (public, or private for invited people only), invite online learners or share the
+  invite link, up to `VOICE_MAX_ROOM_SIZE` people (default 6). Mute, leave, and a small call bar on other pages.
+- **How it works:** audio goes directly between browsers over WebRTC (encrypted, nothing recorded); with several people
+  each browser connects to each other one. The API (`server/src/services/voice.ts`, Socket.IO at `/api/socket.io`)
+  only handles who is online, rooms, invitations and the WebRTC set-up messages. STUN finds a direct path; the
+  optional coturn TURN server relays audio when there is none. TURN logins are short-lived (12 hours) and made from `TURN_SECRET`.
+- Voice chat runs in one API process (rooms are kept in memory). For several API processes you would add the
+  Socket.IO Redis adapter. In demo mode (no `VITE_API_BASE`) the page explains that calls need the server.
+
 ## Admin panel (`/admin`)
 
 | Section | What it does |
@@ -95,20 +155,21 @@ src/
 │                 BlogCard, TopicCard, Dialogue, QuizRunner, SearchDialog, WordOfTheDay, ...
 ├── pages/        Home, Grammar (dashboard/topic/lesson), Vocabulary (list/detail), SpokenEnglish
 │                 (list/lesson), Quiz (categories/category/play), Courses (list/detail), Blog
-│                 (list/article), Contact, Dashboard, Search, Auth (Login/Register), NotFound
+│                 (list/article), Contact, Dashboard, Search, Auth (Login/Register), SpeakLive, NotFound
+├── voice/        useVoiceChat (WebRTC + Socket.IO), VoiceContext (online presence, call pop-ups on every page)
 ├── admin/        Admin panel: AdminApp (routes), pages/, schemas.ts (form definition per content type),
 │                 api/ (http client for server/, plus the in-browser demo backend)
 ├── data/         Built-in content: grammar.ts, vocabulary.ts, spokenEnglish.ts, quizzes.ts, courses.ts,
 │                 blog.ts, site.ts; content.ts applies the admin-managed content over these at start-up
 ├── layouts/      MainLayout.tsx (navbar, footer, lazy-route Suspense)
 ├── routes/       AppRoutes.tsx (all routes, lazy loaded)
-├── context/      AuthContext (auth placeholder), LearningContext (progress, favourites, scores, streak)
+├── context/      AuthContext (learner accounts and owned courses), LearningContext (progress, favourites, scores, streak)
 ├── hooks/        usePageMeta (title, description, Open Graph), useDebounce
 ├── utils/        api.ts, search.ts, quiz.ts, speech.ts, storage.ts, sitemap.ts, format.ts, cn.ts
 └── types/        Shared TypeScript interfaces
 server/
-├── src/routes/   public.ts (content, orders, contact), admin.ts (admin API), webhooks.ts (Cashfree)
-├── src/services/ cashfree.ts, orders.ts, settings.ts (encrypted gateway keys), content.ts, auth.ts
+├── src/routes/   public.ts (content, orders, contact), account.ts (learner sign-up/login, /me), admin.ts (admin API), webhooks.ts (Cashfree)
+├── src/services/ cashfree.ts, orders.ts, settings.ts (encrypted gateway keys), content.ts, auth.ts, learners.ts, voice.ts (voice chat)
 └── seed/         content.json (built-in content loaded into an empty database)
 ```
 
@@ -125,8 +186,8 @@ server/
 
 - **New content fields:** add the field to `src/types`, to the page that shows it, and to its form in `src/admin/schemas.ts`.
 - **Contact form:** messages go to the API and appear in Admin → Messages. See `src/utils/api.ts`.
-- **Auth:** implement `signIn`, `signUp` and `signOut` in `src/context/AuthContext.tsx`. Login, Register,
-  Navbar and Dashboard already use that interface.
+- **Auth:** learner accounts live in `src/context/AuthContext.tsx` and `src/utils/account.ts`; wrap a route in
+  `<RequireAuth>` (see `src/routes/AppRoutes.tsx`) to make it members-only.
 - **Progress:** `src/context/LearningContext.tsx` stores progress in localStorage; swap the storage calls for
   API calls to sync across devices.
 - **Search:** `src/utils/search.ts` searches local data; replace `search()` with a server call.

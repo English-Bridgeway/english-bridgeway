@@ -1,12 +1,4 @@
-import type { Activity, User } from "../types";
-
-// Mock signed-in student used by the dashboard until a backend /me endpoint exists.
-export const mockUser: User = {
-  id: "u_demo",
-  name: "Student",
-  email: "student@englishbridgeway.example",
-  avatarInitials: "ST",
-};
+import type { Activity } from "../types";
 
 export const recentActivity: Activity[] = [
   { id: "a1", kind: "lesson", label: "Completed a lesson", detail: "Present Continuous Tense", when: "Today, 8:40 a.m." },

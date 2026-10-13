@@ -78,10 +78,42 @@ Setting.init(
   { sequelize, tableName: 'settings', underscored: true },
 );
 
+// Learners: the students who sign up on the public site (separate from admins).
+export class Learner extends Model<InferAttributes<Learner>, InferCreationAttributes<Learner>> {
+  declare id: CreationOptional<string>;
+  declare email: string;
+  declare name: string;
+  declare phone: CreationOptional<string | null>;
+  declare passwordHash: string;
+  declare active: CreationOptional<boolean>;
+  // Raised on "log out everywhere" and password changes; tokens carrying an older value stop working.
+  declare tokenVersion: CreationOptional<number>;
+  declare lastLoginAt: CreationOptional<Date | null>;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
+}
+
+Learner.init(
+  {
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    email: { type: DataTypes.STRING(254), allowNull: false, unique: true },
+    name: { type: DataTypes.STRING(120), allowNull: false },
+    phone: { type: DataTypes.STRING(15), allowNull: true },
+    passwordHash: { type: DataTypes.STRING(100), allowNull: false },
+    active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+    tokenVersion: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    lastLoginAt: { type: DataTypes.DATE, allowNull: true },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  },
+  { sequelize, tableName: 'learners', underscored: true },
+);
+
 export type OrderStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export class Order extends Model<InferAttributes<Order>, InferCreationAttributes<Order>> {
   declare orderId: string;
+  declare userId: CreationOptional<string | null>;
   declare courseId: string;
   declare courseTitle: string;
   declare amountPaise: number;
@@ -100,6 +132,8 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
 Order.init(
   {
     orderId: { type: DataTypes.STRING(45), primaryKey: true },
+    // The learner account that bought the course. Paid orders with this id unlock the course.
+    userId: { type: DataTypes.UUID, allowNull: true },
     courseId: { type: DataTypes.STRING(160), allowNull: false },
     courseTitle: { type: DataTypes.STRING(200), allowNull: false },
     amountPaise: { type: DataTypes.INTEGER, allowNull: false },
@@ -114,7 +148,7 @@ Order.init(
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
-  { sequelize, tableName: 'orders', underscored: true, indexes: [{ fields: ['status'] }, { fields: ['customer_email'] }] },
+  { sequelize, tableName: 'orders', underscored: true, indexes: [{ fields: ['status'] }, { fields: ['customer_email'] }, { fields: ['user_id'] }] },
 );
 
 export class Message extends Model<InferAttributes<Message>, InferCreationAttributes<Message>> {
@@ -166,5 +200,11 @@ AuditLog.init(
 /** Creates any missing tables. Safe to run on every start; it never drops data. */
 export async function initDatabase(): Promise<void> {
   await sequelize.authenticate();
+  // sync() creates missing tables but never changes existing ones, so columns added after
+  // the first release are added here (idempotent, keeps the data).
+  const orders = await sequelize.getQueryInterface().describeTable('orders').catch(() => null);
+  if (orders && !orders.user_id) {
+    await sequelize.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id UUID');
+  }
   await sequelize.sync();
 }
