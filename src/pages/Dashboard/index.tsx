@@ -53,10 +53,10 @@ export default function Dashboard() {
       )}
 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <div className="relative overflow-hidden rounded-3xl bg-ink-800 p-6 text-white sm:p-8">
+        <div className="relative overflow-hidden rounded-3xl bg-brand-primary p-6 text-white sm:p-8">
           <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-ink-600/50" aria-hidden="true" />
           <p className="relative text-sm font-semibold text-amber-300">Welcome back</p>
-          <h1 className="relative mt-1 text-3xl font-bold text-white sm:text-4xl">Welcome back, {user?.name ?? "Student"}!</h1>
+          <h1 className="relative mt-1 text-3xl font-bold text-amber-400 sm:text-4xl">Welcome back, {user?.name ?? "Student"}!</h1>
           <p className="relative mt-3 text-lg text-ink-100">You're {Math.round(coursePercent)}% through {course.title}.</p>
           <ProgressBar value={coursePercent} label={`${course.title} progress`} tone="amber" className="relative mt-5 max-w-md" />
           <div className="relative mt-6 flex flex-wrap gap-3">

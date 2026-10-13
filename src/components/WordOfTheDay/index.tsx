@@ -10,7 +10,7 @@ export function WordOfTheDay({ className }: { className?: string }) {
   const w = getWordOfTheDay();
   const date = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
   return (
-    <section aria-labelledby="wotd-title" className={cn("relative overflow-hidden rounded-3xl bg-ink-800 p-6 text-white sm:p-10", className)}>
+    <section aria-labelledby="wotd-title" className={cn("relative overflow-hidden rounded-3xl bg-brand-primary p-6 text-white sm:p-10", className)}>
       <div className="absolute -right-10 -top-10 h-56 w-56 rounded-full bg-ink-600/40" aria-hidden="true" />
       <div className="absolute -bottom-16 right-24 h-40 w-40 rounded-full bg-amber-400/15" aria-hidden="true" />
       <div className="relative grid gap-8 md:grid-cols-[1.1fr_1fr] md:items-center">

@@ -285,7 +285,7 @@ export const schemas: CollectionSchema[] = [
     titleField: "title",
     subtitle: (p) => `${p.category} · ${p.date} · ${p.author}`,
     slugFrom: "title",
-    newItem: () => ({ title: "", excerpt: "", category: blogCategories[0], author: "", date: new Date().toISOString().slice(0, 10), readingMinutes: 5, cover: { from: "#0f3d3e", to: "#1f6e70", icon: "BookOpen" }, content: [] }),
+    newItem: () => ({ title: "", excerpt: "", category: blogCategories[0], author: "", date: new Date().toISOString().slice(0, 10), readingMinutes: 5, cover: { icon: "BookOpen" }, content: [] }),
     fields: [
       { name: "title", label: "Title", type: "text", required: true, wide: true },
       { name: "category", label: "Category", type: "select", options: blogCategories, required: true },
@@ -294,8 +294,6 @@ export const schemas: CollectionSchema[] = [
       { name: "readingMinutes", label: "Reading time (minutes)", type: "number", min: 1, required: true },
       { name: "excerpt", label: "Excerpt", type: "textarea", required: true, wide: true },
       { name: "cover", label: "Cover art", type: "group", wide: true, fields: [
-        { name: "from", label: "Gradient start", type: "color", required: true },
-        { name: "to", label: "Gradient end", type: "color", required: true },
         { name: "icon", label: "Icon", type: "icon", hint: iconHint, required: true },
       ] },
       {

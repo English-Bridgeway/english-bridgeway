@@ -8,13 +8,11 @@ import { ProgressBar } from "../ProgressBar";
 import { buttonClasses } from "../Button";
 import { formatNumber, formatPrice } from "../../utils/format";
 
-const tints = ["from-ink-800 to-ink-500", "from-ink-700 to-ink-400", "from-amber-800 to-amber-600", "from-ink-900 to-ink-600"];
-
-export function CourseCard({ course, index = 0, progress }: { course: Course; index?: number; progress?: number }) {
+export function CourseCard({ course, progress }: { course: Course; index?: number; progress?: number }) {
   const free = !course.price;
   return (
     <Card interactive className="flex h-full flex-col overflow-hidden">
-      <div className={`relative flex h-36 items-end bg-gradient-to-br p-5 ${tints[index % tints.length]}`}>
+      <div className="relative flex h-36 items-end bg-brand-primary p-5">
         <Icon name={course.icon} className="absolute right-5 top-5 h-16 w-16 text-white/15" strokeWidth={1.5} />
         <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/15 text-white backdrop-blur">
           <Icon name={course.icon} className="h-6 w-6" />

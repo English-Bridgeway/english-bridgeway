@@ -39,18 +39,18 @@ export function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn("rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
-      isActive ? "bg-ink-50 text-ink-900" : "text-muted hover:bg-ink-50/70 hover:text-ink-900");
+      isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10 hover:text-amber-300");
 
   return (
     <header
       className={cn(
         "sticky top-0 z-40 border-b transition-[background-color,box-shadow,border-color] duration-200",
-        scrolled || menuOpen ? "border-line bg-white/95 shadow-[0_4px_20px_-12px_rgb(15_61_62/0.25)] backdrop-blur" : "border-transparent bg-canvas",
+        scrolled || menuOpen ? "border-white/10 bg-brand-primary/95 shadow-[0_4px_20px_-12px_rgb(79_95_245/0.35)] backdrop-blur" : "border-transparent bg-brand-primary",
       )}
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
       <div className="container-page flex h-16 items-center justify-between gap-3 lg:h-18">
-        <Logo />
+        <Logo light />
         <nav aria-label="Main" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
             {mainNav.map((item) => (
@@ -61,17 +61,17 @@ export function Navbar() {
           </ul>
         </nav>
         <div className="flex items-center gap-1.5">
-          <button type="button" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-ink-800 hover:bg-ink-50" aria-label="Search (press /)">
+          <button type="button" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10" aria-label="Search (press /)">
             <Search className="h-5 w-5" aria-hidden="true" />
           </button>
-          <Link to="/dashboard" className="hidden h-10 w-10 place-items-center rounded-xl text-ink-800 hover:bg-ink-50 sm:grid" aria-label={`My dashboard${user ? ` (${user.name})` : ""}`}>
+          <Link to="/dashboard" className="hidden h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 sm:grid" aria-label={`My dashboard${user ? ` (${user.name})` : ""}`}>
             <UserRound className="h-5 w-5" aria-hidden="true" />
           </Link>
-          <span className="hidden sm:block"><Button to="/courses/beginner-english" size="sm">Start Learning</Button></span>
+          <span className="hidden sm:block"><Button to="/courses/beginner-english" size="sm" variant="accent">Start Learning</Button></span>
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            className="grid h-10 w-10 place-items-center rounded-xl text-ink-800 hover:bg-ink-50 xl:hidden"
+            className="grid h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 xl:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -88,26 +88,26 @@ export function Navbar() {
         inert={!menuOpen}
       >
         <div className="min-h-0">
-          <nav aria-label="Mobile" className="container-page border-t border-line pb-6 pt-3">
+          <nav aria-label="Mobile" className="container-page border-t border-white/15 pb-6 pt-3">
             <ul className="grid gap-1 sm:grid-cols-2">
               {mainNav.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
                     end={item.to === "/"}
-                    className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-ink-50 text-ink-900" : "text-ink-800 hover:bg-ink-50")}
+                    className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}
                   >
                     {item.label}
                   </NavLink>
                 </li>
               ))}
               <li>
-                <NavLink to="/dashboard" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-ink-50 text-ink-900" : "text-ink-800 hover:bg-ink-50")}>
+                <NavLink to="/dashboard" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}>
                   My Dashboard
                 </NavLink>
               </li>
             </ul>
-            <Button to="/courses/beginner-english" className="mt-4 w-full">Start Learning</Button>
+            <Button to="/courses/beginner-english" className="mt-4 w-full" variant="accent">Start Learning</Button>
           </nav>
         </div>
       </div>

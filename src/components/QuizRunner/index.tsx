@@ -60,9 +60,9 @@ export function QuizRunner({ questions, title, onSubmit, resultActions }: Props)
     const percent = Math.round((score / total) * 100);
     return (
       <section aria-labelledby="quiz-result" className="animate-fade-in">
-        <div className="rounded-2xl bg-ink-800 p-6 text-white sm:p-8">
+        <div className="rounded-2xl bg-brand-primary p-6 text-white sm:p-8">
           <p className="text-sm font-semibold uppercase tracking-wider text-ink-200">{title ? `${title} · ` : ""}Results</p>
-          <h2 id="quiz-result" ref={headingRef} tabIndex={-1} className="mt-2 text-3xl font-bold text-white sm:text-4xl">
+          <h2 id="quiz-result" ref={headingRef} tabIndex={-1} className="mt-2 text-3xl font-bold text-amber-400 sm:text-4xl">
             Your score: <span className="tabular-nums">{score}/{total}</span>
           </h2>
           <p className="mt-2 text-lg text-ink-100">{scoreMessage(percent)}</p>
@@ -78,14 +78,14 @@ export function QuizRunner({ questions, title, onSubmit, resultActions }: Props)
           {questions.map((x, i) => {
             const ok = isCorrect(x, answers[x.id]);
             return (
-              <li key={x.id} className={cn("rounded-xl border bg-white p-4", ok ? "border-emerald-200" : "border-red-200")}>
+              <li key={x.id} className={cn("rounded-xl border bg-white p-4", ok ? "border-brand-sky/25" : "border-danger/30")}>
                 <div className="flex gap-3">
-                  {ok ? <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-label="Correct" /> : <CircleX className="mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-label="Wrong" />}
+                  {ok ? <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-sky" aria-label="Correct" /> : <CircleX className="mt-0.5 h-5 w-5 shrink-0 text-danger" aria-label="Wrong" />}
                   <div className="min-w-0">
                     <p className="font-medium"><span className="text-muted">{i + 1}.</span> <Prompt text={x.prompt} /></p>
                     <p className="mt-1 text-sm">
-                      Your answer: <span className={ok ? "font-semibold text-emerald-700" : "font-semibold text-red-700"}>{answers[x.id]?.trim() || "No answer"}</span>
-                      {!ok && <> · Correct: <span className="font-semibold text-emerald-700">{primaryAnswer(x)}</span></>}
+                      Your answer: <span className={ok ? "font-semibold text-brand-sky" : "font-semibold text-danger"}>{answers[x.id]?.trim() || "No answer"}</span>
+                      {!ok && <> · Correct: <span className="font-semibold text-brand-sky">{primaryAnswer(x)}</span></>}
                     </p>
                     <p className="mt-1 text-sm text-muted">{x.explanation}</p>
                   </div>
@@ -132,10 +132,10 @@ export function QuizRunner({ questions, title, onSubmit, resultActions }: Props)
                   onClick={() => setAnswer(opt)}
                   className={cn(
                     "flex items-center gap-3 rounded-xl border p-3.5 text-left transition-colors",
-                    selected ? "border-ink-600 bg-ink-50 ring-1 ring-ink-600" : "border-line bg-white hover:border-ink-300",
+                    selected ? "border-brand-sky bg-ink-50 ring-1 ring-brand-sky" : "border-line bg-white hover:border-ink-300",
                   )}
                 >
-                  <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg text-sm font-bold", selected ? "bg-ink-800 text-white" : "bg-ink-50 text-ink-700")}>
+                  <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg text-sm font-bold", selected ? "bg-brand-sky text-white" : "bg-ink-50 text-ink-700")}>
                     {String.fromCharCode(65 + i)}
                   </span>
                   <span>{opt}</span>

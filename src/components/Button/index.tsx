@@ -8,9 +8,9 @@ type Size = "sm" | "md" | "lg";
 const base =
   "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 const variants: Record<Variant, string> = {
-  primary: "bg-ink-800 text-white hover:bg-ink-700 shadow-sm hover:shadow-md",
-  secondary: "bg-ink-50 text-ink-800 hover:bg-ink-100",
-  outline: "border border-line bg-white text-ink-800 hover:border-ink-300 hover:bg-ink-50",
+  primary: "bg-brand-primary text-white hover:bg-brand-primary/90 shadow-sm hover:shadow-md",
+  secondary: "bg-brand-sky text-ink-900 hover:bg-brand-sky/80",
+  outline: "border border-brand-sky bg-white text-ink-900 hover:bg-ink-50",
   ghost: "text-ink-700 hover:bg-ink-50",
   accent: "bg-amber-400 text-ink-900 hover:bg-amber-300 shadow-sm",
   danger: "bg-red-700 text-white hover:bg-red-800 shadow-sm",

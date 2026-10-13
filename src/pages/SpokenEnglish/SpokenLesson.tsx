@@ -77,7 +77,7 @@ export default function SpokenLesson() {
               <div role="group" aria-label="Practice mode" className="inline-flex rounded-xl bg-ink-50 p-1">
                 {(["read", "repeat"] as const).map((m) => (
                   <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
-                    className={cn("rounded-lg px-3.5 py-1.5 text-sm font-semibold", mode === m ? "bg-white text-ink-900 shadow-card" : "text-muted hover:text-ink-900")}>
+                    className={cn("rounded-lg px-3.5 py-1.5 text-sm font-semibold", mode === m ? "bg-brand-sky text-white shadow-card" : "text-muted hover:text-ink-900")}>
                     {m === "read" ? "Conversation" : "Repeat practice"}
                   </button>
                 ))}
@@ -94,7 +94,7 @@ export default function SpokenLesson() {
             ) : (
               <div className="mt-6">
                 <p className="text-sm text-muted">Line {step + 1} of {lesson.dialogue.length}. Listen, then say the line out loud. Repeat until it feels natural.</p>
-                <div className={cn("mt-4 rounded-2xl p-6", line.speaker === "A" ? "bg-ink-800 text-white" : "bg-amber-50 text-ink-900")}>
+                <div className={cn("mt-4 rounded-2xl p-6", line.speaker === "A" ? "bg-brand-primary text-white" : "bg-amber-50 text-ink-900")}>
                   <p className={cn("text-sm font-semibold", line.speaker === "A" ? "text-ink-200" : "text-amber-800")}>{line.name} (Speaker {line.speaker})</p>
                   <p className="mt-2 font-display text-2xl font-semibold leading-snug">{line.text}</p>
                 </div>

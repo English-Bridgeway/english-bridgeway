@@ -13,7 +13,7 @@ export const blogPosts: BlogPost[] = [
     author: "Ananya Deshpande",
     date: "2026-10-02",
     readingMinutes: 6,
-    cover: { from: "#0f3d3e", to: "#1f6e70", icon: "AlertTriangle" },
+    cover: { icon: "AlertTriangle" },
     content: [
       { type: "p", text: "Many common mistakes come from translating directly from Hindi, Marathi, Tamil or other languages. The good news: once you notice them, they are easy to fix. Here are ten we hear every week, with the correct version." },
       { type: "pairs", items: [
@@ -39,7 +39,7 @@ export const blogPosts: BlogPost[] = [
     author: "Rohan Mathew",
     date: "2026-09-28",
     readingMinutes: 8,
-    cover: { from: "#155a5c", to: "#3f8b8d", icon: "MessagesSquare" },
+    cover: { icon: "MessagesSquare" },
     content: [
       { type: "p", text: "You don't need thousands of words to have a good conversation. You need the right phrases at the right time. Here are fifty, grouped by situation." },
       { type: "h2", text: "Greetings and small talk" },
@@ -63,7 +63,7 @@ export const blogPosts: BlogPost[] = [
     author: "Rohan Mathew",
     date: "2026-09-24",
     readingMinutes: 7,
-    cover: { from: "#6e4a05", to: "#b37a0b", icon: "Mic" },
+    cover: { icon: "Mic" },
     content: [
       { type: "p", text: "Speaking is a skill, like cycling or cooking. You improve by doing it, a little every day. These habits work even if you live in a place where you rarely hear English." },
       { type: "h2", text: "1. Shadow native speakers" },
@@ -91,7 +91,7 @@ export const blogPosts: BlogPost[] = [
     author: "Farah Khan",
     date: "2026-09-20",
     readingMinutes: 5,
-    cover: { from: "#0b2b2c", to: "#155a5c", icon: "Sparkles" },
+    cover: { icon: "Sparkles" },
     content: [
       { type: "p", text: "Idioms are phrases whose meaning isn't clear from the individual words. Native speakers use them all the time, so knowing the common ones helps you understand conversations, films and emails." },
       { type: "pairs", items: [
@@ -119,7 +119,7 @@ export const blogPosts: BlogPost[] = [
     author: "Ananya Deshpande",
     date: "2026-09-16",
     readingMinutes: 4,
-    cover: { from: "#1f6e70", to: "#74b0b1", icon: "Clock" },
+    cover: { icon: "Clock" },
     content: [
       { type: "p", text: "Both since and for are used with the present perfect to talk about how long something has continued. The difference is simple." },
       { type: "pairs", items: [
@@ -138,7 +138,7 @@ export const blogPosts: BlogPost[] = [
     author: "Farah Khan",
     date: "2026-09-12",
     readingMinutes: 5,
-    cover: { from: "#b37a0b", to: "#f4b740", icon: "Brain" },
+    cover: { icon: "Brain" },
     content: [
       { type: "p", text: "Most learners forget new words within a week. That's not a memory problem; it's a method problem. Try this instead." },
       { type: "list", items: ["Learn five words a day, not fifty.", "Say each word out loud and copy the stress.", "Write one sentence about your own life with each word.", "Review after 1 day, 3 days, 7 days and 21 days.", "Use the word in a real conversation or message within a week."] },
@@ -153,7 +153,7 @@ export const blogPosts: BlogPost[] = [
     author: "Rohan Mathew",
     date: "2026-09-08",
     readingMinutes: 5,
-    cover: { from: "#0f4849", to: "#3f8b8d", icon: "Video" },
+    cover: { icon: "Video" },
     content: [
       { type: "p", text: "Video calls bring their own challenges: delays, frozen screens and people talking at the same time. These phrases help you stay calm and professional." },
       { type: "h2", text: "Joining and starting" },

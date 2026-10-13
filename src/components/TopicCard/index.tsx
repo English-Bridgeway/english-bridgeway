@@ -25,7 +25,7 @@ export function TopicCard({ to, icon, title, summary, level, lessons, cta = "Sta
       <div className="mt-5 flex items-center justify-between border-t border-line pt-4 text-sm">
         <span className="text-muted">
           {pluralize(lessons, "lesson")}
-          {done ? <span className="text-emerald-700"> · {done} done</span> : null}
+          {done ? <span className="text-brand-sky"> · {done} done</span> : null}
         </span>
         <span className="inline-flex items-center gap-1 font-semibold text-ink-700">
           {cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />

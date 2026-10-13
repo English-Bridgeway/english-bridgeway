@@ -14,7 +14,7 @@ export function BlogCover({ post, className, large }: { post: BlogPost; classNam
       role="img"
       aria-label={`Cover illustration for ${post.title}`}
       className={cn("relative overflow-hidden", className)}
-      style={{ background: `linear-gradient(135deg, ${post.cover.from}, ${post.cover.to})` }}
+      style={{ backgroundColor: "var(--primary-color)" }}
     >
       <div className="absolute -right-6 -bottom-8 opacity-15">
         <Icon name={post.cover.icon} className={large ? "h-64 w-64 text-white" : "h-40 w-40 text-white"} strokeWidth={1.25} />
