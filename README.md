@@ -18,6 +18,31 @@ npm run preview    # serve the production build
 Without `VITE_API_BASE` the site runs in **demo mode**: the admin panel (`/admin`, demo login filled in), checkout and the contact
 form all work, but data is kept in the browser only. Connect the API (below) for real use.
 
+## Run everything with Docker
+
+One command starts PostgreSQL, the API and the website (Nginx), with the API served under `/api` on the same address.
+
+```bash
+cp .env.docker.example .env     # set JWT_SECRET (openssl rand -hex 32), ADMIN_EMAIL and ADMIN_PASSWORD (10+ characters)
+docker compose up -d --build    # http://localhost:8080, admin panel at http://localhost:8080/admin
+docker compose logs -f server   # watch start-up
+```
+
+On the first start the API creates its tables, loads the built-in lessons from `server/seed/content.json` and creates the
+first owner from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Data is kept in the `db-data` volume.
+
+| Task | Command |
+|---|---|
+| Add or reset an admin | `docker compose exec -e ADMIN_PASSWORD='new-password-123' server node dist/scripts/createAdmin.js you@example.com "Your Name" owner` |
+| Reload the built-in content (overwrites items with the same slug) | `docker compose exec server node dist/scripts/seed.js --force` |
+| Update after pulling new code | `docker compose up -d --build` |
+| Stop / stop and delete the database | `docker compose down` / `docker compose down -v` |
+
+For a real server, set `PUBLIC_SITE_URL` and `API_PUBLIC_URL` to your domain (both the same, e.g. `https://www.example.com`),
+put HTTPS in front of port 8080 (Caddy, Nginx or your host's load balancer), change `POSTGRES_PASSWORD` before the first start,
+and add `https://www.example.com/api/webhooks/cashfree` as the webhook URL in Cashfree.
+Files: `Dockerfile` (website), `server/Dockerfile` (API), `docker/nginx.conf`, `docker-compose.yml`.
+
 ## Admin panel (`/admin`)
 
 | Section | What it does |
@@ -26,7 +51,7 @@ form all work, but data is kept in the browser only. Connect the API (below) for
 | Content | Add, edit, hide/publish, reorder and delete grammar topics and lessons, vocabulary, spoken English lessons, quiz categories, quizzes (with questions), courses (price, curriculum) and blog posts |
 | Orders & payments | Every course order with Cashfree payment ID and UTR, status filters, search, "Check" against Cashfree, refunds, CSV export |
 | Messages | Contact form inbox: read, reply by email, archive, delete |
-| Site settings | Site name, tagline, contact details, social links, home-page numbers |
+| Site settings | Site name, tagline, contact details, social links, home-page numbers, Listen voice |
 | Payment gateway | Turn payments on/off, sandbox or production, Cashfree App ID and Secret key (stored encrypted), key test, webhook URL |
 | Admins | Owners (everything) and editors (content, orders, messages); add, disable, reset passwords |
 | Activity log | Every sign-in and change, with who did it |
@@ -90,6 +115,9 @@ server/
 ## Customising
 
 - **Site name, email, WhatsApp, location, social links, home-page stats:** Admin → Site settings (defaults in `src/data/site.ts`)
+- **Listen voice:** Admin → Site settings → Listen voice. Automatic picks a friendly female English voice (Edge's natural
+  voices, Google UK English Female, Samantha, Zira and so on) with a slightly higher pitch; you can choose a named voice, pitch
+  and speed and try it there. Voices come from each visitor's browser, so a named voice falls back to Automatic where it is missing.
 - **Content:** Admin → Content. The arrays in `src/data/*.ts` are only the starting content.
 - **Colours and fonts:** the `@theme` block in `src/index.css`.
 

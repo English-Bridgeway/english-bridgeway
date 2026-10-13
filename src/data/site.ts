@@ -12,6 +12,8 @@ export interface SiteSettings {
   hours: string;
   social: { youtube: string; instagram: string; facebook: string; linkedin: string };
   stats: { label: string; value: string; icon: string }[];
+  /** Read-aloud voice for Listen buttons. An empty name picks a friendly female English voice automatically. */
+  voice: { name: string; pitch: number; rate: number };
 }
 
 export const site: SiteSettings = {
@@ -38,6 +40,7 @@ export const site: SiteSettings = {
     { label: "Quizzes", value: "100+", icon: "ListChecks" },
     { label: "Courses", value: "20+", icon: "GraduationCap" },
   ],
+  voice: { name: "", pitch: 1.15, rate: 0.92 },
 };
 
 export const mainNav = [

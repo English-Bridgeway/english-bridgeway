@@ -10,7 +10,7 @@ import { ListenButton } from "../../components/ListenButton";
 import { Alert } from "../../components/Alert";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { getSpokenLesson, spokenLessons } from "../../data/spokenEnglish";
-import { canSpeak } from "../../utils/speech";
+import { canSpeak, makeUtterance } from "../../utils/speech";
 import { cn } from "../../utils/cn";
 import NotFound from "../NotFound";
 
@@ -47,10 +47,8 @@ export default function SpokenLesson() {
     const say = (n: number) => {
       if (stopRef.current || n >= lesson.dialogue.length) { setPlaying(undefined); return; }
       setPlaying(n);
-      const u = new SpeechSynthesisUtterance(lesson.dialogue[n].text);
-      u.lang = "en-GB";
-      u.rate = 0.9;
-      u.pitch = lesson.dialogue[n].speaker === "A" ? 1 : 1.15;
+      // Same friendly voice for both speakers; Speaker A a little lower so they sound different.
+      const u = makeUtterance(lesson.dialogue[n].text, { pitchShift: lesson.dialogue[n].speaker === "A" ? -0.2 : 0 });
       u.onend = () => setTimeout(() => say(n + 1), 350);
       u.onerror = () => setPlaying(undefined);
       window.speechSynthesis.speak(u);

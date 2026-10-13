@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Volume2 } from "lucide-react";
 import { adminApi } from "../api";
 import { useAdmin } from "../AdminContext";
 import { ErrorNote, Loading, PageTitle, Panel, inputClass } from "../ui";
 import { Button } from "../../components/Button";
 import { site as defaults, type SiteSettings } from "../../data/site";
+import { canSpeak, englishVoices, pickVoice, speak } from "../../utils/speech";
 
 const fields: { key: keyof SiteSettings; label: string; hint?: string; wide?: boolean }[] = [
   { key: "name", label: "Site name", hint: "Shown in the logo, page titles and emails." },
@@ -23,11 +24,20 @@ export default function SiteSettingsPage() {
   const [value, setValue] = useState<SiteSettings | null>(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [voices, setVoices] = useState(() => englishVoices());
+
+  useEffect(() => {
+    if (!canSpeak()) return;
+    const refresh = () => setVoices(englishVoices());
+    window.speechSynthesis.addEventListener("voiceschanged", refresh);
+    const t = setTimeout(refresh, 300);
+    return () => { window.speechSynthesis.removeEventListener("voiceschanged", refresh); clearTimeout(t); };
+  }, []);
 
   useEffect(() => {
     adminApi.getSite()
       // Saved settings may be missing newer fields; fill them from the defaults.
-      .then((s) => setValue({ ...JSON.parse(JSON.stringify(defaults)), ...s, social: { ...defaults.social, ...(s?.social ?? {}) } }))
+      .then((s) => setValue({ ...JSON.parse(JSON.stringify(defaults)), ...s, social: { ...defaults.social, ...(s?.social ?? {}) }, voice: { ...defaults.voice, ...(s?.voice ?? {}) } }))
       .catch((e) => setError(e instanceof Error ? e.message : "Could not load."));
   }, []);
 
@@ -73,6 +83,33 @@ export default function SiteSettingsPage() {
                 <input id={`social-${k}`} type="url" className={inputClass} value={value.social[k]} onChange={(e) => set("social", { ...value.social, [k]: e.target.value })} />
               </div>
             ))}
+          </div>
+        </Panel>
+        <Panel title="Listen voice">
+          <p className="mb-4 text-sm text-muted">
+            The voice used by every Listen button. Automatic picks a friendly female English voice on each visitor's device.
+            A named voice is used only on devices that have it; others fall back to Automatic.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
+            <div>
+              <label htmlFor="voice-name" className="mb-1.5 block text-sm font-semibold">Voice</label>
+              <select id="voice-name" className={inputClass} value={value.voice.name} onChange={(e) => set("voice", { ...value.voice, name: e.target.value })}>
+                <option value="">Automatic (friendly female voice{voices.length ? `: ${pickVoice("")?.name ?? "browser default"}` : ""})</option>
+                {value.voice.name && !voices.some((v) => v.name === value.voice.name) && <option value={value.voice.name}>{value.voice.name} (not on this device)</option>}
+                {voices.map((v) => <option key={v.voiceURI} value={v.name}>{v.name} ({v.lang})</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="voice-pitch" className="mb-1.5 block text-sm font-semibold">Pitch {value.voice.pitch.toFixed(2)}</label>
+              <input id="voice-pitch" type="range" min="0.8" max="1.6" step="0.05" className="w-full" value={value.voice.pitch} onChange={(e) => set("voice", { ...value.voice, pitch: Number(e.target.value) })} />
+            </div>
+            <div>
+              <label htmlFor="voice-rate" className="mb-1.5 block text-sm font-semibold">Speed {value.voice.rate.toFixed(2)}</label>
+              <input id="voice-rate" type="range" min="0.6" max="1.3" step="0.02" className="w-full" value={value.voice.rate} onChange={(e) => set("voice", { ...value.voice, rate: Number(e.target.value) })} />
+            </div>
+            <Button size="sm" variant="outline" disabled={!canSpeak()} onClick={() => speak("Hello! Welcome to English-Bridgeway. Let's practise speaking English together.", { voiceName: value.voice.name, pitch: value.voice.pitch, rate: value.voice.rate })}>
+              <Volume2 className="h-4 w-4" aria-hidden="true" /> Try it
+            </Button>
           </div>
         </Panel>
         <Panel title="Home page numbers" actions={<Button size="sm" variant="outline" onClick={() => set("stats", [...value.stats, { label: "", value: "", icon: "Star" }])}><Plus className="h-4 w-4" aria-hidden="true" /> Add</Button>}>

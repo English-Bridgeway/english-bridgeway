@@ -56,7 +56,7 @@ export function getBundledContent(): ContentBundle {
 }
 
 export function applyContent(bundle: Partial<ContentBundle> & { collections?: Partial<ContentCollections> }) {
-  if (bundle.site) Object.assign(site, bundle.site);
+  if (bundle.site) Object.assign(site, bundle.site, { voice: { ...site.voice, ...(bundle.site.voice ?? {}) } });
   for (const key of Object.keys(live) as CollectionKey[]) {
     const items = bundle.collections?.[key];
     if (Array.isArray(items)) {
