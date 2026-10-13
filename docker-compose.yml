@@ -1,6 +1,8 @@
-# Whole site in Docker: PostgreSQL + API + website (Nginx).
+# Whole site in Docker: PostgreSQL + API (with the voice chat server) + website (Nginx).
 #   cp .env.docker.example .env   # then set JWT_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD
 #   docker compose up -d --build  # open http://localhost:8080 (admin at /admin)
+# Optional TURN relay for voice calls behind strict firewalls (set TURN_* in .env first):
+#   docker compose --profile turn up -d --build
 services:
   db:
     image: postgres:16-alpine
@@ -37,6 +39,11 @@ services:
       CASHFREE_APP_ID: ${CASHFREE_APP_ID:-}
       CASHFREE_SECRET_KEY: ${CASHFREE_SECRET_KEY:-}
       CASHFREE_ENV: ${CASHFREE_ENV:-sandbox}
+      # Voice chat: STUN/TURN servers handed to browsers (see the turn service below).
+      STUN_URLS: ${STUN_URLS:-stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302}
+      TURN_URLS: ${TURN_URLS:-}
+      TURN_SECRET: ${TURN_SECRET:-}
+      VOICE_MAX_ROOM_SIZE: ${VOICE_MAX_ROOM_SIZE:-6}
 
   web:
     build:
@@ -48,6 +55,45 @@ services:
       - server
     ports:
       - "${WEB_PORT:-8080}:80"
+
+  # coturn TURN server: relays call audio when two browsers can't reach each other directly
+  # (office/college Wi-Fi, some mobile networks). Only started with `--profile turn`.
+  # Uses the host network because it needs UDP 3478 plus a range of relay ports; open
+  # 3478/tcp+udp and 49160-49200/udp in the server's firewall (AWS security group).
+  turn:
+    image: coturn/coturn:4.6.3
+    profiles: ["turn"]
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TURN_SECRET: ${TURN_SECRET:-}
+      TURN_REALM: ${TURN_REALM:-englishbridgeway.com}
+      # Public IP of the server. Leave empty to detect it on start.
+      TURN_EXTERNAL_IP: ${TURN_EXTERNAL_IP:-}
+    # The image's entrypoint expands $${...} and $$(...) inside each argument.
+    command:
+      - -n
+      - --log-file=stdout
+      - --listening-port=3478
+      - --min-port=49160
+      - --max-port=49200
+      - --fingerprint
+      - --use-auth-secret
+      - --static-auth-secret=$${TURN_SECRET}
+      - --realm=$${TURN_REALM}
+      - --external-ip=$${TURN_EXTERNAL_IP:-$$(detect-external-ip)}
+      - --no-cli
+      - --no-tls
+      - --no-dtls
+      - --no-multicast-peers
+      # Never relay into private networks (keeps the server's own network out of reach).
+      - --denied-peer-ip=0.0.0.0-0.255.255.255
+      - --denied-peer-ip=10.0.0.0-10.255.255.255
+      - --denied-peer-ip=100.64.0.0-100.127.255.255
+      - --denied-peer-ip=127.0.0.0-127.255.255.255
+      - --denied-peer-ip=169.254.0.0-169.254.255.255
+      - --denied-peer-ip=172.16.0.0-172.31.255.255
+      - --denied-peer-ip=192.168.0.0-192.168.255.255
 
 volumes:
   db-data:

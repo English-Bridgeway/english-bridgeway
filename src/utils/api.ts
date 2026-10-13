@@ -63,11 +63,17 @@ export interface PublicOrder {
  * browser is sent to Cashfree's checkout, which returns to /payment/status. Demo: the
  * payment is simulated and the order id is returned for the status page.
  */
-export async function startCoursePayment(course: { id: string; title: string; price: number }, customer: CheckoutCustomer): Promise<{ demoOrderId?: string }> {
+export async function startCoursePayment(
+  course: { id: string; title: string; price: number },
+  customer: CheckoutCustomer,
+  account: { token: string | null; userId: string | null },
+): Promise<{ demoOrderId?: string }> {
   if (isLive) {
+    // The server takes the email from the signed-in account and ties the order to it.
     const { paymentSessionId, mode } = await apiFetch<{ orderId: string; paymentSessionId: string; mode: "sandbox" | "production" }>("/orders", {
       method: "POST",
-      json: { courseId: course.id, ...customer },
+      token: account.token ?? undefined,
+      json: { courseId: course.id, name: customer.name, phone: customer.phone },
     });
     const { load } = await import("@cashfreepayments/cashfree-js");
     const cashfree = await load({ mode });
@@ -81,7 +87,7 @@ export async function startCoursePayment(course: { id: string; title: string; pr
   const now = new Date().toISOString();
   updateDemoDb((db) => {
     db.orders.unshift({
-      orderId, courseId: course.id, courseTitle: course.title, amount: course.price, currency: "INR",
+      orderId, userId: account.userId, courseId: course.id, courseTitle: course.title, amount: course.price, currency: "INR",
       customerName: customer.name, customerEmail: customer.email.toLowerCase(), customerPhone: customer.phone.replace(/\D/g, "").slice(-10),
       status: "paid", gateway: "demo", gatewayPaymentId: `demo_${newId()}`, bankReference: null, refundId: null, paidAt: now, createdAt: now,
     });

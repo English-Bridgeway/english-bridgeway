@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, CircleCheck, Flame, Heart, ListChecks, PlayCircle, Sparkles, Target, Trophy } from "lucide-react";
+import { BookOpen, CircleCheck, Flame, Heart, ListChecks, Mic, PlayCircle, Sparkles, Target, Trophy } from "lucide-react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/Button";
 import { Badge } from "../../components/Badge";
@@ -22,7 +22,8 @@ const activityIcon = { lesson: CircleCheck, quiz: Trophy, word: Heart, course: P
 
 export default function Dashboard() {
   usePageMeta({ title: "My Dashboard", description: "Track your English learning progress, quiz scores, streak and favourite words." });
-  const { user } = useAuth();
+  const { user, purchasedCourseIds } = useAuth();
+  const myCourses = purchasedCourseIds.map(getCourse).filter((c): c is NonNullable<typeof c> => Boolean(c));
   const { completedLessons, quizScores, favoriteWords, streak } = useLearning();
   const progressFor = useCourseProgress();
 
@@ -48,7 +49,7 @@ export default function Dashboard() {
     <div className="container-page py-10">
       {!hasRealData && (
         <Alert tone="info" className="mb-6" title="You're viewing a sample dashboard">
-          Complete a lesson or quiz and these numbers will switch to your own progress, saved on this device. Student accounts are coming soon.
+          Complete a lesson or quiz and these numbers will switch to your own progress, saved on this device.
         </Alert>
       )}
 
@@ -96,6 +97,35 @@ export default function Dashboard() {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-10">
+          <section>
+            <div className="flex items-end justify-between"><h2 className="text-xl font-semibold">My courses</h2><Link to="/courses" className="text-sm font-semibold text-ink-700">All courses →</Link></div>
+            {myCourses.length ? (
+              <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+                {myCourses.map((c) => {
+                  const p = progressFor(c);
+                  return (
+                    <li key={c.id}>
+                      <Card className="p-5">
+                        <Link to={`/courses/${c.id}`} className="font-semibold hover:text-ink-600">{c.title}</Link>
+                        <ProgressBar value={p.percent} label={`${p.done} of ${p.total} lessons done`} className="mt-3" showValue />
+                      </Card>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="mt-3 rounded-2xl border border-dashed border-ink-200 bg-white p-5 text-muted">You haven't bought a course yet. Free courses are open to everyone. <Link to="/courses" className="font-semibold text-ink-700">Browse courses →</Link></p>
+            )}
+          </section>
+          <section>
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-ink-50 p-5">
+              <div>
+                <h2 className="text-lg font-semibold">Practise speaking live</h2>
+                <p className="text-sm text-muted">Call another learner one-to-one, or start a team room for up to six people.</p>
+              </div>
+              <Button to="/speak"><Mic className="h-4 w-4" aria-hidden="true" /> Open Speak Live</Button>
+            </div>
+          </section>
           <section>
             <div className="flex items-end justify-between"><h2 className="text-xl font-semibold">Recommended lessons</h2><Link to="/grammar" className="text-sm font-semibold text-ink-700">All lessons →</Link></div>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

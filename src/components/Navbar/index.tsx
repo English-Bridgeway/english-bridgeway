@@ -1,6 +1,6 @@
-import { Menu, Search, UserRound, X } from "lucide-react";
+import { LogIn, LogOut, Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { mainNav } from "../../data/site";
 import { Logo } from "../Logo";
 import { Button } from "../Button";
@@ -13,7 +13,12 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { pathname } = useLocation();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const logOut = () => {
+    signOut();
+    navigate("/");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -64,10 +69,23 @@ export function Navbar() {
           <button type="button" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10" aria-label="Search (press /)">
             <Search className="h-5 w-5" aria-hidden="true" />
           </button>
-          <Link to="/dashboard" className="hidden h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 sm:grid" aria-label={`My dashboard${user ? ` (${user.name})` : ""}`}>
-            <UserRound className="h-5 w-5" aria-hidden="true" />
-          </Link>
-          <span className="hidden sm:block"><Button to="/courses/beginner-english" size="sm" variant="accent">Start Learning</Button></span>
+          {user ? (
+            <>
+              <Link to="/dashboard" className="hidden h-10 w-10 place-items-center rounded-full bg-amber-300 font-display text-sm font-bold text-ink-900 hover:bg-amber-200 sm:grid" aria-label={`My dashboard (${user.name})`} title={user.name}>
+                {user.avatarInitials}
+              </Link>
+              <button type="button" onClick={logOut} className="hidden h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 sm:grid" aria-label="Log out" title="Log out">
+                <LogOut className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden items-center gap-1.5 rounded-xl px-3 py-2 text-[0.92rem] font-medium text-white hover:bg-white/10 sm:flex">
+                <LogIn className="h-4 w-4" aria-hidden="true" /> Log in
+              </Link>
+              <span className="hidden sm:block"><Button to="/register" size="sm" variant="accent">Sign up free</Button></span>
+            </>
+          )}
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
@@ -101,13 +119,24 @@ export function Navbar() {
                   </NavLink>
                 </li>
               ))}
-              <li>
-                <NavLink to="/dashboard" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}>
-                  My Dashboard
-                </NavLink>
-              </li>
+              {user && (
+                <li>
+                  <NavLink to="/dashboard" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}>
+                    My Dashboard
+                  </NavLink>
+                </li>
+              )}
             </ul>
-            <Button to="/courses/beginner-english" className="mt-4 w-full" variant="accent">Start Learning</Button>
+            {user ? (
+              <Button onClick={logOut} className="mt-4 w-full border-white/20 bg-white/10 text-white hover:bg-white/20" variant="outline">
+                <LogOut className="h-4 w-4" aria-hidden="true" /> Log out ({user.name})
+              </Button>
+            ) : (
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <Button to="/login" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20">Log in</Button>
+                <Button to="/register" variant="accent">Sign up free</Button>
+              </div>
+            )}
           </nav>
         </div>
       </div>

@@ -50,6 +50,7 @@ export const mainNav = [
   { label: "Spoken English", to: "/spoken-english" },
   { label: "Quiz", to: "/quiz" },
   { label: "Courses", to: "/courses" },
+  { label: "Speak Live", to: "/speak" },
   { label: "Blog", to: "/blog" },
   { label: "Contact", to: "/contact" },
 ] as const;

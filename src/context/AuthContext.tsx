@@ -1,36 +1,81 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { User } from "../types";
-import { mockUser } from "../data/dashboard";
+import { HttpError } from "../utils/backend";
+import { clearLearnerSession, fetchMe, getLearnerSession, login, register } from "../utils/account";
 
 /**
- * Authentication placeholder. No real sign-in happens yet: the app always shows the demo student.
- * To add auth later, implement signIn/signUp/signOut with your provider and keep this interface,
- * so pages (Navbar, Dashboard, Login, Register) don't need to change.
+ * The signed-in learner. Sessions are kept on this device for 30 days; the server is asked
+ * who the learner is (and which paid courses they own) when the site loads and after a purchase.
  */
 interface AuthContextValue {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
-  authEnabled: boolean;
-  signIn: (email: string, password: string) => Promise<{ ok: boolean; message: string }>;
-  signUp: (name: string, email: string, password: string) => Promise<{ ok: boolean; message: string }>;
+  /** False until the saved session has been checked with the server. */
+  ready: boolean;
+  purchasedCourseIds: string[];
+  hasCourse: (courseId: string) => boolean;
+  refresh: () => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const notReady = { ok: false, message: "Student accounts are coming soon. Your progress is saved on this device for now." };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user] = useState<User | null>(mockUser);
+  const [session, setSession] = useState(getLearnerSession);
+  const [purchasedCourseIds, setPurchased] = useState<string[]>([]);
+  const [ready, setReady] = useState(!session);
+
+  const token = session?.token ?? null;
+
+  const signOut = useCallback(() => {
+    clearLearnerSession();
+    setSession(null);
+    setPurchased([]);
+  }, []);
+
+  const refresh = useCallback(async () => {
+    const current = getLearnerSession();
+    if (!current) return;
+    try {
+      const me = await fetchMe(current.token);
+      setSession((s) => (s ? { ...s, user: me.user } : s));
+      setPurchased(me.purchasedCourseIds);
+    } catch (e) {
+      // Only a rejected session logs the learner out; a network blip keeps them signed in.
+      if (e instanceof HttpError && e.status === 401) signOut();
+    }
+  }, [signOut]);
+
+  useEffect(() => {
+    if (!token) return;
+    refresh().finally(() => setReady(true));
+  }, [token, refresh]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
-      user,
-      isAuthenticated: false,
-      authEnabled: false,
-      signIn: async () => notReady,
-      signUp: async () => notReady,
-      signOut: () => {},
+      user: session?.user ?? null,
+      token,
+      isAuthenticated: Boolean(session),
+      ready,
+      purchasedCourseIds,
+      hasCourse: (id) => purchasedCourseIds.includes(id),
+      refresh,
+      signIn: async (email, password) => {
+        const s = await login(email, password);
+        setReady(false);
+        setSession(s);
+      },
+      signUp: async (name, email, password) => {
+        const s = await register(name, email, password);
+        setReady(false);
+        setSession(s);
+      },
+      signOut,
     }),
-    [user],
+    [session, token, ready, purchasedCourseIds, refresh, signOut],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

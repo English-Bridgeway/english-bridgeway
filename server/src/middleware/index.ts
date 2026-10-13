@@ -1,6 +1,7 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import { Admin } from '../db';
+import { Admin, Learner } from '../db';
 import { verifyToken } from '../services/auth';
+import { learnerFromToken } from '../services/learners';
 
 export type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<unknown>;
 
@@ -13,6 +14,7 @@ export const asyncHandler =
 declare module 'express-serve-static-core' {
   interface Request {
     admin?: Admin;
+    learner?: Learner;
   }
 }
 
@@ -26,6 +28,22 @@ export const requireAdmin = asyncHandler(async (req, res, next) => {
     return;
   }
   req.admin = admin;
+  next();
+});
+
+const bearer = (req: Request) => {
+  const header = req.get('authorization') || '';
+  return header.startsWith('Bearer ') ? header.slice(7) : null;
+};
+
+/** Requires a signed-in learner (student) account. */
+export const requireLearner = asyncHandler(async (req, res, next) => {
+  const learner = await learnerFromToken(bearer(req));
+  if (!learner) {
+    res.status(401).json({ message: 'Please log in to continue.' });
+    return;
+  }
+  req.learner = learner;
   next();
 });
 

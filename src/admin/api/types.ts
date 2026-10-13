@@ -33,6 +33,8 @@ export type OrderStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface Order {
   orderId: string;
+  /** The learner account that bought the course (null for orders placed before accounts existed). */
+  userId?: string | null;
   courseId: string;
   courseTitle: string;
   amount: number; // rupees
