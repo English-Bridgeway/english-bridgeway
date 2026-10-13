@@ -6,7 +6,6 @@ import { BlogCard, BlogCover } from "../../components/BlogCard";
 import { Tabs } from "../../components/Tabs";
 import { Badge } from "../../components/Badge";
 import { EmptyState } from "../../components/EmptyState";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { blogCategories, blogPosts } from "../../data/blog";
 import { formatDate } from "../../utils/format";
 import type { BlogCategory } from "../../types";
@@ -14,10 +13,6 @@ import type { BlogCategory } from "../../types";
 type Cat = "All" | BlogCategory;
 
 export default function Blog() {
-  usePageMeta({
-    title: "English Learning Blog: Tips, Idioms and Common Mistakes",
-    description: "Practical English tips, idioms, grammar explainers, vocabulary guides and common mistakes, with new posts every week.",
-  });
   const [cat, setCat] = useState<Cat>("All");
   const [featured, ...rest] = blogPosts;
   const list = cat === "All" ? rest : blogPosts.filter((p) => p.category === cat);

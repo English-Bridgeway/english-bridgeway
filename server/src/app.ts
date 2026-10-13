@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import express, { type ErrorRequestHandler } from 'express';
 import { config } from './config';
@@ -7,6 +6,7 @@ import { accountRouter } from './routes/account';
 import { adminRouter } from './routes/admin';
 import { webhookRouter } from './routes/webhooks';
 import { OrderError } from './services/orders';
+import { invalidateRenderedPages, serveWebsite, websiteBuildDir } from './services/ssr';
 
 export function createApp() {
   const app = express();
@@ -30,6 +30,11 @@ export function createApp() {
   // Webhooks need the raw body for signature checks, so they come before the JSON parser.
   app.use('/api/webhooks', webhookRouter);
   app.use(express.json({ limit: '2mb' }));
+  // Any admin change (content, site settings) refreshes the server-rendered pages.
+  app.use('/api/admin', (req, res, next) => {
+    if (req.method !== 'GET') res.on('finish', () => res.statusCode < 400 && invalidateRenderedPages());
+    next();
+  });
   app.use('/api/admin', adminRouter);
   app.use('/api', accountRouter);
   app.use('/api', publicRouter);
@@ -37,10 +42,14 @@ export function createApp() {
     res.status(404).json({ message: 'Not found' });
   });
 
-  // Optionally serve the built website (npm run build in the project root) from the same server.
-  const dist = path.resolve(__dirname, '../../dist');
-  if (fs.existsSync(path.join(dist, 'index.html'))) {
+  // The website: server-rendered pages, sitemap.xml and robots.txt (see services/ssr.ts).
+  // When the build is here too, its files are served as well, so the API alone can run the
+  // whole site; behind Nginx (Docker) Nginx serves the files and sends page requests here.
+  const dist = websiteBuildDir;
+  if (dist) {
+    app.get(['/robots.txt', '/sitemap.xml'], serveWebsite);
     app.use(express.static(dist, { index: false, maxAge: '1h' }));
+    app.use(serveWebsite);
     app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')));
   }
 

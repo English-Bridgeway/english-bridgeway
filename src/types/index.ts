@@ -3,7 +3,20 @@
 
 export type Level = "Beginner" | "Intermediate" | "Advanced";
 
+/** Optional search-engine overrides, editable per item in the admin panel (SEO section). */
+export interface SeoFields {
+  /** Replaces the page title in search results and social previews. */
+  title?: string;
+  /** Replaces the meta description (aim for 120 to 160 characters). */
+  description?: string;
+  /** Social preview image (absolute URL or a path such as /og-image.png). */
+  image?: string;
+  /** Keeps the page out of search results and the sitemap. */
+  noindex?: boolean;
+}
+
 export interface GrammarTopic {
+  seo?: SeoFields;
   id: string; // slug, used in /grammar/:topic
   title: string;
   summary: string;
@@ -30,6 +43,7 @@ export interface LessonSection {
 }
 
 export interface GrammarLesson {
+  seo?: SeoFields;
   id: string; // slug, used in /grammar/:topic/:lesson
   topicId: string;
   title: string;
@@ -57,6 +71,7 @@ export type VocabCategory =
   | "Work";
 
 export interface VocabularyWord {
+  seo?: SeoFields;
   id: string; // slug, used in /vocabulary/:word
   word: string;
   pronunciation: string; // IPA
@@ -82,6 +97,7 @@ export interface Phrase {
 }
 
 export interface SpokenLesson {
+  seo?: SeoFields;
   id: string; // slug, used in /spoken-english/:lesson
   category: string;
   title: string;
@@ -106,6 +122,7 @@ export interface QuizQuestion {
 }
 
 export interface QuizCategory {
+  seo?: SeoFields;
   id: string; // slug, used in /quiz/:category
   title: string;
   description: string;
@@ -113,6 +130,7 @@ export interface QuizCategory {
 }
 
 export interface Quiz {
+  seo?: SeoFields;
   id: string; // used in /quiz/:category/:quizId
   categoryId: string;
   title: string;
@@ -127,6 +145,7 @@ export interface CurriculumModule {
 }
 
 export interface Course {
+  seo?: SeoFields;
   id: string;
   title: string;
   description: string;
@@ -160,6 +179,7 @@ export type BlogBlock =
   | { type: "tip"; text: string };
 
 export interface BlogPost {
+  seo?: SeoFields;
   slug: string;
   title: string;
   excerpt: string;

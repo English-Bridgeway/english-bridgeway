@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { CircleCheck, CircleX, Clock3, Loader2 } from "lucide-react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/Button";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getOrderStatus, type PublicOrder } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import { formatPrice } from "../../utils/format";
@@ -11,7 +10,6 @@ import { site } from "../../data/site";
 
 /** Cashfree returns the buyer here (?order_id=…). The server re-checks the order with Cashfree. */
 export default function PaymentStatus() {
-  usePageMeta({ title: "Payment status", description: "Your course payment status." });
   const [params] = useSearchParams();
   const orderId = params.get("order_id") || "";
   const [order, setOrder] = useState<PublicOrder | null>(null);

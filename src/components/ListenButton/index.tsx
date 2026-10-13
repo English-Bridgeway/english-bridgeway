@@ -1,11 +1,11 @@
 import { Volume2 } from "lucide-react";
 import { useState } from "react";
-import { canSpeak, speak } from "../../utils/speech";
+import { speak, useCanSpeak } from "../../utils/speech";
 import { cn } from "../../utils/cn";
 
 export function ListenButton({ text, label = "Listen", compact, className }: { text: string; label?: string; compact?: boolean; className?: string }) {
   const [active, setActive] = useState(false);
-  if (!canSpeak()) return null;
+  if (!useCanSpeak()) return null;
   const onClick = () => {
     if (speak(text)) {
       setActive(true);

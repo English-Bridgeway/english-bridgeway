@@ -6,7 +6,6 @@ import { FavoriteButton } from "../../components/FavoriteButton";
 import { Card } from "../../components/Card";
 import { QuizRunner } from "../../components/QuizRunner";
 import { VocabularyCard } from "../../components/VocabularyCard";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getWord, vocabularyWords } from "../../data/vocabulary";
 import type { QuizQuestion, VocabularyWord } from "../../types";
 import NotFound from "../NotFound";
@@ -42,10 +41,6 @@ function practiceFor(w: VocabularyWord): QuizQuestion[] {
 export default function VocabularyDetail() {
   const { word: id = "" } = useParams();
   const w = getWord(id);
-  usePageMeta({
-    title: w ? `${w.word}: Meaning, Pronunciation and Examples` : "Word not found",
-    description: w ? `${w.word} ${w.pronunciation} (${w.partOfSpeech}): ${w.meaning} See example sentences, synonyms and antonyms.` : undefined,
-  });
   if (!w) return <NotFound />;
   const similar = vocabularyWords.filter((o) => o.category === w.category && o.id !== w.id).slice(0, 3);
 

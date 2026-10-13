@@ -20,7 +20,12 @@ services:
       retries: 20
 
   server:
-    build: ./server
+    # Same Dockerfile as web: the API image carries the website build to render pages.
+    build:
+      context: .
+      target: server
+      args:
+        VITE_API_BASE: /api
     restart: unless-stopped
     depends_on:
       db:
@@ -31,6 +36,7 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-english_bridgeway}
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env (see .env.docker.example)}
       SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY:-}
+      # Your real address (e.g. https://englishbridgeway.com): used for canonical links and sitemap.xml.
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-http://localhost:8080}
       API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:8080}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
@@ -48,6 +54,7 @@ services:
   web:
     build:
       context: .
+      target: web
       args:
         VITE_API_BASE: /api
     restart: unless-stopped

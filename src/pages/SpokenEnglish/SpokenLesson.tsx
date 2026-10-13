@@ -8,25 +8,21 @@ import { Card } from "../../components/Card";
 import { Dialogue } from "../../components/Dialogue";
 import { ListenButton } from "../../components/ListenButton";
 import { Alert } from "../../components/Alert";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getSpokenLesson, spokenLessons } from "../../data/spokenEnglish";
-import { canSpeak, makeUtterance } from "../../utils/speech";
+import { canSpeak, makeUtterance, useCanSpeak } from "../../utils/speech";
 import { cn } from "../../utils/cn";
 import NotFound from "../NotFound";
 
 export default function SpokenLesson() {
   const { lesson: id = "" } = useParams();
   const lesson = getSpokenLesson(id);
-  usePageMeta({
-    title: lesson ? `${lesson.title}: Spoken English Conversation` : "Lesson not found",
-    description: lesson ? `${lesson.situation} Listen to the dialogue, learn useful phrases and practise speaking.` : undefined,
-  });
 
   const [playing, setPlaying] = useState<number | undefined>();
   const [mode, setMode] = useState<"read" | "repeat">("read");
   const [step, setStep] = useState(0);
   const [done, setDone] = useState<boolean[]>([]);
   const stopRef = useRef(false);
+  const speakable = useCanSpeak();
 
   useEffect(() => () => { stopRef.current = true; if (canSpeak()) window.speechSynthesis.cancel(); }, []);
   useEffect(() => { setStep(0); setMode("read"); setPlaying(undefined); setDone([]); }, [id]);
@@ -80,7 +76,7 @@ export default function SpokenLesson() {
                   </button>
                 ))}
               </div>
-              {mode === "read" && canSpeak() && (
+              {mode === "read" && speakable && (
                 <Button size="sm" variant={playing !== undefined ? "secondary" : "primary"} onClick={playAll}>
                   {playing !== undefined ? <><Pause className="h-4 w-4" aria-hidden="true" /> Stop</> : <><Play className="h-4 w-4" aria-hidden="true" /> Play conversation</>}
                 </Button>
@@ -112,7 +108,7 @@ export default function SpokenLesson() {
                 </div>
               </div>
             )}
-            {!canSpeak() && <Alert className="mt-6" tone="info">Audio isn't available in this browser, but you can still read and practise each line aloud.</Alert>}
+            {!speakable && <Alert className="mt-6" tone="info">Audio isn't available in this browser, but you can still read and practise each line aloud.</Alert>}
           </Card>
 
           <section className="mt-8">

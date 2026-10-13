@@ -4,16 +4,11 @@ import { PageHeader } from "../../components/PageHeader";
 import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
 import { QuizCard } from "../../components/QuizCard";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getQuizzesForCategory, quizCategories, quizzes } from "../../data/quizzes";
 import { useLearning } from "../../context/LearningContext";
 import { pluralize } from "../../utils/format";
 
 export default function Quiz() {
-  usePageMeta({
-    title: "English Quizzes: Grammar, Vocabulary and Speaking",
-    description: "Free English quizzes with multiple choice and fill-in-the-blank questions on grammar, tenses, articles, prepositions, vocabulary and spoken English.",
-  });
   const { quizScores } = useLearning();
   const taken = Object.keys(quizScores).length;
 

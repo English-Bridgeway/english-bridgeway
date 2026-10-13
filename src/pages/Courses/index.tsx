@@ -5,7 +5,6 @@ import { CourseCard } from "../../components/CourseCard";
 import { Tabs } from "../../components/Tabs";
 import { EmptyState } from "../../components/EmptyState";
 import { Button } from "../../components/Button";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { courses } from "../../data/courses";
 import { useCourseProgress } from "./useCourseProgress";
 
@@ -13,10 +12,6 @@ const levels = ["All levels", "Beginner", "Intermediate", "Advanced"] as const;
 const sorts = { popular: "Most popular", rating: "Highest rated", short: "Fewest lessons" } as const;
 
 export default function Courses() {
-  usePageMeta({
-    title: "English Courses for Every Level",
-    description: "Structured English courses: Beginner English, Spoken English in 30 Days, Grammar Basics and English Vocabulary Mastery. Free to start.",
-  });
   const [level, setLevel] = useState<(typeof levels)[number]>("All levels");
   const [sort, setSort] = useState<keyof typeof sorts>("popular");
   const [q, setQ] = useState("");

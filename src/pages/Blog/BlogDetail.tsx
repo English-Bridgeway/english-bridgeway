@@ -4,7 +4,6 @@ import { Clock, Link2, Lightbulb, Share2 } from "lucide-react";
 import { Breadcrumbs } from "../../components/Breadcrumbs";
 import { Badge } from "../../components/Badge";
 import { BlogCard, BlogCover } from "../../components/BlogCard";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { blogPosts, getPost } from "../../data/blog";
 import { site } from "../../data/site";
 import { formatDate } from "../../utils/format";
@@ -35,7 +34,6 @@ function Block({ b }: { b: BlogBlock }) {
 export default function BlogDetail() {
   const { slug = "" } = useParams();
   const post = getPost(slug);
-  usePageMeta({ title: post?.title ?? "Article not found", description: post?.excerpt, type: "article" });
   const [copied, setCopied] = useState(false);
   if (!post) return <NotFound />;
 

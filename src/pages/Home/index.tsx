@@ -7,7 +7,6 @@ import { CourseCard } from "../../components/CourseCard";
 import { SectionHeading } from "../../components/SectionHeading";
 import { HeroIllustration } from "../../components/HeroIllustration";
 import { WordOfTheDay } from "../../components/WordOfTheDay";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { site } from "../../data/site";
 import { grammarLessons } from "../../data/grammar";
 import { vocabularyWords } from "../../data/vocabulary";
@@ -32,7 +31,6 @@ const newLessons = [
 ];
 
 export default function Home() {
-  usePageMeta({ title: site.name, description: site.description });
 
   return (
     <>

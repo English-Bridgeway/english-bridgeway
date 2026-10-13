@@ -26,14 +26,28 @@ export function SchemaForm({ fields, value, onChange, idPrefix, options }: {
             {f.type === "group" ? (
               <fieldset className="rounded-xl border border-line p-4">
                 <legend className="px-1 text-sm font-semibold text-ink-900">{f.label}</legend>
+                {f.hint && <p className="-mt-1 mb-3 text-xs text-muted">{f.hint}</p>}
                 <SchemaForm fields={f.fields} value={(value[f.name] as Item) ?? {}} onChange={(v) => set(f.name, v)} idPrefix={id} options={options} />
               </fieldset>
             ) : f.type === "list" ? (
               <ListField field={f} items={(value[f.name] as Item[]) ?? []} onChange={(v) => set(f.name, v)} idPrefix={id} options={options} />
+            ) : f.type === "checkbox" ? (
+              <>
+                <label htmlFor={id} className="flex items-center gap-2 text-sm font-semibold text-ink-900">
+                  <input id={id} type="checkbox" className="h-4 w-4 accent-brand-primary" checked={value[f.name] === true} onChange={(e) => set(f.name, e.target.checked)} />
+                  {f.label}
+                </label>
+                {f.hint && <p className="mt-1 text-xs text-muted">{f.hint}</p>}
+              </>
             ) : (
               <>
-                <label htmlFor={id} className="mb-1.5 block text-sm font-semibold text-ink-900">
-                  {f.label} {f.required && <span className="text-red-700" aria-hidden="true">*</span>}
+                <label htmlFor={id} className="mb-1.5 flex items-baseline justify-between gap-2 text-sm font-semibold text-ink-900">
+                  <span>{f.label} {f.required && <span className="text-red-700" aria-hidden="true">*</span>}</span>
+                  {"idealLength" in f && f.idealLength && (
+                    <span className={cn("text-xs font-normal", String(value[f.name] ?? "").length > f.idealLength ? "text-red-700" : "text-muted")}>
+                      {String(value[f.name] ?? "").length} / {f.idealLength}
+                    </span>
+                  )}
                 </label>
                 <Control field={f} id={id} value={value[f.name]} onChange={(v) => set(f.name, v)} options={options} />
                 {f.hint && <p className="mt-1 text-xs text-muted">{f.hint}</p>}

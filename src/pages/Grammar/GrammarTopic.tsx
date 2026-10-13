@@ -4,7 +4,6 @@ import { LessonCard } from "../../components/LessonCard";
 import { LevelBadge } from "../../components/Badge";
 import { Icon } from "../../components/Icon";
 import { Button } from "../../components/Button";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getLessonsForTopic, getTopic, grammarTopics } from "../../data/grammar";
 import { useLearning } from "../../context/LearningContext";
 import NotFound from "../NotFound";
@@ -12,10 +11,6 @@ import NotFound from "../NotFound";
 export default function GrammarTopic() {
   const { topic: topicId = "" } = useParams();
   const topic = getTopic(topicId);
-  usePageMeta({
-    title: topic ? `${topic.title}: English Grammar` : "Topic not found",
-    description: topic ? `${topic.summary} Lessons with examples, common mistakes and practice questions.` : undefined,
-  });
   const { isLessonComplete } = useLearning();
   if (!topic) return <NotFound />;
   const lessons = getLessonsForTopic(topic.id);

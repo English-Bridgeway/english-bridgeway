@@ -1,3 +1,10 @@
+# Fallback for static hosting. With the API server running, /robots.txt is generated
+# from the live site address (server/src/services/ssr.ts).
 User-agent: *
 Allow: /
-Sitemap: https://www.englishbridgeway.example/sitemap.xml
+Disallow: /admin
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /payment/
+
+Sitemap: https://englishbridgeway.com/sitemap.xml

@@ -1,7 +1,15 @@
 /** Text-to-speech using the browser's built-in voices. No network calls. */
+import { useSyncExternalStore } from "react";
 import { site } from "../data/site";
 
 export const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
+
+const noSubscribe = () => () => {};
+/**
+ * canSpeak() for rendering: false in the server-rendered HTML and while React takes it over,
+ * then the browser's real answer, so the first render matches the server's.
+ */
+export const useCanSpeak = () => useSyncExternalStore(noSubscribe, canSpeak, () => false);
 
 // Friendly female English voices, best first. Names differ by browser and OS:
 // Edge's "Online (Natural)" voices, Chrome's Google voices, Apple and Windows voices.

@@ -21,7 +21,8 @@ export interface FieldBase {
 }
 
 export type Field =
-  | (FieldBase & { type: "text" | "textarea" | "icon" | "color" | "date"; format?: (v: unknown) => string; parse?: (s: string, item: Item) => unknown })
+  | (FieldBase & { type: "text" | "textarea" | "icon" | "color" | "date"; format?: (v: unknown) => string; parse?: (s: string, item: Item) => unknown; /** Shows a character count against this ideal length. */ idealLength?: number })
+  | (FieldBase & { type: "checkbox" })
   | (FieldBase & { type: "number"; step?: number; min?: number })
   | (FieldBase & { type: "select"; options?: readonly string[]; optionsFrom?: CollectionKey })
   | (FieldBase & { type: "lines" }) // string[] — one per line
@@ -80,7 +81,22 @@ const phraseRows = (name: string, label: string): Field => ({
   name, label, type: "rows", sep: " :: ", parts: [{ key: "phrase" }, { key: "meaning" }], hint: "One per line: phrase :: meaning", wide: true,
 });
 
-export const schemas: CollectionSchema[] = [
+/** Search engine overrides, added to every content type (shape: SeoFields in src/types). */
+export const seoField: Field = {
+  name: "seo",
+  label: "Search engines (SEO)",
+  type: "group",
+  wide: true,
+  hint: "Optional. Leave blank to use the title and description written for the page automatically.",
+  fields: [
+    { name: "title", label: "SEO title", type: "text", wide: true, idealLength: 60, hint: "Shown as the blue link in Google. The site name is added after it." },
+    { name: "description", label: "Meta description", type: "textarea", wide: true, idealLength: 160, hint: "The grey text under the link in Google. Aim for 120 to 160 characters." },
+    { name: "image", label: "Social share image", type: "text", wide: true, hint: "Image URL or path (e.g. /og-image.png), 1200 × 630 px, used when the page is shared on WhatsApp, Facebook or X." },
+    { name: "noindex", label: "Hide this page from search engines", type: "checkbox", hint: "Adds noindex and leaves the page out of sitemap.xml." },
+  ],
+};
+
+const baseSchemas: CollectionSchema[] = [
   {
     key: "grammarTopics",
     label: "Grammar topics",
@@ -326,6 +342,8 @@ export const schemas: CollectionSchema[] = [
   },
 ];
 
+export const schemas: CollectionSchema[] = baseSchemas.map((s) => ({ ...s, fields: [...s.fields, seoField] }));
+
 export const schemaFor = (key: string) => schemas.find((s) => s.key === key);
 
 // ---- Converting between saved data and form values ----
@@ -350,6 +368,9 @@ export function toForm(fields: Field[], data: Item): Item {
         break;
       case "list":
         out[f.name] = Array.isArray(v) ? v.map((item) => toForm(f.fields, item as Item)) : [];
+        break;
+      case "checkbox":
+        out[f.name] = v === true;
         break;
       case "text":
       case "textarea":
@@ -396,8 +417,16 @@ export function fromForm(fields: Field[], form: Item): Item {
         else out[f.name] = Number(s);
         break;
       }
-      case "group":
-        out[f.name] = fromForm(f.fields, (v as Item) ?? {});
+      case "group": {
+        const group = fromForm(f.fields, (v as Item) ?? {});
+        // An optional group left completely blank (such as SEO) is not saved at all.
+        if (!f.required && Object.keys(group).length === 0) delete out[f.name];
+        else out[f.name] = group;
+        break;
+      }
+      case "checkbox":
+        if (v === true) out[f.name] = true;
+        else delete out[f.name];
         break;
       case "list":
         out[f.name] = Array.isArray(v) ? v.map((item) => fromForm(f.fields, item as Item)) : [];
