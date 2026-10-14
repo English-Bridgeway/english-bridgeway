@@ -207,6 +207,47 @@ export interface User {
   email: string;
   phone?: string | null;
   avatarInitials: string;
+  /** Profile photo URL (already includes the API base), or null. */
+  avatarUrl?: string | null;
+  profile?: LearnerProfile;
+  createdAt?: string;
+}
+
+export interface LearnerProfile {
+  whatsapp?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  occupation?: string;
+  englishLevel?: string;
+  goal?: string;
+  about?: string;
+}
+
+export type AccessStatus = "unlimited" | "active" | "trial" | "expired" | "blocked";
+
+/** What the signed-in learner can open (see server/src/services/access.ts). */
+export interface LearnerAccess {
+  status: AccessStatus;
+  /** Every course is open (free trial, access given by the admin, or unlimited). */
+  full: boolean;
+  until: string | null;
+  trialEndsAt: string | null;
+  accessUntil: string | null;
+  unlimited: boolean;
+  /** May use Speak with AI. */
+  ai: boolean;
+}
+
+/** A special price the admin gave this learner. */
+export interface LearnerOffer {
+  kind: "price" | "percent";
+  value: number;
+  courseId: string | null;
+  note: string;
+  expiresAt: string | null;
 }
 
 export interface Activity {

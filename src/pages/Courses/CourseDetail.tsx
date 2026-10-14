@@ -12,7 +12,7 @@ import { courses, getCourse } from "../../data/courses";
 import { useLearning } from "../../context/LearningContext";
 import { curriculumKey, inCourse, useCourseProgress } from "./useCourseProgress";
 import { formatNumber, formatPrice } from "../../utils/format";
-import { CheckoutDialog } from "../../components/CheckoutDialog";
+import { BuyCourse } from "../../portal/BuyCourse";
 import { getPaymentsConfig, type PaymentsConfig } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../utils/cn";
@@ -24,15 +24,14 @@ export default function CourseDetail() {
   const [open, setOpen] = useState<number[]>([0]);
   const { isLessonComplete, toggleLessonComplete } = useLearning();
   const progressFor = useCourseProgress();
-  const { isAuthenticated, hasCourse, ready } = useAuth();
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const { isAuthenticated, hasCourse, canOpenCourse, priceFor, access } = useAuth();
   const [payments, setPayments] = useState<PaymentsConfig | null>(null);
   const price = course?.price ?? 0;
   useEffect(() => {
     if (price > 0) getPaymentsConfig().then(setPayments).catch(() => setPayments({ enabled: false, mode: "sandbox", demo: false }));
   }, [price]);
   if (!course) return <NotFound />;
-  const locked = price > 0 && !hasCourse(course.id);
+  const locked = price > 0 && !canOpenCourse(course);
 
   const progress = progressFor(course);
   const nextItem = course.curriculum.flatMap((m, mi) => m.lessons.map((l, li) => ({ l, key: curriculumKey(course.id, l.href, `${mi}-${li}`) })))
@@ -82,24 +81,26 @@ export default function CourseDetail() {
               ) : !isAuthenticated ? (
                 <>
                   <Button to={`/login?next=${encodeURIComponent(`/courses/${course.id}`)}`} className="mt-5 w-full" size="lg">
-                    <Lock className="h-5 w-5" aria-hidden="true" /> Log in to buy · {formatPrice(price)}
+                    <Lock className="h-5 w-5" aria-hidden="true" /> Log in to buy · {formatPrice(priceFor(course) || price)}
                   </Button>
-                  <p className="mt-3 text-center text-xs text-muted">The course is added to your account. <Link to={`/register?next=${encodeURIComponent(`/courses/${course.id}`)}`} className="font-semibold text-ink-700">New here? Sign up free</Link></p>
+                  <p className="mt-3 text-center text-xs text-muted">The course is added to your account. <Link to={`/register?next=${encodeURIComponent(`/learn/courses/${course.id}`)}`} className="font-semibold text-ink-700">New here? Sign up for a free trial</Link></p>
                 </>
               ) : (
                 <>
-                  <Button className="mt-5 w-full" size="lg" onClick={() => setCheckoutOpen(true)} disabled={!payments || !ready}>
-                    <Lock className="h-5 w-5" aria-hidden="true" /> Buy course · {formatPrice(price)}
-                  </Button>
-                  <p className="mt-3 text-center text-xs text-muted">One-time payment · UPI, cards and net banking</p>
+                  <BuyCourse course={course} className="mt-5" />
+                  <p className="mt-3 text-center text-xs text-muted">
+                    {access?.trialEndsAt && access.status === "expired" ? "Your free trial has ended. " : ""}One-time payment · UPI, cards and net banking
+                  </p>
                 </>
               )
             ) : (
               <>
-                <Button to={startHref} className="mt-5 w-full" size="lg">
+                <Button to={isAuthenticated ? `/learn/courses/${course.id}` : startHref} className="mt-5 w-full" size="lg">
                   <PlayCircle className="h-5 w-5" aria-hidden="true" /> {progress.done ? "Continue course" : "Start course"}
                 </Button>
-                <p className="mt-3 text-center text-xs text-muted">{price ? "Enrolled · In your account" : "Free · No sign-up needed"} · Progress saved on this device</p>
+                <p className="mt-3 text-center text-xs text-muted">
+                  {!price ? "Free · No sign-up needed" : hasCourse(course.id) ? "Enrolled · In your account" : access?.status === "trial" ? "Open during your free trial" : "Open with your access plan"} · Progress saved on this device
+                </p>
               </>
             )}
           </Card>
@@ -177,9 +178,6 @@ export default function CourseDetail() {
         </aside>
       </div>
 
-      {payments && locked && isAuthenticated && (
-        <CheckoutDialog open={checkoutOpen} onClose={() => setCheckoutOpen(false)} course={{ id: course.id, title: course.title, price }} config={payments} />
-      )}
 
       <section className="container-page">
         <h2 className="text-xl font-semibold">Other courses</h2>

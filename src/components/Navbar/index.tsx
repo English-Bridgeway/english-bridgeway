@@ -81,8 +81,8 @@ export function Navbar() {
           </button>
           {user ? (
             <>
-              <Link to="/dashboard" className="hidden h-10 w-10 place-items-center rounded-full bg-amber-300 font-display text-sm font-bold text-ink-900 hover:bg-amber-200 sm:grid" aria-label={`My dashboard (${user.name})`} title={user.name}>
-                {user.avatarInitials}
+              <Link to="/learn" className="hidden h-10 w-10 place-items-center rounded-full bg-amber-300 font-display text-sm font-bold text-ink-900 hover:bg-amber-200 sm:grid" aria-label={`My learning (${user.name})`} title={user.name}>
+                {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" /> : user.avatarInitials}
               </Link>
               <button type="button" onClick={logOut} className="hidden h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 sm:grid" aria-label="Log out" title="Log out">
                 <LogOut className="h-5 w-5" aria-hidden="true" />
@@ -131,8 +131,8 @@ export function Navbar() {
               ))}
               {user && (
                 <li>
-                  <NavLink to="/dashboard" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}>
-                    My Dashboard
+                  <NavLink to="/learn" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}>
+                    My learning
                   </NavLink>
                 </li>
               )}

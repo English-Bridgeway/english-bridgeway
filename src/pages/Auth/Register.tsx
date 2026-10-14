@@ -42,7 +42,7 @@ export default function Register() {
   };
 
   return (
-    <AuthCard title="Create your free account" subtitle="Buy courses, track your progress and practise speaking live with other learners." footer={<>Already have an account? <Link to={`/login${search}`} className="font-semibold text-ink-700">Log in</Link></>}>
+    <AuthCard title="Create your free account" subtitle="Start with a free trial of every course and the AI speaking tutor, then pick the course you want." footer={<>Already have an account? <Link to={`/login${search}`} className="font-semibold text-ink-700">Log in</Link></>}>
       {failure && <Alert tone="error" className="mb-5">{failure}</Alert>}
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         <TextField id="reg-name" label="Full name" autoComplete="name" value={v.name} onChange={set("name")} error={errors.name} />

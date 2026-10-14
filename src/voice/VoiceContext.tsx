@@ -44,7 +44,7 @@ function PeerAudio({ stream }: { stream: MediaStream | null }) {
 function VoiceOverlay({ vc }: { vc: VoiceChat }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const onSpeakPage = pathname === "/speak";
+  const onSpeakPage = pathname === "/learn/live";
 
   return (
     <>
@@ -54,7 +54,7 @@ function VoiceOverlay({ vc }: { vc: VoiceChat }) {
         <div className="fixed inset-x-4 bottom-4 z-50 space-y-3 sm:left-auto sm:w-96" aria-live="assertive">
           {vc.room && !onSpeakPage && (
             <div className="flex items-center gap-3 rounded-2xl bg-brand-primary p-3 text-white shadow-xl">
-              <Link to="/speak" className="min-w-0 flex-1 pl-1">
+              <Link to="/learn/live" className="min-w-0 flex-1 pl-1">
                 <p className="truncate font-semibold">{vc.room.name}</p>
                 <p className="text-xs text-ink-100">{vc.peers.length ? `${vc.peers.length + 1} people talking` : "Waiting…"} · Open call</p>
               </Link>
@@ -78,7 +78,7 @@ function VoiceOverlay({ vc }: { vc: VoiceChat }) {
               </div>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 <Button size="sm" variant="outline" onClick={() => vc.declineInvite(inv)}><PhoneOff className="h-4 w-4" aria-hidden="true" /> Decline</Button>
-                <Button size="sm" disabled={vc.joining} onClick={async () => { navigate("/speak"); await vc.acceptInvite(inv); }}>
+                <Button size="sm" disabled={vc.joining} onClick={async () => { navigate("/learn/live"); await vc.acceptInvite(inv); }}>
                   <Phone className="h-4 w-4" aria-hidden="true" /> {inv.room.kind === "direct" ? "Answer" : "Join"}
                 </Button>
               </div>

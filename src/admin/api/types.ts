@@ -1,5 +1,6 @@
 import type { CollectionKey } from "../../data/content";
 import type { SiteSettings } from "../../data/site";
+import type { LearnerAccess, LearnerOffer, LearnerProfile } from "../../types";
 
 // Shapes shared by the admin panel and the API in server/. Keep them in sync with server/src/types.ts.
 
@@ -88,11 +89,76 @@ export interface PaymentSettingsInput {
 }
 
 export interface DashboardStats {
+  learners?: number;
   content: Record<CollectionKey, number>;
   orders: { total: number; paid: number; pending: number; revenue: number };
   messages: { total: number; unread: number };
   recentOrders: Order[];
   recentMessages: ContactMessage[];
+}
+
+export interface LearnerSummary {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  avatarInitials: string;
+  avatarUrl: string | null;
+  profile: LearnerProfile;
+  createdAt: string;
+  lastLoginAt: string | null;
+  active: boolean;
+  blockedReason: string | null;
+  access: Omit<LearnerAccess, "ai">;
+  offer: LearnerOffer | null;
+  offerActive: boolean;
+  paidOrders: number;
+  totalSpent: number;
+}
+
+export interface LearnerDetail extends LearnerSummary {
+  adminNote: string | null;
+  orders: Order[];
+}
+
+export type AccessChange =
+  | { mode: "months"; months: number }
+  | { mode: "until"; date: string }
+  | { mode: "unlimited" }
+  | { mode: "trial"; hours: number }
+  | { mode: "none" };
+
+export interface OfferInput {
+  kind: "price" | "percent";
+  value: number;
+  courseId: string | null;
+  note: string;
+  /** YYYY-MM-DD, or null for no end date. */
+  expiresAt: string | null;
+}
+
+export interface AccessSettings {
+  trialHours: number;
+  aiForBuyers: boolean;
+}
+
+export interface AiSettings {
+  enabled: boolean;
+  baseUrl: string;
+  model: string;
+  apiKeyMasked: string | null;
+  instructions: string;
+  dailyLimit: number;
+}
+
+export interface AiSettingsInput {
+  enabled: boolean;
+  baseUrl: string;
+  model: string;
+  apiKey?: string;
+  clearKey?: boolean;
+  instructions: string;
+  dailyLimit: number;
 }
 
 export interface AdminApi {
@@ -127,6 +193,20 @@ export interface AdminApi {
   changePassword(current: string, next: string): Promise<void>;
 
   listAudit(): Promise<AuditEntry[]>;
+
+  listLearners(q?: string): Promise<LearnerSummary[]>;
+  getLearner(id: string): Promise<LearnerDetail>;
+  setLearnerAccess(id: string, change: AccessChange): Promise<LearnerDetail>;
+  setLearnerOffer(id: string, offer: OfferInput | null): Promise<LearnerDetail>;
+  setLearnerBlocked(id: string, blocked: boolean, reason?: string): Promise<LearnerDetail>;
+  saveLearnerNote(id: string, note: string): Promise<LearnerDetail>;
+  deleteLearner(id: string): Promise<void>;
+  getAccessSettings(): Promise<AccessSettings>;
+  saveAccessSettings(input: AccessSettings): Promise<AccessSettings>;
+
+  getAi(): Promise<AiSettings>;
+  saveAi(input: AiSettingsInput): Promise<AiSettings>;
+  testAi(): Promise<{ ok: boolean; message: string }>;
 }
 
 export class ApiError extends Error {

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BookOpen, CircleCheck, Flame, Heart, ListChecks, Mic, PlayCircle, Sparkles, Target, Trophy } from "lucide-react";
+import { Bot, BookOpen, CircleCheck, Flame, Heart, ListChecks, Mic, PlayCircle, Sparkles, Target, Trophy } from "lucide-react";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/Button";
 import { Badge } from "../../components/Badge";
@@ -15,10 +15,13 @@ import { grammarLessons, getTopic } from "../../data/grammar";
 import { getWord, getWordOfTheDay } from "../../data/vocabulary";
 import { quizzes } from "../../data/quizzes";
 import { useCourseProgress, useStartLearning } from "../Courses/useCourseProgress";
+import { AccessBanner } from "../../portal/AccessBanner";
+import { UserAvatar } from "../../portal/Avatar";
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const activityIcon = { lesson: CircleCheck, quiz: Trophy, word: Heart, course: PlayCircle };
 
+/** The learner portal's overview page (/learn). */
 export default function Dashboard() {
   const { user, purchasedCourseIds } = useAuth();
   const myCourses = purchasedCourseIds.map(getCourse).filter((c): c is NonNullable<typeof c> => Boolean(c));
@@ -46,7 +49,8 @@ export default function Dashboard() {
   const quizList = quizzes.filter((q) => quizScores[q.id]);
 
   return (
-    <div className="container-page py-10">
+    <div className="mx-auto max-w-7xl">
+      <AccessBanner className="mb-6" />
       {!hasRealData && (
         <Alert tone="info" className="mb-6" title="You're viewing a sample dashboard">
           Complete a lesson or quiz and these numbers will switch to your own progress, saved on this device.
@@ -61,13 +65,13 @@ export default function Dashboard() {
           <p className="relative mt-3 text-lg text-ink-100">You're {Math.round(coursePercent)}% through {course.title}.</p>
           <ProgressBar value={coursePercent} label={`${course.title} progress`} tone="amber" className="relative mt-5 max-w-md" />
           <div className="relative mt-6 flex flex-wrap gap-3">
-            <Button to={start.resume ? start.to : `/courses/${course.id}`} variant="accent"><PlayCircle className="h-4 w-4" aria-hidden="true" /> {start.resume ? "Continue course" : "Start a course"}</Button>
+            <Button to={`/learn/courses/${course.id}`} variant="accent"><PlayCircle className="h-4 w-4" aria-hidden="true" /> {start.resume ? "Continue course" : "Start a course"}</Button>
             <Button to="/quiz" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30">Take a quiz</Button>
           </div>
         </div>
         <Card className="p-6">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-amber-100 font-display font-semibold text-amber-800" aria-hidden="true">{user?.avatarInitials}</span>
+            <UserAvatar user={user} className="h-12 w-12" />
             <div>
               <p className="font-semibold">{user?.name}</p>
               <p className="text-sm text-muted">{user?.email}</p>
@@ -98,7 +102,7 @@ export default function Dashboard() {
       <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-10">
           <section>
-            <div className="flex items-end justify-between"><h2 className="text-xl font-semibold">My courses</h2><Link to="/courses" className="text-sm font-semibold text-ink-700">All courses →</Link></div>
+            <div className="flex items-end justify-between"><h2 className="text-xl font-semibold">Bought courses</h2><Link to="/learn/courses" className="text-sm font-semibold text-ink-700">All courses →</Link></div>
             {myCourses.length ? (
               <ul className="mt-4 grid gap-4 sm:grid-cols-2">
                 {myCourses.map((c) => {
@@ -106,7 +110,7 @@ export default function Dashboard() {
                   return (
                     <li key={c.id}>
                       <Card className="p-5">
-                        <Link to={`/courses/${c.id}`} className="font-semibold hover:text-ink-600">{c.title}</Link>
+                        <Link to={`/learn/courses/${c.id}`} className="font-semibold hover:text-ink-600">{c.title}</Link>
                         <ProgressBar value={p.percent} label={`${p.done} of ${p.total} lessons done`} className="mt-3" showValue />
                       </Card>
                     </li>
@@ -114,16 +118,19 @@ export default function Dashboard() {
                 })}
               </ul>
             ) : (
-              <p className="mt-3 rounded-2xl border border-dashed border-ink-200 bg-white p-5 text-muted">You haven't bought a course yet. Free courses are open to everyone. <Link to="/courses" className="font-semibold text-ink-700">Browse courses →</Link></p>
+              <p className="mt-3 rounded-2xl border border-dashed border-ink-200 bg-white p-5 text-muted">You haven't bought a course yet. Free courses are open to everyone. <Link to="/learn/courses" className="font-semibold text-ink-700">Browse courses →</Link></p>
             )}
           </section>
           <section>
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-ink-50 p-5">
               <div>
-                <h2 className="text-lg font-semibold">Practise speaking live</h2>
-                <p className="text-sm text-muted">Call another learner one-to-one, or start a team room for up to six people.</p>
+                <h2 className="text-lg font-semibold">Practise speaking</h2>
+                <p className="text-sm text-muted">Talk with the AI tutor any time, or call another learner live.</p>
               </div>
-              <Button to="/speak"><Mic className="h-4 w-4" aria-hidden="true" /> Open Speak Live</Button>
+              <div className="flex flex-wrap gap-2">
+                <Button to="/learn/ai"><Bot className="h-4 w-4" aria-hidden="true" /> Speak with AI</Button>
+                <Button to="/learn/live" variant="outline"><Mic className="h-4 w-4" aria-hidden="true" /> Speak Live</Button>
+              </div>
             </div>
           </section>
           <section>

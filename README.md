@@ -82,7 +82,8 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
 ## Learner accounts and course payments
 
 - Learners sign up at `/register` and log in at `/login` (passwords bcrypt-hashed, 30-day sessions kept on the device,
-  rate-limited). `/dashboard` and `/speak` need an account; other lessons stay open to everyone.
+  rate-limited). After logging in learners land in their own portal at `/learn` (see below); lessons on the public site stay
+  open to everyone.
 - Buying a paid course requires an account. The order is tied to that account and uses its email; when Cashfree confirms
   the payment (return page or webhook) the course unlocks for that learner on every device. Refunded orders lock it again.
 - Cashfree runs in **sandbox (test) mode** by default. Use Cashfree's test cards/UPI there; switch to production in
@@ -90,7 +91,50 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
 - API: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/me` (profile and owned course ids), `GET /api/me/orders`,
   `POST /api/me/logout-all`. `POST /api/orders` now needs the learner's `Authorization: Bearer` token.
 
-## Speak Live: voice chat (`/speak`)
+## Learner portal (`/learn`), free trial and access
+
+- **The portal** has its own layout: Overview (progress, streak, quiz scores), **My courses** (every course with its state:
+  free, bought, open with access, or locked), a **course player** (`/learn/courses/:id`, lesson list on the side, the lesson in
+  the middle, Previous / Mark as done / Next), **Speak with AI**, **Speak Live**, **Plan & payments** and **My profile**
+  (photo upload, mobile, WhatsApp, date of birth, city, level, goal…). `/dashboard` and `/speak` redirect here.
+- **Free trial:** a new account gets full access for `trialHours` (24 by default, Admin → Learners → Free trial). Full access
+  opens every paid course and Speak with AI. When it ends, paid courses show the buy screen; bought courses and free courses stay open.
+- **Admin → Learners** lists every learner (search, filters for trial / access / ended / buyers / offers / blocked). A learner's
+  page shows their photo, contact and profile details and payments, and lets the owner **give N months** (added to any time
+  left), **set an end date**, **give unlimited access**, **restart the trial**, **remove access**, give a **special offer**
+  (percent off or a fixed price, for one course or all, optional end date: the learner sees it and Cashfree charges that price),
+  **block / unblock** (blocking signs them out everywhere at once; the reason is shown when they try to log in), keep a
+  private note, or delete the account.
+- The rules live in `server/src/services/access.ts`; the server checks them for payments and the AI tutor.
+- API: `PATCH /api/me` (name, phone, `profile`), `PUT/DELETE /api/me/avatar` (photo as a data: URL, shrunk to 256×256 in the
+  browser), `GET /api/avatars/:id`, `GET /api/ai/status`, `POST /api/ai/chat`; admin: `/api/admin/learners…`,
+  `/api/admin/settings/access`, `/api/admin/settings/ai`.
+
+## Speak with AI (`/learn/ai`)
+
+Learners talk out loud with "Bridget", an AI English tutor: the browser's speech recognition turns their voice into text
+(Chrome, Edge, Safari; typing works everywhere), the server asks the AI, and the reply is read aloud in the site's female
+Listen voice. Situations: free talk, job interview, restaurant, shopping, travel, doctor, office. When the learner makes a
+mistake the tutor shows a "Better:" correction. Hands-free mode listens again after each reply.
+
+**Set it up (Admin → AI tutor, owner only):** pick a provider, paste an API key, tick *Speak with AI is on*, save, then
+**Test saved settings**. Any OpenAI-compatible API works:
+
+| Provider | API base URL | Example model | Key |
+| --- | --- | --- | --- |
+| Groq (free tier) | `https://api.groq.com/openai/v1` | `llama-3.1-8b-instant` | console.groq.com/keys |
+| Google Gemini (free tier) | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-2.0-flash` | aistudio.google.com/apikey |
+| OpenRouter | `https://openrouter.ai/api/v1` | a `:free` model | openrouter.ai/keys |
+| OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` | platform.openai.com/api-keys |
+| Ollama (own server) | `http://<host>:11434/v1` | `llama3.1` | none |
+
+The key is stored encrypted in the database and never reaches browsers. `AI_BASE_URL`, `AI_MODEL` and `AI_API_KEY` in
+`.env` are used when nothing is saved in the admin panel. "Messages per learner per day" (default 200) protects free-tier
+limits; it is counted in memory per API process. Who may use it: anyone on the free trial or with access, plus (switch in
+Admin → Learners) anyone who bought a course. In demo mode the browser calls the provider directly with the key saved in the
+demo admin panel; some providers block that, so test on the real server.
+
+## Speak Live: voice chat (`/learn/live`)
 
 - **Learners online:** everyone logged in shows up while they are anywhere on the site. Press **Call** for a one-to-one call;
   the other learner gets a ringing pop-up on whatever page they are on (Answer / Decline, rings for 40 seconds).

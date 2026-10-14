@@ -4,6 +4,7 @@ import { config } from '../config';
 import { getPaymentConfig, webhookUrl } from './settings';
 import { getPublishedItem } from './content';
 import * as cashfree from './cashfree';
+import { priceFor } from './access';
 
 export class OrderError extends Error {
   constructor(
@@ -65,8 +66,10 @@ export async function createCourseOrder(learner: Learner, input: { courseId?: un
   // The price always comes from the database, never from the browser.
   const course = typeof input.courseId === 'string' ? await getPublishedItem('courses', input.courseId) : null;
   if (!course) throw new OrderError('This course is not available.', 404);
-  const price = Number(course.data.price ?? 0);
-  if (!Number.isFinite(price) || price <= 0) throw new OrderError('This course is free. Just press Start course.');
+  const listPrice = Number(course.data.price ?? 0);
+  if (!Number.isFinite(listPrice) || listPrice <= 0) throw new OrderError('This course is free. Just press Start course.');
+  // A special offer the admin gave this learner lowers the price (never raises it).
+  const price = priceFor(learner, course.key, listPrice);
   const title = String(course.data.title ?? course.key);
   if (await Order.count({ where: { userId: learner.id, courseId: course.key, status: 'paid' } })) {
     throw new OrderError('You already own this course.', 409);

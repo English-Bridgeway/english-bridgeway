@@ -1,7 +1,11 @@
 import { Router, type ErrorRequestHandler } from 'express';
-import { Order } from '../db';
+import { LearnerAvatar, Order, type Learner } from '../db';
 import { asyncHandler, rateLimit, requireLearner } from '../middleware';
-import { AccountError, learnerDto, loginLearner, purchasedCourseIds, registerLearner, signLearnerToken } from '../services/learners';
+import {
+  AccountError, learnerDto, loginLearner, purchasedCourseIds, registerLearner, removeAvatar, saveAvatar, signLearnerToken, updateProfile,
+} from '../services/learners';
+import { accessState, activeOffer, getAccessSettings } from '../services/access';
+import { AiError, getAiConfig, tutorReply, usedToday } from '../services/ai';
 import { publicOrderDto } from '../services/orders';
 import { iceServersFor } from '../services/voice';
 
@@ -29,11 +33,26 @@ accountRouter.post(
   }),
 );
 
+/** Whether this learner may use Speak with AI: full access, or (when allowed) any bought course. */
+async function aiAllowed(learner: Learner, purchased?: string[]) {
+  if (accessState(learner).full) return true;
+  const { aiForBuyers } = await getAccessSettings();
+  return aiForBuyers && (purchased ?? (await purchasedCourseIds(learner.id))).length > 0;
+}
+
 accountRouter.get(
   '/me',
   requireLearner,
   asyncHandler(async (req, res) => {
-    res.json({ user: learnerDto(req.learner!), purchasedCourseIds: await purchasedCourseIds(req.learner!.id) });
+    const learner = req.learner!;
+    const purchased = await purchasedCourseIds(learner.id);
+    const offer = activeOffer(learner);
+    res.json({
+      user: learnerDto(learner),
+      purchasedCourseIds: purchased,
+      access: { ...accessState(learner), ai: await aiAllowed(learner, purchased) },
+      offer: offer && { kind: offer.kind, value: offer.value, courseId: offer.courseId, note: offer.note, expiresAt: offer.expiresAt },
+    });
   }),
 );
 
@@ -41,11 +60,67 @@ accountRouter.patch(
   '/me',
   requireLearner,
   asyncHandler(async (req, res) => {
-    const b = req.body ?? {};
-    const name = typeof b.name === 'string' ? b.name.trim().replace(/\s+/g, ' ') : req.learner!.name;
-    if (name.length < 2 || name.length > 120) throw new AccountError('Please enter your name.', 400, 'name');
-    await req.learner!.update({ name });
-    res.json({ user: learnerDto(req.learner!) });
+    res.json({ user: learnerDto(await updateProfile(req.learner!, req.body ?? {})) });
+  }),
+);
+
+accountRouter.put(
+  '/me/avatar',
+  requireLearner,
+  rateLimit({ windowMs: 60 * 60_000, max: 30 }),
+  asyncHandler(async (req, res) => {
+    res.json({ user: learnerDto(await saveAvatar(req.learner!, req.body?.dataUrl)) });
+  }),
+);
+
+accountRouter.delete(
+  '/me/avatar',
+  requireLearner,
+  asyncHandler(async (req, res) => {
+    res.json({ user: learnerDto(await removeAvatar(req.learner!)) });
+  }),
+);
+
+/** Profile photos. The learner id is a random UUID, and the URL carries a version for caching. */
+accountRouter.get(
+  '/avatars/:learnerId',
+  asyncHandler(async (req, res) => {
+    const id = req.params.learnerId;
+    const avatar = /^[0-9a-f-]{36}$/i.test(id) ? await LearnerAvatar.findByPk(id) : null;
+    if (!avatar) {
+      res.status(404).json({ message: 'No photo.' });
+      return;
+    }
+    res.setHeader('Content-Type', avatar.mime);
+    res.setHeader('Cache-Control', req.query.v ? 'private, max-age=31536000, immutable' : 'private, no-cache');
+    res.send(avatar.data);
+  }),
+);
+
+// ---- Speak with AI ----
+
+accountRouter.get(
+  '/ai/status',
+  requireLearner,
+  asyncHandler(async (req, res) => {
+    const cfg = await getAiConfig();
+    res.json({
+      enabled: cfg.enabled,
+      allowed: await aiAllowed(req.learner!),
+      remainingToday: cfg.dailyLimit ? Math.max(0, cfg.dailyLimit - usedToday(req.learner!.id)) : null,
+    });
+  }),
+);
+
+accountRouter.post(
+  '/ai/chat',
+  requireLearner,
+  rateLimit({ windowMs: 60_000, max: 20 }),
+  asyncHandler(async (req, res) => {
+    if (!(await aiAllowed(req.learner!))) {
+      throw new AiError('Your free trial has ended. Buy a course or ask us for access to keep talking with the AI tutor.', 402, 'access');
+    }
+    res.json(await tutorReply(req.learner!, req.body ?? {}));
   }),
 );
 
@@ -76,6 +151,10 @@ accountRouter.get('/voice/config', requireLearner, (req, res) => {
 const onAccountError: ErrorRequestHandler = (err, _req, res, next) => {
   if (err instanceof AccountError) {
     res.status(err.status).json({ message: err.message, field: err.field });
+    return;
+  }
+  if (err instanceof AiError) {
+    res.status(err.status).json({ message: err.message, code: err.code });
     return;
   }
   next(err);

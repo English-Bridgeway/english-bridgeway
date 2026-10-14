@@ -1,6 +1,8 @@
 import { collectionIdField, type CollectionKey } from "../../data/content";
-import { newId, readDemoDb, updateDemoDb, type DemoDb } from "../../utils/demoStore";
-import { ApiError, type AdminApi, type AdminUser, type DashboardStats } from "./types";
+import { DEMO_ACCESS_DEFAULTS, DEMO_AI_DEFAULTS, newId, readDemoDb, updateDemoDb, type DemoDb } from "../../utils/demoStore";
+import { readDemoLearners, updateDemoLearner, writeDemoLearners, type DemoLearner } from "../../utils/demoLearners";
+import { addMonths, computeAccess, offerApplies } from "../../utils/access";
+import { ApiError, type AdminApi, type AdminUser, type DashboardStats, type LearnerDetail, type LearnerSummary } from "./types";
 import { getSession } from "./session";
 
 // Demo admin API: same contract as the server, stored in this browser (utils/demoStore.ts).
@@ -35,6 +37,42 @@ function paymentsView(db: DemoDb) {
   return { enabled: p.enabled, mode: p.mode, appId: p.appId, secretKeyMasked: mask(p.secretKey), webhookUrl: null, currency: "INR" as const };
 }
 
+function learnerSummary(l: DemoLearner, orders: DemoDb["orders"]): LearnerSummary {
+  const paid = orders.filter((o) => o.userId === l.id && o.status === "paid");
+  return {
+    id: l.id, name: l.name, email: l.email, phone: l.phone ?? null, avatarInitials: l.avatarInitials, avatarUrl: l.avatarUrl ?? null,
+    profile: l.profile, createdAt: l.createdAt, lastLoginAt: l.lastLoginAt, active: l.active, blockedReason: l.blockedReason,
+    access: computeAccess(l), offer: l.offer, offerActive: offerApplies(l.offer), paidOrders: paid.length, totalSpent: paid.reduce((s, o) => s + o.amount, 0),
+  };
+}
+
+function learnerDetail(id: string): LearnerDetail {
+  const l = readDemoLearners().find((x) => x.id === id);
+  if (!l) throw new ApiError("Learner not found.", 404);
+  const { orders } = readDemoDb();
+  return { ...learnerSummary(l, orders), adminNote: l.adminNote, orders: orders.filter((o) => o.userId === id) };
+}
+
+/** Runs a learner change as an owner and writes it to the activity log. */
+function changeLearner(id: string, action: string, fn: (l: DemoLearner) => void): Promise<LearnerDetail> {
+  const db = readDemoDb();
+  const admin = owner(db);
+  let email = "";
+  try {
+    updateDemoLearner(id, (l) => {
+      fn(l);
+      email = l.email;
+    });
+  } catch (e) {
+    if (e instanceof ApiError) throw e;
+    throw new ApiError("Learner not found.", 404);
+  }
+  updateDemoDb((d) => log(d, admin.email, action, email));
+  return wait(learnerDetail(id));
+}
+
+const endOfDay = (date: string) => new Date(`${date}T23:59:59+05:30`).toISOString();
+
 export const localApi: AdminApi = {
   mode: "demo",
   async login(email, password) {
@@ -58,6 +96,7 @@ export const localApi: AdminApi = {
     current(db);
     const paid = db.orders.filter((o) => o.status === "paid");
     const stats: DashboardStats = {
+      learners: readDemoLearners().length,
       content: Object.fromEntries((Object.keys(db.content) as CollectionKey[]).map((c) => [c, db.content[c].length])) as DashboardStats["content"],
       orders: { total: db.orders.length, paid: paid.length, pending: db.orders.filter((o) => o.status === "pending").length, revenue: paid.reduce((s, o) => s + o.amount, 0) },
       messages: { total: db.messages.length, unread: db.messages.filter((m) => m.status === "new").length },
@@ -250,5 +289,124 @@ export const localApi: AdminApi = {
     const db = readDemoDb();
     current(db);
     return wait(clone(db.audit));
+  },
+  async listLearners(q) {
+    const db = readDemoDb();
+    current(db);
+    const needle = q?.trim().toLowerCase() ?? "";
+    const rows = readDemoLearners()
+      .filter((l) => !needle || [l.name, l.email, l.phone ?? ""].some((v) => v.toLowerCase().includes(needle)))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return wait(rows.map((l) => learnerSummary(l, db.orders)));
+  },
+  async getLearner(id) {
+    current(readDemoDb());
+    return wait(learnerDetail(id));
+  },
+  async setLearnerAccess(id, change) {
+    const now = new Date();
+    if (change.mode === "months" && !(change.months >= 1 && change.months <= 120)) throw new ApiError("Choose between 1 and 120 months.", 400);
+    if (change.mode === "until" && !(Date.parse(endOfDay(change.date)) > now.getTime())) throw new ApiError("Choose a date in the future.", 400);
+    if (change.mode === "trial" && !(change.hours >= 1 && change.hours <= 24 * 90)) throw new ApiError("Choose between 1 hour and 90 days.", 400);
+    const label = change.mode === "months" ? `+${change.months} months` : change.mode === "until" ? `until ${change.date}` : change.mode === "trial" ? `trial ${change.hours}h` : change.mode === "none" ? "removed" : "unlimited";
+    return changeLearner(id, `Set learner access (${label})`, (l) => {
+      if (change.mode === "months") {
+        const from = l.accessUntil && Date.parse(l.accessUntil) > now.getTime() ? new Date(l.accessUntil) : now;
+        l.accessUnlimited = false;
+        l.accessUntil = addMonths(from, Math.round(change.months)).toISOString();
+      } else if (change.mode === "until") {
+        l.accessUnlimited = false;
+        l.accessUntil = endOfDay(change.date);
+      } else if (change.mode === "unlimited") {
+        l.accessUnlimited = true;
+      } else if (change.mode === "trial") {
+        l.trialEndsAt = new Date(now.getTime() + change.hours * 3600_000).toISOString();
+      } else {
+        l.accessUnlimited = false;
+        l.accessUntil = null;
+        if (l.trialEndsAt && Date.parse(l.trialEndsAt) > now.getTime()) l.trialEndsAt = now.toISOString();
+      }
+    });
+  },
+  async setLearnerOffer(id, offer) {
+    if (offer) {
+      if (offer.kind === "percent" && !(offer.value >= 1 && offer.value <= 100)) throw new ApiError("The discount must be between 1% and 100%.", 400);
+      if (offer.kind === "price" && !(offer.value >= 1)) throw new ApiError("The offer price must be at least ₹1.", 400);
+    }
+    return changeLearner(id, offer ? `Gave special offer (${offer.kind === "percent" ? `${offer.value}% off` : `₹${offer.value}`})` : "Removed special offer", (l) => {
+      l.offer = offer ? { ...offer, value: Math.round(offer.value), note: offer.note.trim(), expiresAt: offer.expiresAt ? endOfDay(offer.expiresAt) : null } : null;
+    });
+  },
+  async setLearnerBlocked(id, blocked, reason) {
+    return changeLearner(id, blocked ? "Blocked learner" : "Unblocked learner", (l) => {
+      l.active = !blocked;
+      l.blockedReason = blocked ? reason?.trim() || null : null;
+    });
+  },
+  async saveLearnerNote(id, note) {
+    return changeLearner(id, "Updated learner note", (l) => {
+      l.adminNote = note || null;
+    });
+  },
+  async deleteLearner(id) {
+    const db = readDemoDb();
+    const admin = owner(db);
+    const l = readDemoLearners().find((x) => x.id === id);
+    writeDemoLearners(readDemoLearners().filter((x) => x.id !== id));
+    if (l) updateDemoDb((d) => log(d, admin.email, "Deleted learner account", l.email));
+    return wait(undefined);
+  },
+  async getAccessSettings() {
+    const db = readDemoDb();
+    current(db);
+    return wait({ ...DEMO_ACCESS_DEFAULTS, ...db.access });
+  },
+  async saveAccessSettings(input) {
+    return wait(
+      updateDemoDb((db) => {
+        const admin = owner(db);
+        db.access = { trialHours: Math.max(0, Math.min(24 * 90, Math.round(input.trialHours) || 0)), aiForBuyers: input.aiForBuyers };
+        log(db, admin.email, "Updated learner access settings", `trial ${db.access.trialHours}h`);
+        return { ...db.access };
+      }),
+    );
+  },
+  async getAi() {
+    const db = readDemoDb();
+    owner(db);
+    const ai = { ...DEMO_AI_DEFAULTS, ...db.ai };
+    return wait({ enabled: ai.enabled, baseUrl: ai.baseUrl, model: ai.model, apiKeyMasked: mask(ai.apiKey), instructions: ai.instructions, dailyLimit: ai.dailyLimit });
+  },
+  async saveAi(input) {
+    return wait(
+      updateDemoDb((db) => {
+        const admin = owner(db);
+        const prev = { ...DEMO_AI_DEFAULTS, ...db.ai };
+        db.ai = {
+          enabled: input.enabled, baseUrl: input.baseUrl.trim().replace(/\/+$/, ""), model: input.model.trim(),
+          apiKey: input.clearKey ? "" : input.apiKey?.trim() || prev.apiKey, instructions: input.instructions, dailyLimit: Math.max(0, Math.round(input.dailyLimit) || 0),
+        };
+        log(db, admin.email, "Updated AI tutor settings", input.enabled ? "on" : "off");
+        const ai = db.ai;
+        return { enabled: ai.enabled, baseUrl: ai.baseUrl, model: ai.model, apiKeyMasked: mask(ai.apiKey), instructions: ai.instructions, dailyLimit: ai.dailyLimit };
+      }),
+    );
+  },
+  async testAi() {
+    const db = readDemoDb();
+    owner(db);
+    const ai = { ...DEMO_AI_DEFAULTS, ...db.ai };
+    try {
+      const res = await fetch(`${ai.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${ai.apiKey}` },
+        body: JSON.stringify({ model: ai.model, max_tokens: 20, messages: [{ role: "user", content: 'Say "Hello from the AI tutor" and nothing else.' }] }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) return { ok: false, message: `The AI service returned an error (${res.status})${data?.error?.message ? `: ${data.error.message}` : ""}` };
+      return { ok: true, message: `Connected to ${ai.model}. It said: “${String(data?.choices?.[0]?.message?.content ?? "").slice(0, 120)}”` };
+    } catch {
+      return { ok: false, message: "The browser could not reach the AI service. Some providers only accept calls from a server; it will work once the API server is connected." };
+    }
   },
 };

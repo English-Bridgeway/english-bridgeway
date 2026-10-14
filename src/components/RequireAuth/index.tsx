@@ -21,8 +21,8 @@ export function RequireAuth({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-/** Where to go after logging in: the ?next= page when it is on this site, else the dashboard. */
+/** Where to go after logging in: the ?next= page when it is on this site, else the learner portal. */
 export function safeNext(search: string) {
   const next = new URLSearchParams(search).get("next") || "";
-  return next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  return next.startsWith("/") && !next.startsWith("//") ? next : "/learn";
 }

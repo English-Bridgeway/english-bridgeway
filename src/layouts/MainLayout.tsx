@@ -3,7 +3,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { PageSkeleton } from "../components/Skeleton";
-import { VoiceProvider } from "../voice/VoiceContext";
 import { CourseBar } from "../components/CourseBar";
 
 function ScrollToTop() {
@@ -16,7 +15,7 @@ function ScrollToTop() {
 
 export function MainLayout() {
   return (
-    <VoiceProvider>
+    <>
       <div className="flex min-h-screen flex-col">
         <a
           href="#main"
@@ -35,6 +34,6 @@ export function MainLayout() {
         </main>
         <Footer />
       </div>
-    </VoiceProvider>
+    </>
   );
 }

@@ -89,8 +89,44 @@ export class Learner extends Model<InferAttributes<Learner>, InferCreationAttrib
   // Raised on "log out everywhere" and password changes; tokens carrying an older value stop working.
   declare tokenVersion: CreationOptional<number>;
   declare lastLoginAt: CreationOptional<Date | null>;
+  /** Extra personal details the learner fills in on their profile (city, goal, WhatsApp…). */
+  declare profile: CreationOptional<LearnerProfile>;
+  /** When the photo last changed; null when there is no photo. The photo is in learner_avatars. */
+  declare avatarUpdatedAt: CreationOptional<Date | null>;
+  // Access to every course and the AI tutor: the free trial after sign-up, and whatever the
+  // admin grants (N months, an end date, or unlimited). Paid courses stay unlocked either way.
+  declare trialEndsAt: CreationOptional<Date | null>;
+  declare accessUntil: CreationOptional<Date | null>;
+  declare accessUnlimited: CreationOptional<boolean>;
+  /** A special price for this learner, set in the admin panel. */
+  declare offer: CreationOptional<LearnerOffer | null>;
+  declare blockedReason: CreationOptional<string | null>;
+  declare adminNote: CreationOptional<string | null>;
   declare createdAt: CreationOptional<Date>;
   declare updatedAt: CreationOptional<Date>;
+}
+
+export interface LearnerProfile {
+  whatsapp?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  occupation?: string;
+  englishLevel?: string;
+  goal?: string;
+  about?: string;
+}
+
+export interface LearnerOffer {
+  /** "price": the course costs `value` rupees; "percent": `value`% off. */
+  kind: 'price' | 'percent';
+  value: number;
+  /** Only this course; null means every paid course. */
+  courseId: string | null;
+  note: string;
+  expiresAt: string | null;
 }
 
 Learner.init(
@@ -103,10 +139,34 @@ Learner.init(
     active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
     tokenVersion: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     lastLoginAt: { type: DataTypes.DATE, allowNull: true },
+    profile: { type: DataTypes.JSONB, allowNull: false, defaultValue: {} },
+    avatarUpdatedAt: { type: DataTypes.DATE, allowNull: true },
+    trialEndsAt: { type: DataTypes.DATE, allowNull: true },
+    accessUntil: { type: DataTypes.DATE, allowNull: true },
+    accessUnlimited: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    offer: { type: DataTypes.JSONB, allowNull: true },
+    blockedReason: { type: DataTypes.STRING(300), allowNull: true },
+    adminNote: { type: DataTypes.TEXT, allowNull: true },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE,
   },
   { sequelize, tableName: 'learners', underscored: true },
+);
+
+// Profile photos, kept out of the learners table so loading a learner stays light.
+export class LearnerAvatar extends Model<InferAttributes<LearnerAvatar>, InferCreationAttributes<LearnerAvatar>> {
+  declare learnerId: string;
+  declare mime: string;
+  declare data: Buffer;
+}
+
+LearnerAvatar.init(
+  {
+    learnerId: { type: DataTypes.UUID, primaryKey: true },
+    mime: { type: DataTypes.STRING(30), allowNull: false },
+    data: { type: DataTypes.BLOB, allowNull: false },
+  },
+  { sequelize, tableName: 'learner_avatars', underscored: true },
 );
 
 export type OrderStatus = 'pending' | 'paid' | 'failed' | 'refunded';
@@ -205,6 +265,21 @@ export async function initDatabase(): Promise<void> {
   const orders = await sequelize.getQueryInterface().describeTable('orders').catch(() => null);
   if (orders && !orders.user_id) {
     await sequelize.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id UUID');
+  }
+  const learners = await sequelize.getQueryInterface().describeTable('learners').catch(() => null);
+  if (learners && !learners.trial_ends_at) {
+    await sequelize.query(`
+      ALTER TABLE learners
+        ADD COLUMN IF NOT EXISTS profile JSONB NOT NULL DEFAULT '{}'::jsonb,
+        ADD COLUMN IF NOT EXISTS avatar_updated_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS access_until TIMESTAMPTZ,
+        ADD COLUMN IF NOT EXISTS access_unlimited BOOLEAN NOT NULL DEFAULT false,
+        ADD COLUMN IF NOT EXISTS offer JSONB,
+        ADD COLUMN IF NOT EXISTS blocked_reason VARCHAR(300),
+        ADD COLUMN IF NOT EXISTS admin_note TEXT`);
+    // Accounts made before the free trial existed get one too, starting now.
+    await sequelize.query("UPDATE learners SET trial_ends_at = now() + interval '24 hours' WHERE trial_ends_at IS NULL");
   }
   await sequelize.sync();
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import {
-  BookOpen, CreditCard, ExternalLink, FileText, GraduationCap, History, Inbox, Languages, LayoutDashboard, ListChecks,
+  Bot, BookOpen, CreditCard, Contact, ExternalLink, FileText, GraduationCap, History, Inbox, Languages, LayoutDashboard, ListChecks,
   LogOut, Menu, MessagesSquare, Settings, ShieldCheck, ShoppingBag, UserRound, Users, X,
 } from "lucide-react";
 import { useAdmin } from "../AdminContext";
@@ -30,6 +30,7 @@ const sections: { title?: string; items: NavItem[] }[] = [
   {
     title: "Business",
     items: [
+      { to: "/admin/learners", label: "Learners", icon: Contact },
       { to: "/admin/orders", label: "Orders & payments", icon: ShoppingBag },
       { to: "/admin/messages", label: "Messages", icon: Inbox },
     ],
@@ -39,6 +40,7 @@ const sections: { title?: string; items: NavItem[] }[] = [
     items: [
       { to: "/admin/settings/site", label: "Site settings", icon: Settings },
       { to: "/admin/settings/payments", label: "Payment gateway", icon: CreditCard, ownerOnly: true },
+      { to: "/admin/settings/ai", label: "AI tutor", icon: Bot, ownerOnly: true },
       { to: "/admin/admins", label: "Admins", icon: Users, ownerOnly: true },
       { to: "/admin/activity", label: "Activity log", icon: History },
     ],

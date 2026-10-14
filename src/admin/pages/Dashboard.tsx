@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { IndianRupee, Inbox, ShoppingBag, Clock3 } from "lucide-react";
+import { Contact, IndianRupee, Inbox, ShoppingBag } from "lucide-react";
 import { adminApi } from "../api";
 import { schemas } from "../schemas";
 import { useAdmin } from "../AdminContext";
@@ -17,7 +17,7 @@ export default function Dashboard() {
   const cards = [
     { label: "Revenue", value: formatPrice(data.orders.revenue), icon: IndianRupee, to: "/admin/orders" },
     { label: "Paid orders", value: formatNumber(data.orders.paid), icon: ShoppingBag, to: "/admin/orders" },
-    { label: "Pending payments", value: formatNumber(data.orders.pending), icon: Clock3, to: "/admin/orders" },
+    { label: "Learners", value: formatNumber(data.learners ?? 0), icon: Contact, to: "/admin/learners" },
     { label: "Unread messages", value: formatNumber(data.messages.unread), icon: Inbox, to: "/admin/messages" },
   ];
 
