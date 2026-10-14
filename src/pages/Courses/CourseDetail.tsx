@@ -10,7 +10,7 @@ import { ProgressBar } from "../../components/ProgressBar";
 import { CourseCard } from "../../components/CourseCard";
 import { courses, getCourse } from "../../data/courses";
 import { useLearning } from "../../context/LearningContext";
-import { curriculumKey, useCourseProgress } from "./useCourseProgress";
+import { curriculumKey, inCourse, useCourseProgress } from "./useCourseProgress";
 import { formatNumber, formatPrice } from "../../utils/format";
 import { CheckoutDialog } from "../../components/CheckoutDialog";
 import { getPaymentsConfig, type PaymentsConfig } from "../../utils/api";
@@ -35,9 +35,13 @@ export default function CourseDetail() {
   const locked = price > 0 && !hasCourse(course.id);
 
   const progress = progressFor(course);
-  const first = course.curriculum[0].lessons[0];
   const nextItem = course.curriculum.flatMap((m, mi) => m.lessons.map((l, li) => ({ l, key: curriculumKey(course.id, l.href, `${mi}-${li}`) })))
-    .find((x) => !isLessonComplete(x.key));
+    .find((x) => x.l.href && !isLessonComplete(x.key));
+  // The next unfinished lesson that has a page (some curriculum items are titles only).
+  const startHref = (() => {
+    const href = nextItem?.l.href ?? course.curriculum.flatMap((m) => m.lessons).find((l) => l.href)?.href;
+    return href ? inCourse(href, course.id) : "/courses";
+  })();
   const others = courses.filter((c) => c.id !== course.id).slice(0, 3);
   const toggle = (i: number) => setOpen((o) => (o.includes(i) ? o.filter((x) => x !== i) : [...o, i]));
 
@@ -92,7 +96,7 @@ export default function CourseDetail() {
               )
             ) : (
               <>
-                <Button to={(nextItem?.l.href ?? first.href) || "/courses"} className="mt-5 w-full" size="lg">
+                <Button to={startHref} className="mt-5 w-full" size="lg">
                   <PlayCircle className="h-5 w-5" aria-hidden="true" /> {progress.done ? "Continue course" : "Start course"}
                 </Button>
                 <p className="mt-3 text-center text-xs text-muted">{price ? "Enrolled · In your account" : "Free · No sign-up needed"} · Progress saved on this device</p>
@@ -144,7 +148,7 @@ export default function CourseDetail() {
                               className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border", done ? "border-brand-sky bg-brand-sky text-white" : "border-line hover:border-ink-400")}>
                               {done && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
                             </button>
-                            {l.href ? <Link to={l.href} className="min-w-0 flex-1 text-[0.95rem] hover:text-ink-600">{l.title}</Link> : <span className="min-w-0 flex-1">{l.title}</span>}
+                            {l.href && !locked ? <Link to={inCourse(l.href, course.id)} className="min-w-0 flex-1 text-[0.95rem] hover:text-ink-600">{l.title}</Link> : <span className="min-w-0 flex-1">{l.title}</span>}
                             <span className="text-xs text-muted tabular-nums">{l.minutes} min</span>
                           </li>
                         );

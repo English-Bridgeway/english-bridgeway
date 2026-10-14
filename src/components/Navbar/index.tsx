@@ -1,7 +1,7 @@
-import { LogIn, LogOut, Menu, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, LogIn, LogOut, Menu, Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { mainNav } from "../../data/site";
+import { mainNav, moreNavPaths } from "../../data/site";
 import { Logo } from "../Logo";
 import { Button } from "../Button";
 import { SearchDialog } from "../SearchDialog";
@@ -43,8 +43,13 @@ export function Navbar() {
   }, []);
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
-    cn("rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
+    cn("block whitespace-nowrap rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
       isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10 hover:text-amber-300");
+
+  // Desktop: the logo already goes home, and the less-used pages sit under "More" so the
+  // row fits on one line.
+  const primary = mainNav.filter((item) => item.to !== "/" && !moreNavPaths.includes(item.to));
+  const more = mainNav.filter((item) => moreNavPaths.includes(item.to));
 
   return (
     <header
@@ -58,14 +63,19 @@ export function Navbar() {
         <Logo light />
         <nav aria-label="Main" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
-            {mainNav.map((item) => (
+            {primary.map((item) => (
               <li key={item.to}>
-                <NavLink to={item.to} end={item.to === "/"} className={linkClass}>{item.label}</NavLink>
+                <NavLink to={item.to} className={linkClass}>{item.label}</NavLink>
               </li>
             ))}
+            {more.length > 0 && (
+              <li>
+                <MoreMenu items={more} active={more.some((m) => pathname.startsWith(m.to))} />
+              </li>
+            )}
           </ul>
         </nav>
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
           <button type="button" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10" aria-label="Search (press /)">
             <Search className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -80,10 +90,10 @@ export function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" className="hidden items-center gap-1.5 rounded-xl px-3 py-2 text-[0.92rem] font-medium text-white hover:bg-white/10 sm:flex">
+              <Link to="/login" className="hidden items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[0.92rem] font-medium text-white hover:bg-white/10 sm:flex">
                 <LogIn className="h-4 w-4" aria-hidden="true" /> Log in
               </Link>
-              <span className="hidden sm:block"><Button to="/register" size="sm" variant="accent">Sign up free</Button></span>
+              <span className="hidden whitespace-nowrap sm:block"><Button to="/register" size="sm" variant="accent">Sign up free</Button></span>
             </>
           )}
           <button
@@ -143,5 +153,50 @@ export function Navbar() {
 
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
+  );
+}
+
+function MoreMenu({ items, active }: { items: readonly { label: string; to: string }[]; active: boolean }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const { pathname } = useLocation();
+
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="true"
+        className={cn("flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
+          active ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10 hover:text-amber-300")}
+      >
+        More <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} aria-hidden="true" />
+      </button>
+      {open && (
+        <ul className="absolute right-0 top-full mt-2 min-w-44 rounded-xl border border-line bg-white p-1.5 shadow-lg">
+          {items.map((item) => (
+            <li key={item.to}>
+              <NavLink
+                to={item.to}
+                className={({ isActive }) => cn("block rounded-lg px-3 py-2 text-[0.92rem] font-medium", isActive ? "bg-ink-50 text-brand-primary" : "text-ink-900 hover:bg-ink-50")}
+              >
+                {item.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
