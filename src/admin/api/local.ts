@@ -4,6 +4,7 @@ import { readDemoLearners, updateDemoLearner, writeDemoLearners, type DemoLearne
 import { addMonths, computeAccess, offerApplies } from "../../utils/access";
 import { ApiError, type AdminApi, type AdminUser, type DashboardStats, type LearnerDetail, type LearnerSummary } from "./types";
 import { getSession } from "./session";
+import { normalizePlans } from "../../utils/plans";
 
 // Demo admin API: same contract as the server, stored in this browser (utils/demoStore.ts).
 
@@ -208,6 +209,14 @@ export const localApi: AdminApi = {
         if (order.status !== "paid") throw new ApiError("Only paid orders can be refunded.", 400);
         order.status = "refunded";
         order.refundId = `RF-${id}`;
+        // A refunded subscription takes its months back off the learner's access.
+        if (order.planMonths && order.userId) {
+          updateDemoLearner(order.userId, (l) => {
+            if (!l.accessUntil || l.accessUnlimited) return;
+            const back = addMonths(new Date(l.accessUntil), -order.planMonths!);
+            l.accessUntil = (back.getTime() > Date.now() ? back : new Date()).toISOString();
+          });
+        }
         log(db, admin.email, "Refunded order", `${id}${reason ? `: ${reason}` : ""}`);
         return clone(order);
       }),
@@ -368,6 +377,27 @@ export const localApi: AdminApi = {
         db.access = { trialHours: Math.max(0, Math.min(24 * 90, Math.round(input.trialHours) || 0)), aiForBuyers: input.aiForBuyers };
         log(db, admin.email, "Updated learner access settings", `trial ${db.access.trialHours}h`);
         return { ...db.access };
+      }),
+    );
+  },
+  async getPlans() {
+    const db = readDemoDb();
+    owner(db);
+    return wait(clone(db.plans ?? []));
+  },
+  async savePlans(input) {
+    return wait(
+      updateDemoDb((db) => {
+        const admin = owner(db);
+        let plans;
+        try {
+          plans = normalizePlans(input);
+        } catch (e) {
+          throw new ApiError(e instanceof Error ? e.message : "Invalid plans.", 400);
+        }
+        db.plans = plans;
+        log(db, admin.email, "Updated subscription plans", plans.map((p) => `${p.name} ₹${p.price}/${p.months}m`).join(", "));
+        return clone(plans);
       }),
     );
   },

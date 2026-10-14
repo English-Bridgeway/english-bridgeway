@@ -3,7 +3,8 @@ import { Message, Order } from '../db';
 import { asyncHandler, rateLimit, requireLearner } from '../middleware';
 import { publicBundle } from '../services/content';
 import { getPaymentConfig } from '../services/settings';
-import { createCourseOrder, publicOrderDto, syncOrder } from '../services/orders';
+import { createCourseOrder, createPlanOrder, publicOrderDto, syncOrder } from '../services/orders';
+import { activePlans, publicPlan } from '../services/plans';
 
 export const publicRouter = Router();
 
@@ -27,12 +28,23 @@ publicRouter.get(
   }),
 );
 
+/** Subscription plans learners can buy (all courses until the end date). */
+publicRouter.get(
+  '/plans',
+  asyncHandler(async (_req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
+    res.json((await activePlans()).map(publicPlan));
+  }),
+);
+
 publicRouter.post(
   '/orders',
   requireLearner,
   rateLimit({ windowMs: 10 * 60_000, max: 20 }),
   asyncHandler(async (req, res) => {
-    res.status(201).json(await createCourseOrder(req.learner!, req.body ?? {}));
+    const body = req.body ?? {};
+    // { planId } buys a subscription; { courseId } buys one course.
+    res.status(201).json(body.planId ? await createPlanOrder(req.learner!, body) : await createCourseOrder(req.learner!, body));
   }),
 );
 

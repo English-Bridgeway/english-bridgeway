@@ -13,6 +13,8 @@ import { useLearning } from "../../context/LearningContext";
 import { curriculumKey, inCourse, useCourseProgress } from "./useCourseProgress";
 import { formatNumber, formatPrice } from "../../utils/format";
 import { BuyCourse } from "../../portal/BuyCourse";
+import { SubscribeButton } from "../../portal/Subscribe";
+import { timeLeft } from "../../utils/access";
 import { getPaymentsConfig, type PaymentsConfig } from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../utils/cn";
@@ -26,7 +28,7 @@ export default function CourseDetail() {
   const progressFor = useCourseProgress();
   const { isAuthenticated, hasCourse, canOpenCourse, priceFor, access } = useAuth();
   const [payments, setPayments] = useState<PaymentsConfig | null>(null);
-  const price = course?.price ?? 0;
+  const price = Number(course?.price ?? 0);
   useEffect(() => {
     if (price > 0) getPaymentsConfig().then(setPayments).catch(() => setPayments({ enabled: false, mode: "sandbox", demo: false }));
   }, [price]);
@@ -84,6 +86,7 @@ export default function CourseDetail() {
                     <Lock className="h-5 w-5" aria-hidden="true" /> Log in to buy · {formatPrice(priceFor(course) || price)}
                   </Button>
                   <p className="mt-3 text-center text-xs text-muted">The course is added to your account. <Link to={`/register?next=${encodeURIComponent(`/learn/courses/${course.id}`)}`} className="font-semibold text-ink-700">New here? Sign up for a free trial</Link></p>
+                  <SubscribeButton className="mt-4" size="md" />
                 </>
               ) : (
                 <>
@@ -91,6 +94,7 @@ export default function CourseDetail() {
                   <p className="mt-3 text-center text-xs text-muted">
                     {access?.trialEndsAt && access.status === "expired" ? "Your free trial has ended. " : ""}One-time payment · UPI, cards and net banking
                   </p>
+                  <SubscribeButton className="mt-4" size="md" />
                 </>
               )
             ) : (
@@ -99,8 +103,16 @@ export default function CourseDetail() {
                   <PlayCircle className="h-5 w-5" aria-hidden="true" /> {progress.done ? "Continue course" : "Start course"}
                 </Button>
                 <p className="mt-3 text-center text-xs text-muted">
-                  {!price ? "Free · No sign-up needed" : hasCourse(course.id) ? "Enrolled · In your account" : access?.status === "trial" ? "Open during your free trial" : "Open with your access plan"} · Progress saved on this device
+                  {!price ? "Free · No sign-up needed" : hasCourse(course.id) ? "Enrolled · In your account" : access?.status === "trial" ? `Open during your free trial (${timeLeft(access.until)} left)` : access?.unlimited ? "Open with unlimited access" : `Open with your plan (${timeLeft(access?.until ?? null)} left)`} · Progress saved on this device
                 </p>
+                {/* Open only for a while (trial or plan): it can still be bought to keep for good. */}
+                {price > 0 && isAuthenticated && !hasCourse(course.id) && !access?.unlimited && payments?.enabled !== false && (
+                  <div className="mt-5 border-t border-line pt-5">
+                    <p className="mb-3 text-center text-sm font-semibold text-ink-900">Keep learning after {access?.status === "trial" ? "your trial" : "your plan"} ends</p>
+                    <BuyCourse course={course} size="md" variant="outline" label="Buy this course" />
+                    <SubscribeButton className="mt-3" size="md" />
+                  </div>
+                )}
               </>
             )}
           </Card>

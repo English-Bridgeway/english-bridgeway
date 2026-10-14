@@ -241,6 +241,19 @@ export interface LearnerAccess {
   ai: boolean;
 }
 
+/** A subscription plan: every course and the AI tutor for a number of months. */
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  /** Rupees for the whole period. */
+  price: number;
+  /** 1 = monthly, 3 = quarterly, 6 = half-yearly, 12 = yearly. */
+  months: number;
+  /** Shown as "Best value". */
+  highlight: boolean;
+}
+
 /** A special price the admin gave this learner. */
 export interface LearnerOffer {
   kind: "price" | "percent";

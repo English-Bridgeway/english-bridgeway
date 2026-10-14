@@ -38,6 +38,10 @@ export interface Order {
   userId?: string | null;
   courseId: string;
   courseTitle: string;
+  /** "plan" for subscriptions (courseId is then "plan:<id>"). Missing on older demo orders. */
+  kind?: "course" | "plan";
+  planId?: string | null;
+  planMonths?: number | null;
   amount: number; // rupees
   currency: "INR";
   customerName: string;
@@ -137,6 +141,18 @@ export interface OfferInput {
   expiresAt: string | null;
 }
 
+/** A subscription plan as the admin edits it. */
+export interface AdminPlan {
+  /** Empty for a new plan; the server makes one from the name. */
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  months: number;
+  active: boolean;
+  highlight: boolean;
+}
+
 export interface AccessSettings {
   trialHours: number;
   aiForBuyers: boolean;
@@ -202,6 +218,8 @@ export interface AdminApi {
   saveLearnerNote(id: string, note: string): Promise<LearnerDetail>;
   deleteLearner(id: string): Promise<void>;
   getAccessSettings(): Promise<AccessSettings>;
+  getPlans(): Promise<AdminPlan[]>;
+  savePlans(plans: AdminPlan[]): Promise<AdminPlan[]>;
   saveAccessSettings(input: AccessSettings): Promise<AccessSettings>;
 
   getAi(): Promise<AiSettings>;

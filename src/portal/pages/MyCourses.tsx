@@ -9,17 +9,26 @@ import { ProgressBar } from "../../components/ProgressBar";
 import { buttonClasses } from "../../components/Button";
 import { AccessBanner } from "../AccessBanner";
 import { BuyCourse } from "../BuyCourse";
+import { PlanCards, usePlans } from "../Subscribe";
 import { formatPrice } from "../../utils/format";
 
 /** Every course with the learner's progress, and which ones are open, bought or locked. */
 export default function MyCourses() {
-  const { canOpenCourse, hasCourse, priceFor } = useAuth();
+  const { canOpenCourse, hasCourse, priceFor, access } = useAuth();
   const progressFor = useCourseProgress();
+  const plans = usePlans();
   return (
     <div className="mx-auto max-w-6xl">
       <h1 className="text-2xl font-bold sm:text-3xl">My courses</h1>
       <p className="mt-1 text-muted">Pick up where you left off. Your progress is saved on this device.</p>
       <AccessBanner className="mt-5" />
+      {plans && plans.length > 0 && !access?.unlimited && access?.status !== "blocked" && (
+        <section className="mt-6" aria-labelledby="plans-h">
+          <h2 id="plans-h" className="text-lg font-semibold">{access?.status === "active" ? "Extend your plan" : "Subscribe for every course"}</h2>
+          <p className="mt-1 text-sm text-muted">One payment opens every course and Speak with AI until the plan ends. Or buy single courses below.</p>
+          <PlanCards plans={plans} className="mt-4" />
+        </section>
+      )}
       <ul className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((c) => {
           const open = canOpenCourse(c);
@@ -53,7 +62,7 @@ export default function MyCourses() {
                       </Link>
                     </>
                   ) : (
-                    <BuyCourse course={c} size="md" />
+                    <BuyCourse course={c} size="md" label="Buy this course" />
                   )}
                 </div>
               </div>

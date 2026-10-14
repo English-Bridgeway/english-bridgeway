@@ -141,7 +141,7 @@ export async function removeAvatar(token: string): Promise<User> {
   return withAvatarBase((await apiFetch<{ user: User }>("/me/avatar", { method: "DELETE", token })).user);
 }
 
-export type MyOrder = Pick<Order, "orderId" | "courseId" | "courseTitle" | "amount" | "status" | "createdAt" | "paidAt">;
+export type MyOrder = Pick<Order, "orderId" | "kind" | "courseId" | "courseTitle" | "planMonths" | "amount" | "status" | "createdAt" | "paidAt">;
 
 export async function fetchMyOrders(token: string): Promise<MyOrder[]> {
   if (!isLive) {
@@ -206,7 +206,7 @@ const demo = {
   },
   async me(token: string): Promise<MeResponse> {
     const l = demo.find(token);
-    const purchasedCourseIds = [...new Set(readDemoDb().orders.filter((o) => o.userId === l.id && o.status === "paid").map((o) => o.courseId))];
+    const purchasedCourseIds = [...new Set(readDemoDb().orders.filter((o) => o.userId === l.id && o.status === "paid" && o.kind !== "plan").map((o) => o.courseId))];
     return { user: publicUser(l), purchasedCourseIds, access: demoAccessFor(l), offer: offerApplies(l.offer) ? l.offer : null };
   },
   async updateProfile(token: string, input: ProfileInput) {

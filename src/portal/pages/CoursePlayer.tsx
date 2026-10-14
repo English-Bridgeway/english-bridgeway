@@ -8,6 +8,7 @@ import { courseSteps, useCourseProgress } from "../../pages/Courses/useCoursePro
 import { ProgressBar } from "../../components/ProgressBar";
 import { PageSkeleton } from "../../components/Skeleton";
 import { BuyCourse } from "../BuyCourse";
+import { SubscribeButton } from "../Subscribe";
 import { cn } from "../../utils/cn";
 
 // The lesson pages of the public site, shown inside the player.
@@ -132,9 +133,14 @@ export default function CoursePlayer() {
                 {access?.status === "blocked" ? "Your account is blocked" : access?.trialEndsAt ? "Your free trial has ended" : "This course is locked"}
               </h2>
               <p className="mx-auto mt-2 max-w-md text-muted">
-                Buy {course.title} once and keep every lesson, or ask us about a longer plan. Your progress so far is kept.
+                Buy {course.title} once and keep every lesson, or subscribe to open every course. Your progress so far is kept.
               </p>
-              <BuyCourse course={course} className="mx-auto mt-6 max-w-sm" />
+              {access?.status !== "blocked" && (
+                <>
+                  <BuyCourse course={course} className="mx-auto mt-6 max-w-sm" label="Buy this course" />
+                  <SubscribeButton className="mx-auto mt-4 max-w-sm" size="md" />
+                </>
+              )}
             </div>
           ) : step ? (
             <>

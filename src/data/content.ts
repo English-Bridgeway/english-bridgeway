@@ -64,7 +64,9 @@ export function applyContent(bundle: Partial<ContentBundle> & { collections?: Pa
     const items = bundle.collections?.[key];
     if (Array.isArray(items)) {
       const target = live[key] as unknown[];
-      target.splice(0, target.length, ...items);
+      // Prices saved from the admin form as text ("499") are numbers to the site.
+      const fixed = key === "courses" ? (items as Course[]).map((c) => ({ ...c, price: Number(c.price) || 0 })) : items;
+      target.splice(0, target.length, ...fixed);
     }
   }
 }

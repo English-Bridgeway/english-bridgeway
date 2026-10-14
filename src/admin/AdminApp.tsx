@@ -18,6 +18,7 @@ const Account = lazy(() => import("./pages/Account"));
 const Learners = lazy(() => import("./pages/Learners"));
 const LearnerDetail = lazy(() => import("./pages/LearnerDetail"));
 const AiTutor = lazy(() => import("./pages/AiTutor"));
+const Plans = lazy(() => import("./pages/Plans"));
 
 function Gate() {
   const { admin, isOwner } = useAdmin();
@@ -37,6 +38,7 @@ function Gate() {
           <Route path="settings/ai" element={isOwner ? <AiTutor /> : <Navigate to="/admin" replace />} />
           <Route path="settings/site" element={<SiteSettingsPage />} />
           <Route path="settings/payments" element={isOwner ? <PaymentSettingsPage /> : <Navigate to="/admin" replace />} />
+          <Route path="settings/plans" element={isOwner ? <Plans /> : <Navigate to="/admin" replace />} />
           <Route path="admins" element={isOwner ? <Admins /> : <Navigate to="/admin" replace />} />
           <Route path="activity" element={<Activity />} />
           <Route path="account" element={<Account />} />

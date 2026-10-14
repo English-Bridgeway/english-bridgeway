@@ -68,7 +68,7 @@ function Control({ field: f, id, value, onChange, options }: { field: Field; id:
     case "rows":
       return <textarea id={id} className={cn(inputClass, "min-h-24 resize-y")} rows={f.type === "textarea" ? 3 : 4} value={str} onChange={(e) => onChange(e.target.value)} required={f.required} />;
     case "number":
-      return <input id={id} type="number" inputMode="decimal" className={inputClass} value={str} step={f.step ?? 1} min={f.min} onChange={(e) => onChange(e.target.value)} required={f.required} />;
+      return <input id={id} type="number" inputMode="decimal" className={inputClass} value={str} step={f.step ?? 1} min={f.min} onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))} required={f.required} />;
     case "select": {
       const opts = f.options ?? (f.optionsFrom ? options[f.optionsFrom] ?? [] : []);
       return (
