@@ -5,17 +5,12 @@ import { PageHeader } from "../../components/PageHeader";
 import { Tabs } from "../../components/Tabs";
 import { Card } from "../../components/Card";
 import { Badge, LevelBadge } from "../../components/Badge";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { spokenCategories, spokenLessons } from "../../data/spokenEnglish";
 import { cn } from "../../utils/cn";
 
 type Cat = "All" | (typeof spokenCategories)[number];
 
 export default function SpokenEnglish() {
-  usePageMeta({
-    title: "Spoken English Practice: Real Conversations",
-    description: "Practise spoken English with real conversations for greetings, introductions, phone calls, shopping, restaurants, travel, office and interviews.",
-  });
   const [cat, setCat] = useState<Cat>("All");
   const lessons = spokenLessons.filter((l) => cat === "All" || l.category === cat);
 

@@ -5,12 +5,10 @@ import { TextField } from "../../components/FormField";
 import { Button } from "../../components/Button";
 import { Alert } from "../../components/Alert";
 import { safeNext } from "../../components/RequireAuth";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { useAuth } from "../../context/AuthContext";
 import { AccountError } from "../../utils/account";
 
 export default function Register() {
-  usePageMeta({ title: "Create your account", description: "Create a free English-Bridgeway account to buy courses and practise speaking live." });
   const { signUp, isAuthenticated } = useAuth();
   const { search } = useLocation();
   const navigate = useNavigate();

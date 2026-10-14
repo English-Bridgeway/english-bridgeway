@@ -7,7 +7,6 @@ import { Button } from "../../components/Button";
 import { Alert } from "../../components/Alert";
 import { Badge } from "../../components/Badge";
 import { TextField } from "../../components/FormField";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { useAuth } from "../../context/AuthContext";
 import { useVoice } from "../../voice/VoiceContext";
 import type { Peer } from "../../voice/useVoiceChat";
@@ -43,7 +42,6 @@ function Tile({ name, initials, muted, state, you }: { name: string; initials: s
 }
 
 export default function SpeakLive() {
-  usePageMeta({ title: "Speak Live", description: "Practise spoken English live: voice call another learner or talk in a team room." });
   const { user } = useAuth();
   const vc = useVoice();
   const [params, setParams] = useSearchParams();

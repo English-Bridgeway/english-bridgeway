@@ -6,7 +6,6 @@ import { Tabs } from "../../components/Tabs";
 import { ProgressBar } from "../../components/ProgressBar";
 import { EmptyState } from "../../components/EmptyState";
 import { Button } from "../../components/Button";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { grammarLessons, grammarTopics, getLessonsForTopic } from "../../data/grammar";
 import { useLearning } from "../../context/LearningContext";
 import type { Level } from "../../types";
@@ -14,10 +13,6 @@ import type { Level } from "../../types";
 const levels = ["All levels", "Beginner", "Intermediate", "Advanced"] as const;
 
 export default function Grammar() {
-  usePageMeta({
-    title: "English Grammar Lessons",
-    description: "Free English grammar lessons: tenses, nouns, pronouns, verbs, articles, prepositions, voice and reported speech, with examples and practice.",
-  });
   const [level, setLevel] = useState<(typeof levels)[number]>("All levels");
   const [q, setQ] = useState("");
   const { completedLessons } = useLearning();

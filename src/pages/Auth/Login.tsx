@@ -5,12 +5,10 @@ import { TextField } from "../../components/FormField";
 import { Button } from "../../components/Button";
 import { Alert } from "../../components/Alert";
 import { safeNext } from "../../components/RequireAuth";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { useAuth } from "../../context/AuthContext";
 import { AccountError } from "../../utils/account";
 
 export default function Login() {
-  usePageMeta({ title: "Log in", description: "Log in to English-Bridgeway to continue your lessons." });
   const { signIn, isAuthenticated } = useAuth();
   const { search } = useLocation();
   const navigate = useNavigate();

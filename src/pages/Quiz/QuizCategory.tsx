@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 import { PageHeader } from "../../components/PageHeader";
 import { QuizCard } from "../../components/QuizCard";
 import { Icon } from "../../components/Icon";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getQuizCategory, getQuizzesForCategory } from "../../data/quizzes";
 import { useLearning } from "../../context/LearningContext";
 import NotFound from "../NotFound";
@@ -10,10 +9,6 @@ import NotFound from "../NotFound";
 export default function QuizCategory() {
   const { category = "" } = useParams();
   const cat = getQuizCategory(category);
-  usePageMeta({
-    title: cat ? `${cat.title} Quizzes` : "Quiz category not found",
-    description: cat ? `${cat.description} Free ${cat.title.toLowerCase()} quizzes with instant explanations.` : undefined,
-  });
   const { quizScores } = useLearning();
   if (!cat) return <NotFound />;
   const list = getQuizzesForCategory(cat.id);

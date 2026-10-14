@@ -1,9 +1,7 @@
 import { Compass } from "lucide-react";
 import { Button } from "../../components/Button";
-import { usePageMeta } from "../../hooks/usePageMeta";
 
 export default function NotFound() {
-  usePageMeta({ title: "Page not found", description: "The page you are looking for does not exist." });
   return (
     <section className="container-page grid min-h-[60vh] place-items-center py-20 text-center">
       <div>

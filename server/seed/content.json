@@ -3,7 +3,7 @@
     "name": "English-Bridgeway",
     "tagline": "Improve your English. Speak with confidence.",
     "description": "Learn grammar, build vocabulary, practise spoken English and test your knowledge with simple, practical lessons.",
-    "url": "https://www.englishbridgeway.example",
+    "url": "https://englishbridgeway.com",
     "email": "hello@englishbridgeway.example",
     "whatsapp": "+91 98765 43210",
     "whatsappLink": "https://wa.me/919876543210",
@@ -36,7 +36,18 @@
         "value": "20+",
         "icon": "GraduationCap"
       }
-    ]
+    ],
+    "voice": {
+      "name": "",
+      "pitch": 1.15,
+      "rate": 0.92
+    },
+    "seo": {
+      "ogImage": "/og-image.png",
+      "googleVerification": "",
+      "bingVerification": "",
+      "twitter": ""
+    }
   },
   "collections": {
     "grammarTopics": [

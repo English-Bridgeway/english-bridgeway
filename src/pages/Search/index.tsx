@@ -5,7 +5,6 @@ import { PageHeader } from "../../components/PageHeader";
 import { Tabs } from "../../components/Tabs";
 import { Badge } from "../../components/Badge";
 import { EmptyState } from "../../components/EmptyState";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { search } from "../../utils/search";
 import type { SearchKind } from "../../types";
 
@@ -15,7 +14,6 @@ export default function SearchPage() {
   const [params, setParams] = useSearchParams();
   const q = params.get("q") ?? "";
   const kind = (params.get("type") as (typeof kinds)[number]) || "All";
-  usePageMeta({ title: q ? `Search results for “${q}”` : "Search", description: "Search English-Bridgeway grammar lessons, vocabulary, spoken English lessons, courses and blog articles." });
 
   const all = useMemo(() => search(q), [q]);
   const results = kind === "All" ? all : all.filter((r) => r.kind === kind);

@@ -5,7 +5,6 @@ import { LevelBadge } from "../../components/Badge";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/Button";
 import { QuizRunner } from "../../components/QuizRunner";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getQuiz, getQuizCategory } from "../../data/quizzes";
 import { useLearning } from "../../context/LearningContext";
 import NotFound from "../NotFound";
@@ -14,10 +13,6 @@ export default function QuizPlay() {
   const { category = "", quizId = "" } = useParams();
   const cat = getQuizCategory(category);
   const quiz = getQuiz(category, quizId);
-  usePageMeta({
-    title: quiz ? `${quiz.title} Quiz (${quiz.questions.length} Questions)` : "Quiz not found",
-    description: quiz ? `Take the ${quiz.title} English quiz: ${quiz.questions.length} questions with explanations. Level: ${quiz.level}.` : undefined,
-  });
   const { saveQuizScore, quizScores } = useLearning();
   if (!cat || !quiz) return <NotFound />;
   const best = quizScores[quiz.id];

@@ -164,12 +164,15 @@ src/
 ├── layouts/      MainLayout.tsx (navbar, footer, lazy-route Suspense)
 ├── routes/       AppRoutes.tsx (all routes, lazy loaded)
 ├── context/      AuthContext (learner accounts and owned courses), LearningContext (progress, favourites, scores, streak)
-├── hooks/        usePageMeta (title, description, Open Graph), useDebounce
+├── seo/          routeSeo.ts (title, description, canonical, Open Graph, JSON-LD for every URL), SeoHead.tsx
+├── entry-server.tsx  Server rendering entry used by the API to send search engines full HTML
+├── hooks/        useDebounce
 ├── utils/        api.ts, search.ts, quiz.ts, speech.ts, storage.ts, sitemap.ts, format.ts, cn.ts
 └── types/        Shared TypeScript interfaces
 server/
 ├── src/routes/   public.ts (content, orders, contact), account.ts (learner sign-up/login, /me), admin.ts (admin API), webhooks.ts (Cashfree)
-├── src/services/ cashfree.ts, orders.ts, settings.ts (encrypted gateway keys), content.ts, auth.ts, learners.ts, voice.ts (voice chat)
+├── src/services/ cashfree.ts, orders.ts, settings.ts (encrypted gateway keys), content.ts, auth.ts, learners.ts, voice.ts (voice chat),
+│                 ssr.ts (server-rendered pages, sitemap.xml, robots.txt)
 └── seed/         content.json (built-in content loaded into an empty database)
 ```
 
@@ -191,9 +194,19 @@ server/
 - **Progress:** `src/context/LearningContext.tsx` stores progress in localStorage; swap the storage calls for
   API calls to sync across devices.
 - **Search:** `src/utils/search.ts` searches local data; replace `search()` with a server call.
-- **Sitemap:** `src/utils/sitemap.ts` exposes `getAllPaths()` and `buildSitemapXml()` for every public URL.
+- **SEO:** see [docs/SEO.md](docs/SEO.md). Page titles, descriptions and structured data come from
+  `src/seo/routeSeo.ts`; new routes need an entry there. The API serves `/sitemap.xml` (from `src/utils/sitemap.ts`).
+
+## SEO
+
+Pages are rendered on the server so search engines get full HTML, with titles, descriptions,
+canonical links, Open Graph tags, JSON-LD, `/sitemap.xml` and `/robots.txt`, and each content item
+has editable SEO fields in the admin panel. Setup steps for Google Search Console and Bing are in
+[docs/SEO.md](docs/SEO.md).
 
 ## Hosting
 
-This is a single-page app. Configure your host to serve `index.html` for unknown paths
-(Netlify `_redirects`: `/* /index.html 200`; Vercel does this automatically).
+With Docker (above), Nginx sends page requests to the API, which renders them for search engines.
+On a static host the site still works as a single-page app: serve `index.html` for unknown paths
+(Netlify `_redirects`: `/* /index.html 200`; Vercel does this automatically), but pages are then
+drawn in the browser only.

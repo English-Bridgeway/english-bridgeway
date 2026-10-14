@@ -6,7 +6,6 @@ import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 import { ListenButton } from "../../components/ListenButton";
 import { QuizRunner } from "../../components/QuizRunner";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { getLesson, getLessonsForTopic, getTopic, grammarLessons } from "../../data/grammar";
 import { useLearning } from "../../context/LearningContext";
 import { cn } from "../../utils/cn";
@@ -16,11 +15,6 @@ export default function GrammarLesson() {
   const { topic: topicId = "", lesson: lessonId = "" } = useParams();
   const topic = getTopic(topicId);
   const lesson = getLesson(topicId, lessonId);
-  usePageMeta({
-    title: lesson ? `${lesson.title}: Rules, Examples and Practice` : "Lesson not found",
-    description: lesson?.description,
-    type: "article",
-  });
   const { isLessonComplete, toggleLessonComplete } = useLearning();
   if (!topic || !lesson) return <NotFound />;
 

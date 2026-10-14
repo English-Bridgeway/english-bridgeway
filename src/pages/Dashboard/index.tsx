@@ -7,7 +7,6 @@ import { ProgressBar } from "../../components/ProgressBar";
 import { LessonCard } from "../../components/LessonCard";
 import { Alert } from "../../components/Alert";
 import { ListenButton } from "../../components/ListenButton";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { useAuth } from "../../context/AuthContext";
 import { useLearning } from "../../context/LearningContext";
 import { demoProgress, recentActivity } from "../../data/dashboard";
@@ -21,7 +20,6 @@ const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const activityIcon = { lesson: CircleCheck, quiz: Trophy, word: Heart, course: PlayCircle };
 
 export default function Dashboard() {
-  usePageMeta({ title: "My Dashboard", description: "Track your English learning progress, quiz scores, streak and favourite words." });
   const { user, purchasedCourseIds } = useAuth();
   const myCourses = purchasedCourseIds.map(getCourse).filter((c): c is NonNullable<typeof c> => Boolean(c));
   const { completedLessons, quizScores, favoriteWords, streak } = useLearning();

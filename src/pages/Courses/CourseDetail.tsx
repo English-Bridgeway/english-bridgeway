@@ -8,7 +8,6 @@ import { Card } from "../../components/Card";
 import { Icon } from "../../components/Icon";
 import { ProgressBar } from "../../components/ProgressBar";
 import { CourseCard } from "../../components/CourseCard";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { courses, getCourse } from "../../data/courses";
 import { useLearning } from "../../context/LearningContext";
 import { curriculumKey, useCourseProgress } from "./useCourseProgress";
@@ -22,10 +21,6 @@ import NotFound from "../NotFound";
 export default function CourseDetail() {
   const { courseId = "" } = useParams();
   const course = getCourse(courseId);
-  usePageMeta({
-    title: course ? `${course.title} Course (${course.level}, ${course.duration})` : "Course not found",
-    description: course?.description,
-  });
   const [open, setOpen] = useState<number[]>([0]);
   const { isLessonComplete, toggleLessonComplete } = useLearning();
   const progressFor = useCourseProgress();

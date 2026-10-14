@@ -6,7 +6,6 @@ import { Button } from "../../components/Button";
 import { Alert } from "../../components/Alert";
 import { SelectField, TextArea, TextField } from "../../components/FormField";
 import { SocialIcons } from "../../components/SocialIcons";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { site } from "../../data/site";
 import { contactIsLive, sendContactMessage, type ContactPayload } from "../../utils/api";
 
@@ -24,7 +23,6 @@ function validate(v: ContactPayload): Errors {
 }
 
 export default function Contact() {
-  usePageMeta({ title: "Contact Us", description: `Contact ${site.name} by email, WhatsApp or the contact form. We reply within one working day.` });
   const [values, setValues] = useState<ContactPayload>(empty);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");

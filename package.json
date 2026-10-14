@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx",
     "build:preview": "tsc -b && vite build --mode preview",
     "typecheck": "tsc -b",
     "preview": "vite preview",

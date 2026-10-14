@@ -11,12 +11,19 @@ const fields: { key: keyof SiteSettings; label: string; hint?: string; wide?: bo
   { key: "name", label: "Site name", hint: "Shown in the logo, page titles and emails." },
   { key: "tagline", label: "Tagline" },
   { key: "description", label: "Description", hint: "Used by search engines and social previews.", wide: true },
-  { key: "url", label: "Website address", hint: "e.g. https://www.englishbridgeway.com" },
+  { key: "url", label: "Website address", hint: "Used for canonical links, sitemap.xml and social previews, e.g. https://englishbridgeway.com (no slash at the end)." },
   { key: "email", label: "Contact email" },
   { key: "whatsapp", label: "WhatsApp number (shown)" },
   { key: "whatsappLink", label: "WhatsApp link", hint: "https://wa.me/91XXXXXXXXXX" },
   { key: "location", label: "Location" },
   { key: "hours", label: "Support hours" },
+];
+
+const seoFields: { key: keyof SiteSettings["seo"]; label: string; hint?: string; placeholder?: string }[] = [
+  { key: "googleVerification", label: "Google Search Console code", hint: "Search Console → Add property → URL prefix → HTML tag.", placeholder: "e.g. AbC123xYz…" },
+  { key: "bingVerification", label: "Bing Webmaster code", hint: "Bing Webmaster Tools → Add site → HTML Meta Tag (msvalidate.01)." },
+  { key: "ogImage", label: "Default social share image", hint: "Shown when a page is shared on WhatsApp, Facebook or X. 1200 × 630 px.", placeholder: "/og-image.png" },
+  { key: "twitter", label: "X (Twitter) handle", placeholder: "@englishbridgeway" },
 ];
 
 export default function SiteSettingsPage() {
@@ -37,7 +44,7 @@ export default function SiteSettingsPage() {
   useEffect(() => {
     adminApi.getSite()
       // Saved settings may be missing newer fields; fill them from the defaults.
-      .then((s) => setValue({ ...JSON.parse(JSON.stringify(defaults)), ...s, social: { ...defaults.social, ...(s?.social ?? {}) }, voice: { ...defaults.voice, ...(s?.voice ?? {}) } }))
+      .then((s) => setValue({ ...JSON.parse(JSON.stringify(defaults)), ...s, social: { ...defaults.social, ...(s?.social ?? {}) }, voice: { ...defaults.voice, ...(s?.voice ?? {}) }, seo: { ...defaults.seo, ...(s?.seo ?? {}) } }))
       .catch((e) => setError(e instanceof Error ? e.message : "Could not load."));
   }, []);
 
@@ -74,6 +81,24 @@ export default function SiteSettingsPage() {
               </div>
             ))}
           </div>
+        </Panel>
+        <Panel title="Search engines">
+          <p className="mb-4 text-sm text-muted">
+            Verification codes prove to Google and Bing that you own the site. Paste only the code from the meta tag they give you
+            (the part inside <code>content="…"</code>). Each page's own title and description are set on the page in Content.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {seoFields.map((f) => (
+              <div key={f.key}>
+                <label htmlFor={`seo-${f.key}`} className="mb-1.5 block text-sm font-semibold">{f.label}</label>
+                <input id={`seo-${f.key}`} className={inputClass} value={value.seo[f.key]} placeholder={f.placeholder} onChange={(e) => set("seo", { ...value.seo, [f.key]: e.target.value.trim() })} />
+                {f.hint && <p className="mt-1 text-xs text-muted">{f.hint}</p>}
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-sm text-muted">
+            Sitemap for Search Console: <code>{(value.url || "https://englishbridgeway.com").replace(/\/+$/, "")}/sitemap.xml</code>
+          </p>
         </Panel>
         <Panel title="Social links">
           <div className="grid gap-4 sm:grid-cols-2">

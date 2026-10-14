@@ -1,7 +1,9 @@
 node_modules
 dist
 dist-preview
-server
+dist-ssr
+server/node_modules
+server/dist
 .env
 .env.*
 .git

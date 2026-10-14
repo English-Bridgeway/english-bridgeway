@@ -6,7 +6,6 @@ import { WordOfTheDay } from "../../components/WordOfTheDay";
 import { Tabs } from "../../components/Tabs";
 import { EmptyState } from "../../components/EmptyState";
 import { Button } from "../../components/Button";
-import { usePageMeta } from "../../hooks/usePageMeta";
 import { useDebounce } from "../../hooks/useDebounce";
 import { vocabCategories, vocabularyWords } from "../../data/vocabulary";
 import { useLearning } from "../../context/LearningContext";
@@ -16,10 +15,6 @@ const levels = ["All", "Beginner", "Intermediate", "Advanced"] as const;
 type Cat = "All categories" | (typeof vocabCategories)[number];
 
 export default function Vocabulary() {
-  usePageMeta({
-    title: "English Vocabulary Words with Meanings",
-    description: "Learn English vocabulary by topic and level: pronunciation, meanings, example sentences, synonyms and antonyms, with audio.",
-  });
   const [q, setQ] = useState("");
   const dq = useDebounce(q, 150);
   const [level, setLevel] = useState<(typeof levels)[number]>("All");
