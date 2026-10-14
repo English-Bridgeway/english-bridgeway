@@ -6,7 +6,7 @@ import { SocialIcons } from "../SocialIcons";
 
 const columns = [
   { title: "Learn", links: [["Grammar", "/grammar"], ["Vocabulary", "/vocabulary"], ["Spoken English", "/spoken-english"], ["Quizzes", "/quiz"]] },
-  { title: "Explore", links: [["Courses", "/courses"], ["Speak Live", "/speak"], ["Blog", "/blog"], ["Search", "/search"], ["My Dashboard", "/dashboard"]] },
+  { title: "Explore", links: [["Courses", "/courses"], ["Speak Live", "/learn/live"], ["Blog", "/blog"], ["Search", "/search"], ["My learning", "/learn"]] },
   { title: "Company", links: [["Contact", "/contact"], ["Log in", "/login"], ["Create account", "/register"]] },
 ] as const;
 

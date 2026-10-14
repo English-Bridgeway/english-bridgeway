@@ -1,7 +1,8 @@
 import { apiFetch, HttpError } from "../../utils/backend";
 import type { CollectionKey } from "../../data/content";
 import type { SiteSettings } from "../../data/site";
-import { ApiError, type AdminApi, type AdminSession, type AdminUser } from "./types";
+import { ApiError, type AdminApi, type AdminSession, type AdminUser, type LearnerDetail, type LearnerSummary } from "./types";
+import { API_BASE } from "../../utils/backend";
 import { getSession, notifyUnauthorized } from "./session";
 
 async function call<T>(path: string, init: { method?: string; json?: unknown; auth?: boolean } = {}): Promise<T> {
@@ -18,6 +19,10 @@ async function call<T>(path: string, init: { method?: string; json?: unknown; au
 }
 
 const enc = encodeURIComponent;
+
+/** Photo paths come relative to the API (/avatars/…). */
+const withBase = <T extends LearnerSummary>(l: T): T => (l.avatarUrl?.startsWith("/avatars/") ? { ...l, avatarUrl: `${API_BASE}${l.avatarUrl}` } : l);
+const learner = (p: Promise<LearnerDetail>) => p.then(withBase);
 
 /** Admin API backed by the server in server/ (VITE_API_BASE). */
 export const httpApi: AdminApi = {
@@ -48,4 +53,16 @@ export const httpApi: AdminApi = {
   deleteAdmin: (id) => call(`/admins/${enc(id)}`, { method: "DELETE" }),
   changePassword: (current, next) => call("/me/password", { json: { current, next } }),
   listAudit: () => call("/audit"),
+  listLearners: (q) => call<LearnerSummary[]>(`/learners${q ? `?q=${enc(q)}` : ""}`).then((rows) => rows.map(withBase)),
+  getLearner: (id) => learner(call(`/learners/${enc(id)}`)),
+  setLearnerAccess: (id, change) => learner(call(`/learners/${enc(id)}/access`, { method: "PUT", json: change })),
+  setLearnerOffer: (id, offer) => learner(offer ? call(`/learners/${enc(id)}/offer`, { method: "PUT", json: offer }) : call(`/learners/${enc(id)}/offer`, { method: "DELETE" })),
+  setLearnerBlocked: (id, blocked, reason) => learner(call(`/learners/${enc(id)}/block`, { method: "PUT", json: { blocked, reason } })),
+  saveLearnerNote: (id, adminNote) => learner(call(`/learners/${enc(id)}`, { method: "PATCH", json: { adminNote } })),
+  deleteLearner: (id) => call(`/learners/${enc(id)}`, { method: "DELETE" }),
+  getAccessSettings: () => call("/settings/access"),
+  saveAccessSettings: (input) => call("/settings/access", { method: "PUT", json: input }),
+  getAi: () => call("/settings/ai"),
+  saveAi: (input) => call("/settings/ai", { method: "PUT", json: input }),
+  testAi: () => call("/settings/ai/test", { json: {} }),
 };

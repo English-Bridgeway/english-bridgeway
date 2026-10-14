@@ -8,7 +8,7 @@ export const API_BASE = raw ? raw.replace(/\/$/, "") : "";
 export const isLive = Boolean(API_BASE);
 
 export class HttpError extends Error {
-  constructor(message: string, public readonly status: number, public readonly field?: "name" | "email" | "password") {
+  constructor(message: string, public readonly status: number, public readonly field?: "name" | "email" | "password" | "phone") {
     super(message);
   }
 }

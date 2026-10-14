@@ -168,6 +168,7 @@ function draftFor(path: string, search: string): Draft {
   }
   if (PRIVATE[path]) return { ...PRIVATE[path], noindex: true };
   if (section === "admin") return { title: "Admin", description: site.description, noindex: true };
+  if (section === "learn") return { title: "My learning", description: `Your ${site.name} courses, progress, AI speaking practice and profile.`, noindex: true };
   if (section === "search" && parts.length === 1) {
     const q = new URLSearchParams(search).get("q");
     return {

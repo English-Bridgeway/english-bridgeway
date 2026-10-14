@@ -45,6 +45,10 @@ services:
       CASHFREE_APP_ID: ${CASHFREE_APP_ID:-}
       CASHFREE_SECRET_KEY: ${CASHFREE_SECRET_KEY:-}
       CASHFREE_ENV: ${CASHFREE_ENV:-sandbox}
+      # Speak with AI (or set it in Admin → AI tutor)
+      AI_BASE_URL: ${AI_BASE_URL:-}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_API_KEY: ${AI_API_KEY:-}
       # Voice chat: STUN/TURN servers handed to browsers (see the turn service below).
       STUN_URLS: ${STUN_URLS:-stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302}
       TURN_URLS: ${TURN_URLS:-}

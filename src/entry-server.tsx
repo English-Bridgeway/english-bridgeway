@@ -20,6 +20,7 @@ export function buildRobotsTxt(): string {
     "Disallow: /admin",
     "Disallow: /api/",
     "Disallow: /dashboard",
+    "Disallow: /learn",
     "Disallow: /payment/",
     "",
     `Sitemap: ${siteOrigin()}/sitemap.xml`,
@@ -31,7 +32,7 @@ export function buildRobotsTxt(): string {
 export { siteOrigin };
 
 // Pages for signed-in learners and the admin panel are drawn in the browser only.
-const CLIENT_ONLY = /^\/(admin|dashboard|speak|payment)(\/|$)/;
+const CLIENT_ONLY = /^\/(admin|learn|dashboard|speak|payment)(\/|$)/;
 export const shouldRender = (pathname: string) => !CLIENT_ONLY.test(pathname);
 
 const bundled = getBundledContent();

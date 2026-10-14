@@ -19,11 +19,14 @@ function validate(v: CheckoutCustomer): Errors {
 }
 
 /** Collects buyer details and hands over to Cashfree checkout (or the demo payment). */
-export function CheckoutDialog({ open, onClose, course, config }: {
+export function CheckoutDialog({ open, onClose, course, config, listPrice }: {
   open: boolean;
   onClose: () => void;
+  /** price: what this learner pays (after any special offer). */
   course: { id: string; title: string; price: number };
   config: PaymentsConfig;
+  /** The normal price, shown struck through when the learner has an offer. */
+  listPrice?: number;
 }) {
   const navigate = useNavigate();
   const { user, token } = useAuth();
@@ -60,7 +63,10 @@ export function CheckoutDialog({ open, onClose, course, config }: {
       <form onSubmit={submit} noValidate className="space-y-4 p-5">
         <div className="flex items-baseline justify-between gap-3 rounded-xl bg-ink-50 p-4">
           <span className="font-semibold text-ink-900">{course.title}</span>
-          <span className="font-display text-xl font-bold text-ink-900">{formatPrice(course.price)}</span>
+          <span className="text-right">
+            {listPrice && listPrice > course.price && <span className="mr-2 text-sm text-muted line-through">{formatPrice(listPrice)}</span>}
+            <span className="font-display text-xl font-bold text-ink-900">{formatPrice(course.price)}</span>
+          </span>
         </div>
         {config.demo && (
           <Alert tone="info" title="Demo checkout">No money is taken. The payment is simulated and the order shows in the admin panel.</Alert>

@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import { VoiceProvider } from "../voice/VoiceContext";
 import { MainLayout } from "../layouts/MainLayout";
-import { RequireAuth } from "../components/RequireAuth";
 
 // Every page is its own chunk, loaded on first visit.
 const Home = lazy(() => import("../pages/Home"));
@@ -20,19 +20,27 @@ const CourseDetail = lazy(() => import("../pages/Courses/CourseDetail"));
 const Blog = lazy(() => import("../pages/Blog"));
 const BlogDetail = lazy(() => import("../pages/Blog/BlogDetail"));
 const Contact = lazy(() => import("../pages/Contact"));
-const Dashboard = lazy(() => import("../pages/Dashboard"));
 const SearchPage = lazy(() => import("../pages/Search"));
 const Login = lazy(() => import("../pages/Auth/Login"));
 const Register = lazy(() => import("../pages/Auth/Register"));
 const NotFound = lazy(() => import("../pages/NotFound"));
-const SpeakLive = lazy(() => import("../pages/SpeakLive"));
 const PaymentStatus = lazy(() => import("../pages/Payment/PaymentStatus"));
 const AdminApp = lazy(() => import("../admin/AdminApp"));
+const PortalApp = lazy(() => import("../portal/PortalApp"));
+
+/** Old addresses of pages that moved into the learner portal (keeps ?room= invite links working). */
+function MovedTo({ to }: { to: string }) {
+  const { search } = useLocation();
+  return <Navigate to={`${to}${search}`} replace />;
+}
 
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="admin/*" element={<Suspense fallback={null}><AdminApp /></Suspense>} />
+      {/* One voice-chat connection for the website and the learner portal, so a call carries on between them. */}
+      <Route element={<VoiceProvider><Outlet /></VoiceProvider>}>
+      <Route path="learn/*" element={<Suspense fallback={null}><PortalApp /></Suspense>} />
       <Route element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="grammar" element={<Grammar />} />
@@ -50,13 +58,14 @@ export function AppRoutes() {
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />
         <Route path="contact" element={<Contact />} />
-        <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-        <Route path="speak" element={<RequireAuth><SpeakLive /></RequireAuth>} />
+        <Route path="dashboard" element={<MovedTo to="/learn" />} />
+        <Route path="speak" element={<MovedTo to="/learn/live" />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="payment/status" element={<PaymentStatus />} />
         <Route path="*" element={<NotFound />} />
+      </Route>
       </Route>
     </Routes>
   );

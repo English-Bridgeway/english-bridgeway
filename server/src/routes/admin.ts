@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { Op } from 'sequelize';
-import { Admin, AuditLog, ContentItem, Message, Order, sequelize } from '../db';
+import { Admin, AuditLog, ContentItem, Learner, Message, Order, sequelize } from '../db';
 import { asyncHandler, rateLimit, requireAdmin, requireOwner } from '../middleware';
 import { adminDto, checkPassword, hashPassword, signToken, validatePassword } from '../services/auth';
 import { audit } from '../services/audit';
@@ -9,6 +9,7 @@ import { getPaymentConfig, getSiteSettings, paymentSettingsForAdmin, savePayment
 import { testCredentials } from '../services/cashfree';
 import { OrderError, orderDto, refundOrder, syncOrder } from '../services/orders';
 import { config } from '../config';
+import { adminLearnersRouter } from './adminLearners';
 
 export const adminRouter = Router();
 
@@ -33,6 +34,8 @@ adminRouter.post(
 );
 
 adminRouter.use(requireAdmin);
+
+adminRouter.use(adminLearnersRouter);
 
 adminRouter.get('/me', (req, res) => {
   res.json(adminDto(req.admin!));
@@ -68,7 +71,8 @@ adminRouter.get(
       raw: true,
     })) as unknown as { collection: string; count: string }[];
     const content = Object.fromEntries(COLLECTIONS.map((c) => [c, Number(counts.find((r) => r.collection === c)?.count ?? 0)]));
-    const [total, paid, pending, revenuePaise, messages, unread, recentOrders, recentMessages] = await Promise.all([
+    const [learners, total, paid, pending, revenuePaise, messages, unread, recentOrders, recentMessages] = await Promise.all([
+      Learner.count(),
       Order.count(),
       Order.count({ where: { status: 'paid' } }),
       Order.count({ where: { status: 'pending' } }),
@@ -80,6 +84,7 @@ adminRouter.get(
     ]);
     res.json({
       content,
+      learners,
       orders: { total, paid, pending, revenue: (revenuePaise || 0) / 100 },
       messages: { total: messages, unread },
       recentOrders: recentOrders.map(orderDto),
