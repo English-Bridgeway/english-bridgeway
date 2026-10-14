@@ -66,3 +66,6 @@ export const mainNav = [
   { label: "Blog", to: "/blog" },
   { label: "Contact", to: "/contact" },
 ] as const;
+
+/** Shown in the desktop navbar's "More" menu instead of the main row (the mobile menu lists everything). */
+export const moreNavPaths: readonly string[] = ["/blog", "/contact"];

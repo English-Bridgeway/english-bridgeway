@@ -1,3 +1,4 @@
+import { useStartLearning } from "../Courses/useCourseProgress";
 import { ArrowRight, CircleCheck } from "lucide-react";
 import { Button } from "../../components/Button";
 import { StatCard } from "../../components/StatCard";
@@ -31,6 +32,7 @@ const newLessons = [
 ];
 
 export default function Home() {
+  const start = useStartLearning();
 
   return (
     <>
@@ -48,8 +50,8 @@ export default function Home() {
               Learn grammar, build vocabulary, practice spoken English, and test your knowledge with simple, practical lessons.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button to="/courses/beginner-english" size="lg" variant="accent">
-                Start Learning <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              <Button to={start.to} size="lg" variant="accent">
+                {start.resume ? "Continue Learning" : "Start Learning"} <ArrowRight className="h-5 w-5" aria-hidden="true" />
               </Button>
               <Button to="/courses" size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white">Explore Courses</Button>
             </div>
@@ -108,8 +110,8 @@ export default function Home() {
             <h2 className="text-3xl font-bold sm:text-4xl">Ready to improve your English?</h2>
             <p className="mt-2 max-w-lg text-lg text-muted">Start with a 10-minute lesson today. Your progress is saved automatically.</p>
           </div>
-          <Button to="/courses/beginner-english" size="lg" variant="accent">
-            Start Learning Free <ArrowRight className="h-5 w-5" aria-hidden="true" />
+          <Button to={start.to} size="lg" variant="accent">
+            {start.resume ? "Continue Learning" : "Start Learning Free"} <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
       </section>

@@ -14,7 +14,7 @@ import { getCourse } from "../../data/courses";
 import { grammarLessons, getTopic } from "../../data/grammar";
 import { getWord, getWordOfTheDay } from "../../data/vocabulary";
 import { quizzes } from "../../data/quizzes";
-import { useCourseProgress } from "../Courses/useCourseProgress";
+import { useCourseProgress, useStartLearning } from "../Courses/useCourseProgress";
 
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const activityIcon = { lesson: CircleCheck, quiz: Trophy, word: Heart, course: PlayCircle };
@@ -25,7 +25,9 @@ export default function Dashboard() {
   const { completedLessons, quizScores, favoriteWords, streak } = useLearning();
   const progressFor = useCourseProgress();
 
-  const course = getCourse(demoProgress.currentCourseId)!;
+  // The course the learner is actually taking (the sample course until they start one).
+  const start = useStartLearning();
+  const course = (start.resume && start.course) || getCourse(demoProgress.currentCourseId) || start.course!;
   const real = progressFor(course);
   const hasRealData = completedLessons.length > 0 || Object.keys(quizScores).length > 0;
   const scores = Object.values(quizScores);
@@ -59,7 +61,7 @@ export default function Dashboard() {
           <p className="relative mt-3 text-lg text-ink-100">You're {Math.round(coursePercent)}% through {course.title}.</p>
           <ProgressBar value={coursePercent} label={`${course.title} progress`} tone="amber" className="relative mt-5 max-w-md" />
           <div className="relative mt-6 flex flex-wrap gap-3">
-            <Button to={`/courses/${course.id}`} variant="accent"><PlayCircle className="h-4 w-4" aria-hidden="true" /> Continue course</Button>
+            <Button to={start.resume ? start.to : `/courses/${course.id}`} variant="accent"><PlayCircle className="h-4 w-4" aria-hidden="true" /> {start.resume ? "Continue course" : "Start a course"}</Button>
             <Button to="/quiz" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30">Take a quiz</Button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { PageSkeleton } from "../components/Skeleton";
 import { VoiceProvider } from "../voice/VoiceContext";
+import { CourseBar } from "../components/CourseBar";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -27,7 +28,9 @@ export function MainLayout() {
         <Navbar />
         <main id="main" className="flex-1">
           <Suspense fallback={<PageSkeleton />}>
+            <CourseBar compact />
             <Outlet />
+            <CourseBar />
           </Suspense>
         </main>
         <Footer />
