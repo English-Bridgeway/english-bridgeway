@@ -176,6 +176,9 @@ export class Order extends Model<InferAttributes<Order>, InferCreationAttributes
   declare userId: CreationOptional<string | null>;
   declare courseId: string;
   declare courseTitle: string;
+  /** Set on subscription orders: the plan bought and how many months of access it adds. */
+  declare planId: CreationOptional<string | null>;
+  declare planMonths: CreationOptional<number | null>;
   declare amountPaise: number;
   declare customerName: string;
   declare customerEmail: string;
@@ -196,6 +199,9 @@ Order.init(
     userId: { type: DataTypes.UUID, allowNull: true },
     courseId: { type: DataTypes.STRING(160), allowNull: false },
     courseTitle: { type: DataTypes.STRING(200), allowNull: false },
+    // Subscription orders keep "plan:<id>" in course_id, so they never unlock a single course.
+    planId: { type: DataTypes.STRING(60), allowNull: true },
+    planMonths: { type: DataTypes.INTEGER, allowNull: true },
     amountPaise: { type: DataTypes.INTEGER, allowNull: false },
     customerName: { type: DataTypes.STRING(120), allowNull: false },
     customerEmail: { type: DataTypes.STRING(254), allowNull: false },
@@ -265,6 +271,9 @@ export async function initDatabase(): Promise<void> {
   const orders = await sequelize.getQueryInterface().describeTable('orders').catch(() => null);
   if (orders && !orders.user_id) {
     await sequelize.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS user_id UUID');
+  }
+  if (orders && !orders.plan_id) {
+    await sequelize.query('ALTER TABLE orders ADD COLUMN IF NOT EXISTS plan_id VARCHAR(60), ADD COLUMN IF NOT EXISTS plan_months INTEGER');
   }
   const learners = await sequelize.getQueryInterface().describeTable('learners').catch(() => null);
   if (learners && !learners.trial_ends_at) {

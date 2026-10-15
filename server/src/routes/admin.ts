@@ -8,6 +8,7 @@ import { COLLECTIONS, ID_FIELD, isCollection, toRecord } from '../services/conte
 import { getPaymentConfig, getSiteSettings, paymentSettingsForAdmin, savePaymentConfig, saveSiteSettings } from '../services/settings';
 import { testCredentials } from '../services/cashfree';
 import { OrderError, orderDto, refundOrder, syncOrder } from '../services/orders';
+import { getPlans, PlanError, savePlans } from '../services/plans';
 import { config } from '../config';
 import { adminLearnersRouter } from './adminLearners';
 
@@ -236,6 +237,34 @@ adminRouter.post(
   requireOwner,
   asyncHandler(async (_req, res) => {
     res.json(await testCredentials(await getPaymentConfig()));
+  }),
+);
+
+// ---- Subscription plans (owner only) ----
+
+adminRouter.get(
+  '/settings/plans',
+  requireOwner,
+  asyncHandler(async (_req, res) => {
+    res.json(await getPlans());
+  }),
+);
+
+adminRouter.put(
+  '/settings/plans',
+  requireOwner,
+  asyncHandler(async (req, res) => {
+    try {
+      const plans = await savePlans(req.body?.plans);
+      await audit(req.admin!.email, 'Updated subscription plans', plans.map((p) => `${p.name} ₹${p.price}/${p.months}m${p.active ? '' : ' (off)'}`).join(', ').slice(0, 240));
+      res.json(plans);
+    } catch (err) {
+      if (err instanceof PlanError) {
+        res.status(400).json({ message: err.message });
+        return;
+      }
+      throw err;
+    }
   }),
 );
 

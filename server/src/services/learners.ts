@@ -177,7 +177,7 @@ export async function loginLearner(input: { email?: unknown; password?: unknown 
 
 /** Course ids this learner has paid for (refunded orders no longer count). */
 export async function purchasedCourseIds(learnerId: string): Promise<string[]> {
-  const rows = await Order.findAll({ where: { userId: learnerId, status: 'paid' }, attributes: ['courseId'] });
+  const rows = await Order.findAll({ where: { userId: learnerId, status: 'paid', planId: null }, attributes: ['courseId'] });
   return [...new Set(rows.map((r) => r.courseId))];
 }
 

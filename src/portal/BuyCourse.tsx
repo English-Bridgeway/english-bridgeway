@@ -9,14 +9,16 @@ import { formatPrice } from "../utils/format";
 import type { Course } from "../types";
 
 /** "Buy course · ₹499" with the learner's special offer applied, and the checkout behind it. */
-export function BuyCourse({ course, className, size = "lg" }: { course: Course; className?: string; size?: "md" | "lg" }) {
+export function BuyCourse({ course, className, size = "lg", variant = "primary", label = "Buy course" }: {
+  course: Course; className?: string; size?: "md" | "lg"; variant?: "primary" | "outline"; label?: string;
+}) {
   const { priceFor, offer, ready } = useAuth();
   const [open, setOpen] = useState(false);
   const [payments, setPayments] = useState<PaymentsConfig | null>(null);
   useEffect(() => {
     getPaymentsConfig().then(setPayments).catch(() => setPayments({ enabled: false, mode: "sandbox", demo: false }));
   }, []);
-  const listPrice = course.price ?? 0;
+  const listPrice = Number(course.price ?? 0);
   const price = priceFor(course);
   const discounted = price < listPrice;
 
@@ -30,8 +32,8 @@ export function BuyCourse({ course, className, size = "lg" }: { course: Course; 
   }
   return (
     <div className={className}>
-      <Button size={size} className="w-full" onClick={() => setOpen(true)} disabled={!payments || !ready}>
-        <Lock className="h-4 w-4" aria-hidden="true" /> Buy course · {formatPrice(price)}
+      <Button size={size} variant={variant} className="w-full" onClick={() => setOpen(true)} disabled={!payments || !ready}>
+        <Lock className="h-4 w-4" aria-hidden="true" /> {label} · {formatPrice(price)}
         {discounted && <span className="font-normal line-through opacity-70">{formatPrice(listPrice)}</span>}
       </Button>
       {discounted && offerApplies(offer, course.id) && (
@@ -40,7 +42,7 @@ export function BuyCourse({ course, className, size = "lg" }: { course: Course; 
         </p>
       )}
       {payments && (
-        <CheckoutDialog open={open} onClose={() => setOpen(false)} course={{ id: course.id, title: course.title, price }} listPrice={listPrice} config={payments} />
+        <CheckoutDialog open={open} onClose={() => setOpen(false)} item={{ kind: "course", id: course.id, title: course.title, price }} listPrice={listPrice} config={payments} />
       )}
     </div>
   );

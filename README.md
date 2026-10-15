@@ -99,6 +99,14 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
   (photo upload, mobile, WhatsApp, date of birth, city, level, goal…). `/dashboard` and `/speak` redirect here.
 - **Free trial:** a new account gets full access for `trialHours` (24 by default, Admin → Learners → Free trial). Full access
   opens every paid course and Speak with AI. When it ends, paid courses show the buy screen; bought courses and free courses stay open.
+  During the trial (or a plan) a paid course page still offers **Buy this course** and **Subscribe**, so learners can pay before it ends.
+- **Subscriptions:** Admin → **Subscription plans** (owner) defines plans: name, price, duration (monthly, quarterly,
+  half-yearly or yearly), on sale, "Best value" badge. Learners see **Subscribe · all courses** on course pages, the plan cards
+  in My courses and Plan & payments, and pay through the same Cashfree checkout. A paid plan moves the learner's access end date
+  (`learners.access_until`) forward by its months, counted from the later of now, their current end date or their trial end,
+  so admin-granted time and plans add up. Plans do not auto-renew; buying again extends. Refunding a plan order takes its months
+  back off. A "% off any course" offer also lowers plan prices; unlimited-access learners aren't offered plans. Plans live in the
+  `settings` table (`subscriptionPlans`); plan orders are rows in `orders` with `plan_id`/`plan_months` and `course_id = plan:<id>`.
 - **Admin → Learners** lists every learner (search, filters for trial / access / ended / buyers / offers / blocked). A learner's
   page shows their photo, contact and profile details and payments, and lets the owner **give N months** (added to any time
   left), **set an end date**, **give unlimited access**, **restart the trial**, **remove access**, give a **special offer**
@@ -107,8 +115,9 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
   private note, or delete the account.
 - The rules live in `server/src/services/access.ts`; the server checks them for payments and the AI tutor.
 - API: `PATCH /api/me` (name, phone, `profile`), `PUT/DELETE /api/me/avatar` (photo as a data: URL, shrunk to 256×256 in the
-  browser), `GET /api/avatars/:id`, `GET /api/ai/status`, `POST /api/ai/chat`; admin: `/api/admin/learners…`,
-  `/api/admin/settings/access`, `/api/admin/settings/ai`.
+  browser), `GET /api/avatars/:id`, `GET /api/ai/status`, `POST /api/ai/chat`, `GET /api/plans`, `POST /api/orders` with
+  `{ planId }` (a subscription) or `{ courseId }` (one course); admin: `/api/admin/learners…`, `/api/admin/settings/access`,
+  `/api/admin/settings/ai`, `/api/admin/settings/plans`.
 
 ## Speak with AI (`/learn/ai`)
 

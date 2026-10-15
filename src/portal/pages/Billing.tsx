@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Receipt } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { AccessBanner } from "../AccessBanner";
+import { PlanCards, usePlans } from "../Subscribe";
 import { fetchMyOrders, type MyOrder } from "../../utils/account";
 import { formatDate, formatDateTime } from "../../utils/access";
 import { formatPrice } from "../../utils/format";
@@ -18,6 +19,7 @@ const tone: Record<string, string> = {
 /** The learner's plan (trial / access end date) and their payments. */
 export default function Billing() {
   const { token, user, access } = useAuth();
+  const plans = usePlans();
   const [orders, setOrders] = useState<MyOrder[] | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -33,6 +35,14 @@ export default function Billing() {
         <div><dt className="text-xs text-muted">Free trial</dt><dd className="font-semibold">{access?.trialEndsAt ? `${Date.parse(access.trialEndsAt) > Date.now() ? "Ends" : "Ended"} ${formatDateTime(access.trialEndsAt)}` : "—"}</dd></div>
         <div><dt className="text-xs text-muted">Full access</dt><dd className="font-semibold">{access?.unlimited ? "Unlimited" : access?.accessUntil ? `Until ${formatDate(access.accessUntil)}` : "—"}</dd></div>
       </dl>
+
+      {plans && plans.length > 0 && !access?.unlimited && access?.status !== "blocked" && (
+        <section id="plans" className="mt-8">
+          <h2 className="text-lg font-semibold">{access?.status === "active" ? "Extend your plan" : "Subscription plans"}</h2>
+          <p className="mt-1 text-sm text-muted">Every course and Speak with AI until the plan ends. Buying again adds the time on to your current end date.</p>
+          <PlanCards plans={plans} compact className="mt-4" />
+        </section>
+      )}
 
       <h2 className="mt-8 text-lg font-semibold">Payments</h2>
       {failed ? (

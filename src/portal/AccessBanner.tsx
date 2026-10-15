@@ -26,7 +26,7 @@ export function AccessBanner({ className }: { className?: string }) {
           <Clock className="h-5 w-5" aria-hidden="true" /> Free trial: {timeLeft(access.until)} left
         </p>
         <p className="mt-1 text-sm text-amber-900/90">
-          Every course and Speak with AI are open until {formatDate(access.until)}, {new Date(access.until!).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}. After that, buy a course to keep learning.
+          Every course and Speak with AI are open until {formatDate(access.until)}, {new Date(access.until!).toLocaleTimeString("en-IN", { hour: "numeric", minute: "2-digit" })}. After that, buy a course or subscribe to keep learning.
         </p>
         {offerLine}
       </div>
@@ -51,8 +51,8 @@ export function AccessBanner({ className }: { className?: string }) {
       </p>
       <p className="mt-1 text-sm text-muted">
         {purchasedCourseIds.length
-          ? "Your bought courses stay open. Buy another course to unlock it."
-          : "Free courses stay open. Buy a course to unlock its lessons and keep practising with the AI tutor."}{" "}
+          ? "Your bought courses stay open. Buy another course, or subscribe to open them all."
+          : "Free courses stay open. Buy a course, or subscribe to open every course and keep practising with the AI tutor."}{" "}
         <Link to="/learn/courses" className="font-semibold text-ink-700 underline">See courses</Link>
       </p>
       {offerLine}

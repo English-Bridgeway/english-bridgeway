@@ -5,7 +5,8 @@ import { Modal } from "../Modal";
 import { Button } from "../Button";
 import { Alert } from "../Alert";
 import { TextField } from "../FormField";
-import { startCoursePayment, type CheckoutCustomer, type PaymentsConfig } from "../../utils/api";
+import { startPayment, type CheckoutCustomer, type CheckoutItem, type PaymentsConfig } from "../../utils/api";
+import { monthsLabel } from "../../utils/plans";
 import { formatPrice } from "../../utils/format";
 import { useAuth } from "../../context/AuthContext";
 
@@ -18,12 +19,12 @@ function validate(v: CheckoutCustomer): Errors {
   return e;
 }
 
-/** Collects buyer details and hands over to Cashfree checkout (or the demo payment). */
-export function CheckoutDialog({ open, onClose, course, config, listPrice }: {
+/** Collects buyer details and hands over to Cashfree checkout (or the demo payment), for a course or a plan. */
+export function CheckoutDialog({ open, onClose, item, config, listPrice }: {
   open: boolean;
   onClose: () => void;
   /** price: what this learner pays (after any special offer). */
-  course: { id: string; title: string; price: number };
+  item: CheckoutItem;
   config: PaymentsConfig;
   /** The normal price, shown struck through when the learner has an offer. */
   listPrice?: number;
@@ -35,6 +36,7 @@ export function CheckoutDialog({ open, onClose, course, config, listPrice }: {
   const [errors, setErrors] = useState<Errors>({});
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState("");
+  const plan = item.kind === "plan";
 
   const set = (k: keyof CheckoutCustomer) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues((v) => ({ ...v, [k]: e.target.value }));
@@ -49,7 +51,7 @@ export function CheckoutDialog({ open, onClose, course, config, listPrice }: {
     setBusy(true);
     setFailure("");
     try {
-      const { demoOrderId } = await startCoursePayment(course, values, { token, userId: user?.id ?? null });
+      const { demoOrderId } = await startPayment(item, values, { token, userId: user?.id ?? null });
       if (demoOrderId) navigate(`/payment/status?order_id=${encodeURIComponent(demoOrderId)}`);
       // Live payments leave the page for Cashfree, which returns to /payment/status.
     } catch (err) {
@@ -59,14 +61,21 @@ export function CheckoutDialog({ open, onClose, course, config, listPrice }: {
   };
 
   return (
-    <Modal open={open} onClose={busy ? () => {} : onClose} title={`Buy ${course.title}`}>
+    <Modal open={open} onClose={busy ? () => {} : onClose} title={plan ? `Subscribe: ${item.title}` : `Buy ${item.title}`}>
       <form onSubmit={submit} noValidate className="space-y-4 p-5">
-        <div className="flex items-baseline justify-between gap-3 rounded-xl bg-ink-50 p-4">
-          <span className="font-semibold text-ink-900">{course.title}</span>
-          <span className="text-right">
-            {listPrice && listPrice > course.price && <span className="mr-2 text-sm text-muted line-through">{formatPrice(listPrice)}</span>}
-            <span className="font-display text-xl font-bold text-ink-900">{formatPrice(course.price)}</span>
-          </span>
+        <div className="rounded-xl bg-ink-50 p-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="font-semibold text-ink-900">{plan ? `${item.title} plan` : item.title}</span>
+            <span className="text-right">
+              {listPrice && listPrice > item.price && <span className="mr-2 text-sm text-muted line-through">{formatPrice(listPrice)}</span>}
+              <span className="font-display text-xl font-bold text-ink-900">{formatPrice(item.price)}</span>
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted">
+            {plan
+              ? `Every course and Speak with AI for ${monthsLabel(item.months ?? 1)}. One-time payment, no auto-renewal.`
+              : "One-time payment. The course stays in your account for good."}
+          </p>
         </div>
         {config.demo && (
           <Alert tone="info" title="Demo checkout">No money is taken. The payment is simulated and the order shows in the admin panel.</Alert>
@@ -79,7 +88,7 @@ export function CheckoutDialog({ open, onClose, course, config, listPrice }: {
         <TextField id="co-phone" label="Mobile number" type="tel" inputMode="tel" autoComplete="tel" value={values.phone} onChange={set("phone")} error={errors.phone} />
         {failure && <Alert tone="error">{failure}</Alert>}
         <Button type="submit" size="lg" className="w-full" disabled={busy}>
-          <Lock className="h-4 w-4" aria-hidden="true" /> {busy ? "Opening payment…" : `Pay ${formatPrice(course.price)}`}
+          <Lock className="h-4 w-4" aria-hidden="true" /> {busy ? "Opening payment…" : `Pay ${formatPrice(item.price)}`}
         </Button>
         <p className="text-center text-xs text-muted">Secure payment by Cashfree: UPI, cards, net banking and wallets.</p>
       </form>

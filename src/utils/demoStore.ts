@@ -1,6 +1,6 @@
 import { collectionIdField, getBundledContent, type CollectionKey, type ContentBundle, type ContentCollections } from "../data/content";
 import type { SiteSettings } from "../data/site";
-import type { AdminUser, AuditEntry, ContactMessage, ContentRecord, Order } from "../admin/api/types";
+import type { AdminPlan, AdminUser, AuditEntry, ContactMessage, ContentRecord, Order } from "../admin/api/types";
 import { storage } from "./storage";
 
 /**
@@ -20,6 +20,8 @@ export interface DemoDb {
   /** Free trial length and who may use Speak with AI (added later, so may be missing). */
   access?: { trialHours: number; aiForBuyers: boolean };
   /** AI tutor provider. In demo mode the browser calls it directly with this key. */
+  /** Subscription plans (added later, so may be missing). */
+  plans?: AdminPlan[];
   ai?: { enabled: boolean; baseUrl: string; model: string; apiKey: string; instructions: string; dailyLimit: number };
 }
 
