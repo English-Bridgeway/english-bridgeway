@@ -1,6 +1,6 @@
 import type { CollectionKey } from "../../data/content";
 import type { SiteSettings } from "../../data/site";
-import type { LearnerAccess, LearnerOffer, LearnerProfile } from "../../types";
+import type { CallLogEntry, LearnerAccess, LearnerOffer, LearnerProfile, UsageSummary } from "../../types";
 
 // Shapes shared by the admin panel and the API in server/. Keep them in sync with server/src/types.ts.
 
@@ -123,6 +123,8 @@ export interface LearnerSummary {
 export interface LearnerDetail extends LearnerSummary {
   adminNote: string | null;
   orders: Order[];
+  usage?: UsageSummary;
+  calls?: CallLogEntry[];
 }
 
 export type AccessChange =
@@ -154,8 +156,18 @@ export interface AdminPlan {
 }
 
 export interface AccessSettings {
+  /** Hours the free trial lasts after sign-up (0 = no trial). */
   trialHours: number;
-  aiForBuyers: boolean;
+  /** Lessons at the start of each course open during the trial. */
+  freeLessons: number;
+  /** AI tutor messages for the whole trial. */
+  trialAiMessages: number;
+  /** Minutes of live calls for the whole trial. */
+  trialCallMinutes: number;
+  /** AI tutor messages a day once paid (0 = no limit). */
+  paidAiPerDay: number;
+  /** Minutes of live calls a day once paid (0 = no limit). */
+  paidCallMinutesPerDay: number;
 }
 
 export interface AiSettings {

@@ -67,10 +67,10 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
    }
    ```
    then `sudo nginx -t && sudo systemctl reload nginx`.
-3. **TURN relay (optional, recommended).** Without it, calls between two strict networks (some office/college Wi-Fi,
-   some mobile carriers) may stay on "Connecting…". In `.env` set `TURN_SECRET` (`openssl rand -hex 32`),
-   `TURN_URLS=turn:englishbridgeway.com:3478?transport=udp,turn:englishbridgeway.com:3478?transport=tcp` and
-   `TURN_EXTERNAL_IP` (the EC2 public IP, or leave empty to detect it), then start with `--profile turn`.
+3. **TURN relay (needed for reliable calls).** Without it, calls between many mobile networks (Jio/Airtel CGNAT) and
+   office/college Wi-Fi end in "Can't connect" because the two browsers can't reach each other directly. In `.env` set
+   `TURN_SECRET` (`openssl rand -hex 32`) and `TURN_EXTERNAL_IP` (the EC2 public IP, or leave empty to detect it), then start
+   with `--profile turn`. `TURN_URLS` defaults to `turn:<your PUBLIC_SITE_URL host>:3478` (UDP and TCP) when it is empty.
    Open these in the EC2 security group: **3478 TCP+UDP** and **49160-49200 UDP**.
 
 | Port | Used by |
@@ -97,9 +97,16 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
   free, bought, open with access, or locked), a **course player** (`/learn/courses/:id`, lesson list on the side, the lesson in
   the middle, Previous / Mark as done / Next), **Speak with AI**, **Speak Live**, **Plan & payments** and **My profile**
   (photo upload, mobile, WhatsApp, date of birth, city, level, goal…). `/dashboard` and `/speak` redirect here.
-- **Free trial:** a new account gets full access for `trialHours` (24 by default, Admin → Learners → Free trial). Full access
-  opens every paid course and Speak with AI. When it ends, paid courses show the buy screen; bought courses and free courses stay open.
-  During the trial (or a plan) a paid course page still offers **Buy this course** and **Subscribe**, so learners can pay before it ends.
+- **Free trial and limits** (all set in Admin → Learners → **Free trial and limits**):
+
+  | | Free trial (`trialHours`, 24 by default) | Paid (subscription, access given, or any bought course) |
+  | --- | --- | --- |
+  | Lessons | first `freeLessons` (1) of every course; the rest show a lock and the buy / subscribe screen | every lesson (a bought course always stays open) |
+  | Speak with AI | `trialAiMessages` (100) in total | `paidAiPerDay` (1000) a day, 0 = no limit |
+  | Speak Live calls | `trialCallMinutes` (2) in total, then the call ends and the learner is sent to the plans | `paidCallMinutesPerDay` (45) a day, 0 = no limit |
+
+  Daily allowances restart at midnight India time. When the trial ends, lessons, the AI tutor and calls stay locked until the
+  learner pays. Usage is stored per learner per day in `learner_usage`; rules in `server/src/services/usage.ts`.
 - **Subscriptions:** Admin → **Subscription plans** (owner) defines plans: name, price, duration (monthly, quarterly,
   half-yearly or yearly), on sale, "Best value" badge. Learners see **Subscribe · all courses** on course pages, the plan cards
   in My courses and Plan & payments, and pay through the same Cashfree checkout. A paid plan moves the learner's access end date
@@ -113,7 +120,8 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
   (percent off or a fixed price, for one course or all, optional end date: the learner sees it and Cashfree charges that price),
   **block / unblock** (blocking signs them out everywhere at once; the reason is shown when they try to log in), keep a
   private note, or delete the account.
-- The rules live in `server/src/services/access.ts`; the server checks them for payments and the AI tutor.
+- The rules live in `server/src/services/access.ts` and `usage.ts`; the server checks them for payments, the AI tutor and calls.
+- A learner's admin page also shows their **usage** (lessons, AI messages, call time) and their **call history**.
 - API: `PATCH /api/me` (name, phone, `profile`), `PUT/DELETE /api/me/avatar` (photo as a data: URL, shrunk to 256×256 in the
   browser), `GET /api/avatars/:id`, `GET /api/ai/status`, `POST /api/ai/chat`, `GET /api/plans`, `POST /api/orders` with
   `{ planId }` (a subscription) or `{ courseId }` (one course); admin: `/api/admin/learners…`, `/api/admin/settings/access`,
@@ -138,15 +146,22 @@ mistake the tutor shows a "Better:" correction. Hands-free mode listens again af
 | Ollama (own server) | `http://<host>:11434/v1` | `llama3.1` | none |
 
 The key is stored encrypted in the database and never reaches browsers. `AI_BASE_URL`, `AI_MODEL` and `AI_API_KEY` in
-`.env` are used when nothing is saved in the admin panel. "Messages per learner per day" (default 200) protects free-tier
-limits; it is counted in memory per API process. Who may use it: anyone on the free trial or with access, plus (switch in
-Admin → Learners) anyone who bought a course. In demo mode the browser calls the provider directly with the key saved in the
+`.env` are used when nothing is saved in the admin panel. Message limits come from Admin → Learners → Free trial and limits
+(see the table above) and are stored in the database. In demo mode the browser calls the provider directly with the key saved in the
 demo admin panel; some providers block that, so test on the real server.
 
 ## Speak Live: voice chat (`/learn/live`)
 
 - **Learners online:** everyone logged in shows up while they are anywhere on the site. Press **Call** for a one-to-one call;
-  the other learner gets a ringing pop-up on whatever page they are on (Answer / Decline, rings for 40 seconds).
+  the other learner gets a ringing pop-up on whatever page they are on (Answer / Decline, rings for 45 seconds, then
+  "No answer"). Someone already on a call can **Keep call**, **End & answer**, or **Merge** the caller in (it becomes a
+  private group call).
+- **Call states:** Ringing → Connecting → Connected (with a running timer) → Reconnecting when a network drops. A dropped
+  connection keeps the call for 30 seconds while the page reconnects; a WebRTC path that fails is restarted automatically,
+  and "Can't connect" offers **Try again**.
+- **Call history:** each call is saved per learner in `call_logs` (with whom, direction, start, talk time, result: completed,
+  no answer, declined, missed, minutes ran out, connection lost). Learners see "Recent calls" on Speak Live; admins see it
+  on the learner's page. Talk time counts while two or more people are in the call and uses the learner's call minutes.
 - **Team rooms:** start a room (public, or private for invited people only), invite online learners or share the
   invite link, up to `VOICE_MAX_ROOM_SIZE` people (default 6). Mute, leave, and a small call bar on other pages.
 - **How it works:** audio goes directly between browsers over WebRTC (encrypted, nothing recorded); with several people

@@ -3,7 +3,7 @@
  * Demo mode (no VITE_API_BASE): accounts are kept in this browser only, so the preview build
  * can still show sign-up, log-in and course purchases end to end.
  */
-import type { LearnerAccess, LearnerOffer, LearnerProfile, User } from "../types";
+import type { CallLogEntry, LearnerAccess, LearnerOffer, LearnerProfile, UsageSummary, User } from "../types";
 import type { Order } from "../admin/api/types";
 import { API_BASE, apiFetch, HttpError, isLive } from "./backend";
 import { DEMO_ACCESS_DEFAULTS, newId, readDemoDb } from "./demoStore";
@@ -79,6 +79,7 @@ export interface MeResponse {
   user: User;
   purchasedCourseIds: string[];
   access: LearnerAccess;
+  usage?: UsageSummary;
   offer: LearnerOffer | null;
 }
 
@@ -151,6 +152,12 @@ export async function fetchMyOrders(token: string): Promise<MyOrder[]> {
   return apiFetch("/me/orders", { token });
 }
 
+/** The learner's own recent live calls (none in demo mode). */
+export async function fetchMyCalls(token: string): Promise<CallLogEntry[]> {
+  if (!isLive) return [];
+  return apiFetch("/me/calls", { token });
+}
+
 // ---- Demo accounts (this browser only) ----
 
 async function sha256(text: string) {
@@ -168,9 +175,19 @@ export const initialsOf = (name: string) =>
 /** Demo access, worked out the same way as the server does it. */
 export function demoAccessFor(l: DemoLearner): LearnerAccess {
   const state = computeAccess(l);
-  const { aiForBuyers } = readDemoDb().access ?? DEMO_ACCESS_DEFAULTS;
-  const bought = readDemoDb().orders.some((o) => o.userId === l.id && o.status === "paid");
-  return { ...state, ai: state.full || (aiForBuyers && bought) };
+  return { ...state, ai: state.status === "blocked" ? false : state.status !== "expired" || demoBought(l) };
+}
+
+const demoBought = (l: DemoLearner) => readDemoDb().orders.some((o) => o.userId === l.id && o.status === "paid");
+
+/** Demo usage: the demo has no metering, so it only reports the allowances. */
+export function demoUsageFor(l: DemoLearner): UsageSummary {
+  const s = { ...DEMO_ACCESS_DEFAULTS, ...readDemoDb().access };
+  const state = computeAccess(l);
+  const allow = (period: "day" | "trial" | "none", limit: number | null) => ({ period, used: 0, limit, remaining: limit });
+  if (state.full || demoBought(l)) return { tier: "paid", freeLessons: null, ai: allow("day", s.paidAiPerDay || null), call: allow("day", s.paidCallMinutesPerDay ? s.paidCallMinutesPerDay * 60 : null) };
+  if (state.status === "trial") return { tier: "trial", freeLessons: s.freeLessons, ai: allow("trial", s.trialAiMessages), call: allow("trial", s.trialCallMinutes * 60) };
+  return { tier: "none", freeLessons: 0, ai: allow("none", 0), call: allow("none", 0) };
 }
 
 const demo = {
@@ -186,7 +203,7 @@ const demo = {
     const all = readDemoLearners();
     const e = email.trim().toLowerCase();
     if (all.some((l) => l.email === e)) throw new AccountError("An account with this email already exists. Log in instead.", "email");
-    const { trialHours } = readDemoDb().access ?? DEMO_ACCESS_DEFAULTS;
+    const { trialHours } = { ...DEMO_ACCESS_DEFAULTS, ...readDemoDb().access };
     const now = new Date();
     const l: DemoLearner = {
       id: newId(), name: name.trim(), email: e, avatarInitials: initialsOf(name), avatarUrl: null, passwordHash: await sha256(password),
@@ -207,7 +224,7 @@ const demo = {
   async me(token: string): Promise<MeResponse> {
     const l = demo.find(token);
     const purchasedCourseIds = [...new Set(readDemoDb().orders.filter((o) => o.userId === l.id && o.status === "paid" && o.kind !== "plan").map((o) => o.courseId))];
-    return { user: publicUser(l), purchasedCourseIds, access: demoAccessFor(l), offer: offerApplies(l.offer) ? l.offer : null };
+    return { user: publicUser(l), purchasedCourseIds, access: demoAccessFor(l), usage: demoUsageFor(l), offer: offerApplies(l.offer) ? l.offer : null };
   },
   async updateProfile(token: string, input: ProfileInput) {
     const l = demo.find(token);

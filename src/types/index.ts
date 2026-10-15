@@ -231,7 +231,7 @@ export type AccessStatus = "unlimited" | "active" | "trial" | "expired" | "block
 /** What the signed-in learner can open (see server/src/services/access.ts). */
 export interface LearnerAccess {
   status: AccessStatus;
-  /** Every course is open (free trial, access given by the admin, or unlimited). */
+  /** Every course is open (subscription, access given by the admin, or unlimited). Not during the free trial. */
   full: boolean;
   until: string | null;
   trialEndsAt: string | null;
@@ -239,6 +239,37 @@ export interface LearnerAccess {
   unlimited: boolean;
   /** May use Speak with AI. */
   ai: boolean;
+}
+
+/** One allowance (AI messages, or call seconds). "day" restarts at midnight IST; "trial" is one-off. */
+export interface Allowance {
+  period: "day" | "trial" | "none";
+  used: number;
+  /** null = no limit. */
+  limit: number | null;
+  remaining: number | null;
+}
+
+/** What the learner may use: lessons per course on the trial, AI tutor messages and live-call seconds. */
+export interface UsageSummary {
+  tier: "paid" | "trial" | "none";
+  /** Lessons at the start of each course open without buying; null = every lesson. */
+  freeLessons: number | null;
+  ai: Allowance;
+  call: Allowance;
+}
+
+/** One live call in a learner's history. */
+export interface CallLogEntry {
+  id: string;
+  roomName: string;
+  kind: "direct" | "team";
+  direction: "outgoing" | "incoming" | "room";
+  withNames: string;
+  startedAt: string;
+  endedAt: string;
+  talkSeconds: number;
+  outcome: "completed" | "no-answer" | "declined" | "missed" | "cancelled" | "limit" | "dropped";
 }
 
 /** A subscription plan: every course and the AI tutor for a number of months. */

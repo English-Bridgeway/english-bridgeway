@@ -8,6 +8,7 @@ import { learnerDto } from '../services/learners';
 import { OrderError, orderDto } from '../services/orders';
 import { aiSettingsForAdmin, AiError, saveAiConfig, testAi } from '../services/ai';
 import { getPublishedItem } from '../services/content';
+import { callHistory, usageSummary } from '../services/usage';
 
 // Admin → Learners: every student account, their details and photo, their access (trial,
 // N months, an end date or unlimited), special offers, and blocking. Admin → AI tutor settings.
@@ -50,6 +51,8 @@ async function detail(l: Learner) {
     ...summary(l, { paid: paid.length, spent: paid.reduce((s, o) => s + o.amountPaise / 100, 0) }),
     adminNote: l.adminNote,
     orders: orders.map(orderDto),
+    usage: await usageSummary(l),
+    calls: await callHistory(l.id, 100),
   };
 }
 
@@ -189,7 +192,7 @@ adminLearnersRouter.delete(
   }),
 );
 
-// ---- Settings: free trial and AI tutor ----
+// ---- Settings: free trial, limits and AI tutor ----
 
 adminLearnersRouter.get(
   '/settings/access',
@@ -203,7 +206,7 @@ adminLearnersRouter.put(
   requireOwner,
   asyncHandler(async (req, res) => {
     const saved = await saveAccessSettings(req.body ?? {});
-    await audit(req.admin!.email, 'Updated learner access settings', `trial ${saved.trialHours}h`);
+    await audit(req.admin!.email, 'Updated learner access settings', `trial ${saved.trialHours}h, ${saved.freeLessons} free lesson(s), AI ${saved.trialAiMessages}/${saved.paidAiPerDay} a day, calls ${saved.trialCallMinutes}m/${saved.paidCallMinutesPerDay}m a day`);
     res.json(saved);
   }),
 );

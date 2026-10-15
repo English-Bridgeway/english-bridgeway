@@ -4,8 +4,9 @@ import { asyncHandler, rateLimit, requireLearner } from '../middleware';
 import {
   AccountError, learnerDto, loginLearner, purchasedCourseIds, registerLearner, removeAvatar, saveAvatar, signLearnerToken, updateProfile,
 } from '../services/learners';
-import { accessState, activeOffer, getAccessSettings } from '../services/access';
-import { AiError, getAiConfig, tutorReply, usedToday } from '../services/ai';
+import { accessState, activeOffer } from '../services/access';
+import { AiError, getAiConfig, tutorReply } from '../services/ai';
+import { callHistory, limitMessage, usageSummary } from '../services/usage';
 import { publicOrderDto } from '../services/orders';
 import { iceServersFor } from '../services/voice';
 
@@ -33,13 +34,6 @@ accountRouter.post(
   }),
 );
 
-/** Whether this learner may use Speak with AI: full access, or (when allowed) any bought course. */
-async function aiAllowed(learner: Learner, purchased?: string[]) {
-  if (accessState(learner).full) return true;
-  const { aiForBuyers } = await getAccessSettings();
-  return aiForBuyers && (purchased ?? (await purchasedCourseIds(learner.id))).length > 0;
-}
-
 accountRouter.get(
   '/me',
   requireLearner,
@@ -47,10 +41,12 @@ accountRouter.get(
     const learner = req.learner!;
     const purchased = await purchasedCourseIds(learner.id);
     const offer = activeOffer(learner);
+    const usage = await usageSummary(learner, purchased);
     res.json({
       user: learnerDto(learner),
       purchasedCourseIds: purchased,
-      access: { ...accessState(learner), ai: await aiAllowed(learner, purchased) },
+      access: { ...accessState(learner), ai: usage.tier !== 'none' },
+      usage,
       offer: offer && { kind: offer.kind, value: offer.value, courseId: offer.courseId, note: offer.note, expiresAt: offer.expiresAt },
     });
   }),
@@ -104,11 +100,8 @@ accountRouter.get(
   requireLearner,
   asyncHandler(async (req, res) => {
     const cfg = await getAiConfig();
-    res.json({
-      enabled: cfg.enabled,
-      allowed: await aiAllowed(req.learner!),
-      remainingToday: cfg.dailyLimit ? Math.max(0, cfg.dailyLimit - usedToday(req.learner!.id)) : null,
-    });
+    const { tier, ai } = await usageSummary(req.learner!);
+    res.json({ enabled: cfg.enabled, allowed: tier !== 'none' && ai.remaining !== 0, remaining: ai.remaining, limit: ai.limit, period: ai.period, message: ai.remaining === 0 ? limitMessage('ai', ai) : null });
   }),
 );
 
@@ -117,10 +110,16 @@ accountRouter.post(
   requireLearner,
   rateLimit({ windowMs: 60_000, max: 20 }),
   asyncHandler(async (req, res) => {
-    if (!(await aiAllowed(req.learner!))) {
-      throw new AiError('Your free trial has ended. Buy a course or ask us for access to keep talking with the AI tutor.', 402, 'access');
-    }
     res.json(await tutorReply(req.learner!, req.body ?? {}));
+  }),
+);
+
+/** The learner's own recent live calls. */
+accountRouter.get(
+  '/me/calls',
+  requireLearner,
+  asyncHandler(async (req, res) => {
+    res.json(await callHistory(req.learner!.id, 30));
   }),
 );
 

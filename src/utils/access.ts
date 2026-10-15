@@ -17,7 +17,7 @@ export function computeAccess(l: AccessFields, now = Date.now()): Omit<LearnerAc
   if (!l.active) return state("blocked", false, null);
   if (l.accessUnlimited) return state("unlimited", true, null);
   if (grantedEnds > now && grantedEnds >= trialEnds) return state("active", true, l.accessUntil);
-  if (trialEnds > now) return state("trial", true, l.trialEndsAt);
+  if (trialEnds > now) return state("trial", false, l.trialEndsAt);
   return state("expired", false, null);
 }
 

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { LearnerAccess, LearnerOffer, User } from "../types";
+import type { LearnerAccess, LearnerOffer, UsageSummary, User } from "../types";
 import { HttpError } from "../utils/backend";
 import { clearLearnerSession, fetchMe, getLearnerSession, login, register, saveSession } from "../utils/account";
 import { offerPrice } from "../utils/access";
@@ -20,8 +20,14 @@ interface AuthContextValue {
   /** Trial / granted access / unlimited; null until loaded or when signed out. */
   access: LearnerAccess | null;
   offer: LearnerOffer | null;
-  /** May open this course now: free, bought, or full access. */
+  /** Lessons per course on the free trial, AI messages and call minutes; null until loaded. */
+  usage: UsageSummary | null;
+  /** Every lesson of this course is open: bought, full access, or a free course for a paying learner. */
   canOpenCourse: (course: { id: string; price?: number }) => boolean;
+  /** Lessons at the start of a not-yet-open course that the learner may still open (the free trial's taste). */
+  freeLessonsFor: (course: { id: string; price?: number }) => number;
+  /** May open lesson number `index` (0-based) of this course. */
+  canOpenLesson: (course: { id: string; price?: number }, index: number) => boolean;
   /** What this learner pays for a course, after their special offer. */
   priceFor: (course: { id: string; price?: number }) => number;
   /** Replaces the signed-in user's details after a profile change. */
@@ -39,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [purchasedCourseIds, setPurchased] = useState<string[]>([]);
   const [access, setAccess] = useState<LearnerAccess | null>(null);
   const [offer, setOffer] = useState<LearnerOffer | null>(null);
+  const [usage, setUsage] = useState<UsageSummary | null>(null);
   const [ready, setReady] = useState(!session);
 
   const token = session?.token ?? null;
@@ -49,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPurchased([]);
     setAccess(null);
     setOffer(null);
+    setUsage(null);
   }, []);
 
   const refresh = useCallback(async () => {
@@ -60,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setPurchased(me.purchasedCourseIds);
       setAccess(me.access ?? null);
       setOffer(me.offer ?? null);
+      setUsage(me.usage ?? null);
     } catch (e) {
       // Only a rejected (or blocked) session logs the learner out; a network blip keeps them signed in.
       if (e instanceof HttpError && (e.status === 401 || e.status === 403)) signOut();
@@ -71,8 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refresh().finally(() => setReady(true));
   }, [token, refresh]);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
+  const value = useMemo<AuthContextValue>(() => {
+    const canOpenCourse = (c: { id: string; price?: number }) =>
+      purchasedCourseIds.includes(c.id) || Boolean(access?.full) || (!(c.price && c.price > 0) && (usage ? usage.tier === "paid" : true));
+    const freeLessonsFor = (c: { id: string; price?: number }) => (canOpenCourse(c) ? Infinity : usage?.tier === "trial" ? (usage.freeLessons ?? 0) : 0);
+    return {
       user: session?.user ?? null,
       token,
       isAuthenticated: Boolean(session),
@@ -81,7 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       hasCourse: (id) => purchasedCourseIds.includes(id),
       access,
       offer,
-      canOpenCourse: (c) => !(c.price && c.price > 0) || purchasedCourseIds.includes(c.id) || Boolean(access?.full),
+      usage,
+      canOpenCourse,
+      freeLessonsFor,
+      canOpenLesson: (c, index) => index < freeLessonsFor(c),
       priceFor: (c) => (c.price && c.price > 0 ? offerPrice(offer, c.id, c.price) : 0),
       setUser: (user) =>
         setSession((s) => {
@@ -100,9 +115,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(s);
       },
       signOut,
-    }),
-    [session, token, ready, purchasedCourseIds, access, offer, refresh, signOut],
-  );
+    };
+  }, [session, token, ready, purchasedCourseIds, access, offer, usage, refresh, signOut]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

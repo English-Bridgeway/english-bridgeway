@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
 import { Link, Navigate, Route, Routes, UNSAFE_RouteContext as RouteContext, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Check, ExternalLink, Lock, PlayCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Crown, ExternalLink, Lock, PlayCircle } from "lucide-react";
+import { buttonClasses } from "../../components/Button";
 import { getCourse } from "../../data/courses";
 import { useAuth } from "../../context/AuthContext";
 import { useLearning } from "../../context/LearningContext";
@@ -54,7 +55,7 @@ export default function CoursePlayer() {
   const { courseId = "" } = useParams();
   const [params, setParams] = useSearchParams();
   const course = getCourse(courseId);
-  const { canOpenCourse, access } = useAuth();
+  const { canOpenCourse, canOpenLesson, freeLessonsFor, access } = useAuth();
   const { isLessonComplete, toggleLessonComplete } = useLearning();
   const progressFor = useCourseProgress();
   const steps = useMemo(() => (course ? courseSteps(course) : []), [course]);
@@ -72,7 +73,9 @@ export default function CoursePlayer() {
   }, [index]);
 
   if (!course) return <Navigate to="/learn/courses" replace />;
-  const open = canOpenCourse(course);
+  const fullyOpen = canOpenCourse(course);
+  const freeCount = freeLessonsFor(course);
+  const open = canOpenLesson(course, index);
   const progress = progressFor(course);
   const go = (i: number) => setParams({ step: String(i + 1) });
   const prev = index > 0 ? index - 1 : -1;
@@ -90,14 +93,17 @@ export default function CoursePlayer() {
               const i = n++;
               const s = steps[i];
               const isDone = isLessonComplete(s.key);
+              const lessonOpen = canOpenLesson(course, i);
               return (
                 <li key={`${mod.title}-${l.title}`}>
-                  <button type="button" onClick={() => go(i)} disabled={!open} aria-current={i === index ? "step" : undefined}
-                    className={cn("flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm", i === index ? "bg-ink-50 font-semibold text-ink-900" : "text-body hover:bg-ink-50/60", !open && "cursor-not-allowed opacity-70")}>
-                    <span className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[0.65rem]", isDone ? "border-brand-sky bg-brand-sky text-white" : "border-line")}>
-                      {isDone ? <Check className="h-3 w-3" aria-hidden="true" /> : !open ? <Lock className="h-3 w-3" aria-hidden="true" /> : i + 1}
+                  <button type="button" onClick={() => go(i)} aria-current={i === index ? "step" : undefined}
+                    aria-label={lessonOpen ? undefined : `${l.title} (locked)`}
+                    className={cn("flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm", i === index ? "bg-ink-50 font-semibold text-ink-900" : "text-body hover:bg-ink-50/60", !lessonOpen && "text-muted")}>
+                    <span className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[0.65rem]", isDone && lessonOpen ? "border-brand-sky bg-brand-sky text-white" : "border-line")}>
+                      {!lessonOpen ? <Lock className="h-3 w-3" aria-hidden="true" /> : isDone ? <Check className="h-3 w-3" aria-hidden="true" /> : i + 1}
                     </span>
                     <span className="min-w-0 flex-1">{l.title}</span>
+                    {!fullyOpen && lessonOpen && <span className="rounded-full bg-emerald-50 px-1.5 py-0.5 text-[0.65rem] font-semibold text-emerald-700">Free</span>}
                     <span className="text-xs text-muted tabular-nums">{l.minutes}m</span>
                   </button>
                 </li>
@@ -130,15 +136,20 @@ export default function CoursePlayer() {
             <div className="rounded-2xl border border-line bg-white p-8 text-center shadow-card">
               <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ink-50 text-ink-700"><Lock className="h-7 w-7" aria-hidden="true" /></span>
               <h2 className="mt-4 text-xl font-semibold">
-                {access?.status === "blocked" ? "Your account is blocked" : access?.trialEndsAt ? "Your free trial has ended" : "This course is locked"}
+                {access?.status === "blocked" ? "Your account is blocked" : freeCount > 0 ? `Lesson ${index + 1} is locked` : access?.status === "expired" && access.trialEndsAt ? "Your free trial has ended" : "This course is locked"}
               </h2>
               <p className="mx-auto mt-2 max-w-md text-muted">
-                Buy {course.title} once and keep every lesson, or subscribe to open every course. Your progress so far is kept.
+                {freeCount > 0
+                  ? `Your free trial includes the first ${freeCount === 1 ? "lesson" : `${freeCount} lessons`} of every course. Unlock the remaining ${steps.length - freeCount} lessons of ${course.title}: buy it once and keep it, or subscribe to open every course.`
+                  : `Buy ${course.title} once and keep every lesson, or subscribe to open every course. Your progress so far is kept.`}
               </p>
               {access?.status !== "blocked" && (
                 <>
-                  <BuyCourse course={course} className="mx-auto mt-6 max-w-sm" label="Buy this course" />
-                  <SubscribeButton className="mx-auto mt-4 max-w-sm" size="md" />
+                  {Boolean(course.price && course.price > 0) && <BuyCourse course={course} className="mx-auto mt-6 max-w-sm" label="Buy this course" />}
+                  <SubscribeButton className="mx-auto mt-4 max-w-sm" size="md" variant={course.price ? "outline" : "primary"} />
+                  <Link to="/learn/billing#plans" className={buttonClasses(course.price ? "outline" : "primary", "md", "mx-auto mt-4 flex w-full max-w-sm")}>
+                    <Crown className="h-4 w-4" aria-hidden="true" /> See plans
+                  </Link>
                 </>
               )}
             </div>

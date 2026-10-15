@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState, type FormEvent } from "react";
 import { Bot, CircleCheck, CircleX, ExternalLink, PlugZap } from "lucide-react";
 import { adminApi, type AiSettings } from "../api";
@@ -108,10 +109,9 @@ export default function AiTutor() {
             )}
           </Panel>
           <Panel title="Tutor behaviour">
-            <label className="block text-sm"><span className="font-semibold">Messages per learner per day</span>
-              <input type="number" min={0} max={10000} value={form.dailyLimit} onChange={(e) => set("dailyLimit", Number(e.target.value))} className={cn(inputClass, "mt-1 w-32")} />
-              <span className="mt-1 block text-xs text-muted">Keeps free-tier limits and costs under control. 0 means no limit.</span>
-            </label>
+            <p className="text-sm text-muted">
+              Message limits (free trial and paid per day) are set in <Link to="/admin/learners" className="font-semibold text-ink-700 underline">Learners → Free trial and limits</Link>.
+            </p>
             <label className="mt-4 block text-sm"><span className="font-semibold">Extra instructions (optional)</span>
               <textarea rows={4} maxLength={2000} value={form.instructions} onChange={(e) => set("instructions", e.target.value)} placeholder="e.g. Use British spelling. Mention our Spoken English course when it fits." className={cn(inputClass, "mt-1 resize-y")} />
               <span className="mt-1 block text-xs text-muted">Added to the built-in tutor rules: short spoken replies, gentle corrections, one question at a time.</span>

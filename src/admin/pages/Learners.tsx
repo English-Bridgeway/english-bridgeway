@@ -55,28 +55,43 @@ function TrialSettings() {
     setSaving(true);
     try {
       setS(await adminApi.saveAccessSettings(s));
-      toast("Free trial settings saved");
+      toast("Trial and limit settings saved");
     } catch (err) {
       toast(err instanceof Error ? err.message : "Could not save.", "error");
     } finally {
       setSaving(false);
     }
   };
+  const field = (key: keyof AccessSettings, label: string, max: number, hint?: string) => (
+    <label className="block text-sm">
+      <span className="font-semibold">{label}</span>
+      <input type="number" min={0} max={max} value={s[key]} disabled={!isOwner} onChange={(e) => setS({ ...s, [key]: Number(e.target.value) })} className={cn(inputClass, "mt-1 w-32")} />
+      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
+    </label>
+  );
   return (
-    <Panel title="Free trial for new sign-ups" className="mb-6">
-      <form onSubmit={save} className="flex flex-wrap items-end gap-4">
-        <label className="block text-sm">
-          <span className="font-semibold">Trial length (hours)</span>
-          <input type="number" min={0} max={2160} value={s.trialHours} disabled={!isOwner} onChange={(e) => setS({ ...s, trialHours: Number(e.target.value) })} className={cn(inputClass, "mt-1 w-32")} />
-        </label>
-        <label className="flex items-center gap-2 pb-2 text-sm">
-          <input type="checkbox" checked={s.aiForBuyers} disabled={!isOwner} onChange={(e) => setS({ ...s, aiForBuyers: e.target.checked })} className="h-4 w-4" />
-          Learners who bought any course can also use Speak with AI
-        </label>
+    <Panel title="Free trial and limits" className="mb-6">
+      <form onSubmit={save} className="space-y-5">
+        <fieldset>
+          <legend className="text-xs font-semibold uppercase tracking-wide text-muted">Free trial (new sign-ups)</legend>
+          <div className="mt-2 flex flex-wrap items-start gap-4">
+            {field("trialHours", "Trial length (hours)", 2160, "0 turns the trial off")}
+            {field("freeLessons", "Free lessons per course", 50, "The rest show a lock and pay screen")}
+            {field("trialAiMessages", "AI chat messages (total)", 100000)}
+            {field("trialCallMinutes", "Live call minutes (total)", 10000, "Then the call ends and they go to plans")}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend className="text-xs font-semibold uppercase tracking-wide text-muted">Paid learners (subscription, access given, or a bought course)</legend>
+          <div className="mt-2 flex flex-wrap items-start gap-4">
+            {field("paidAiPerDay", "AI chat messages per day", 100000, "0 = no limit")}
+            {field("paidCallMinutesPerDay", "Live call minutes per day", 1440, "0 = no limit · resets at midnight IST")}
+          </div>
+        </fieldset>
         {isOwner && <Button type="submit" size="sm" disabled={saving}>{saving ? "Saving…" : "Save"}</Button>}
       </form>
       <p className="mt-3 text-xs text-muted">
-        During the trial every course and Speak with AI are open. Afterwards learners see the buy screen for paid courses. 0 turns the trial off. Applies to new sign-ups; change one learner's access on their page.
+        When the trial ends, every lesson, the AI tutor and live calls stay locked until the learner pays. Bought courses always stay open. Trial length applies to new sign-ups; change one learner's access on their page.
       </p>
     </Panel>
   );
