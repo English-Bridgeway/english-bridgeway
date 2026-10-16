@@ -1,9 +1,9 @@
 import { collectionIdField, getBundledContent, type CollectionKey, type ContentBundle, type ContentCollections } from "../data/content";
 import type { SiteSettings } from "../data/site";
-import type { Policies } from "../data/policies";
-import { toPublicPlan } from "./plans";
 import type { AdminPlan, AdminUser, AuditEntry, ContactMessage, ContentRecord, Order } from "../admin/api/types";
 import { storage } from "./storage";
+import { toPublicPlan } from "./plans";
+import type { Policies } from "../data/policies";
 
 /**
  * Demo backend for when no API is configured (VITE_API_BASE unset), e.g. the preview build.

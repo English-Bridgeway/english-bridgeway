@@ -1,9 +1,10 @@
 import type { CollectionKey } from "../../data/content";
 import type { SiteSettings } from "../../data/site";
-import type { Policies } from "../../data/policies";
 import type { LearnerAccess, LearnerOffer, LearnerProfile } from "../../types";
 
 // Shapes shared by the admin panel and the API in server/. Keep them in sync with server/src/types.ts.
+
+import type { Policies } from "../../data/policies";
 
 export type AdminRole = "owner" | "editor";
 
