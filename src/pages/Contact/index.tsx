@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Clock, Mail, MapPin, MessageCircle, Send } from "lucide-react";
+import { Building2, Clock, Mail, MapPin, MessageCircle, Phone, Send } from "lucide-react";
+import { Link } from "react-router-dom";
 import { PageHeader } from "../../components/PageHeader";
 import { Card } from "../../components/Card";
 import { Button } from "../../components/Button";
@@ -7,6 +8,7 @@ import { Alert } from "../../components/Alert";
 import { SelectField, TextArea, TextField } from "../../components/FormField";
 import { SocialIcons } from "../../components/SocialIcons";
 import { site } from "../../data/site";
+import { businessInfo, policyPages } from "../../data/policies";
 import { contactIsLive, sendContactMessage, type ContactPayload } from "../../utils/api";
 
 type Errors = Partial<Record<keyof ContactPayload, string>>;
@@ -47,10 +49,12 @@ export default function Contact() {
     }
   };
 
+  const biz = businessInfo();
   const channels = [
-    { icon: Mail, label: "Email", value: site.email, href: `mailto:${site.email}` },
+    { icon: Mail, label: "Email", value: biz.email, href: `mailto:${biz.email}` },
+    { icon: Phone, label: "Phone", value: biz.phone, href: `tel:${biz.phone.replace(/[^\d+]/g, "")}` },
     { icon: MessageCircle, label: "WhatsApp", value: site.whatsapp, href: site.whatsappLink },
-    { icon: MapPin, label: "Location", value: site.location },
+    { icon: MapPin, label: "Address", value: biz.address },
     { icon: Clock, label: "Support hours", value: site.hours },
   ];
 
@@ -60,6 +64,14 @@ export default function Contact() {
         description="Have a grammar doubt, a course question or a suggestion? Send us a message and we'll reply within one working day." />
       <div className="container-page grid gap-8 py-10 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <aside className="space-y-4">
+          <Card className="flex items-start gap-4 p-5">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink-50 text-ink-700"><Building2 className="h-5 w-5" aria-hidden="true" /></span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold">Business</p>
+              <p className="text-muted">{biz.name}</p>
+              {biz.gstin && <p className="text-sm text-muted">GSTIN: {biz.gstin}</p>}
+            </div>
+          </Card>
           {channels.map((c) => (
             <Card key={c.label} className="flex items-start gap-4 p-5">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink-50 text-ink-700"><c.icon className="h-5 w-5" aria-hidden="true" /></span>
@@ -67,7 +79,7 @@ export default function Contact() {
                 <p className="text-sm font-semibold">{c.label}</p>
                 {c.href ? (
                   <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="break-words text-ink-700 hover:text-ink-900 hover:underline">{c.value}</a>
-                ) : <p className="text-muted">{c.value}</p>}
+                ) : <p className="whitespace-pre-line text-muted">{c.value}</p>}
               </div>
             </Card>
           ))}
@@ -76,6 +88,14 @@ export default function Contact() {
             <p className="mt-1 text-sm text-ink-200">Daily phrases and quick grammar tips.</p>
             <SocialIcons className="mt-4" />
           </div>
+          <nav aria-label="Policies" className="px-1 text-sm">
+            <p className="font-semibold">Policies</p>
+            <ul className="mt-2 space-y-1.5">
+              {[...policyPages, { key: "pricing", path: "/pricing", label: "Pricing" }].map((p) => (
+                <li key={p.path}><Link to={p.path} className="text-ink-700 hover:text-ink-900 hover:underline">{p.label}</Link></li>
+              ))}
+            </ul>
+          </nav>
         </aside>
 
         <Card className="p-6 sm:p-8">

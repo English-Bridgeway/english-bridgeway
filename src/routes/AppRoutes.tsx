@@ -20,6 +20,8 @@ const CourseDetail = lazy(() => import("../pages/Courses/CourseDetail"));
 const Blog = lazy(() => import("../pages/Blog"));
 const BlogDetail = lazy(() => import("../pages/Blog/BlogDetail"));
 const Contact = lazy(() => import("../pages/Contact"));
+const Pricing = lazy(() => import("../pages/Pricing"));
+const PolicyPage = lazy(() => import("../pages/Legal"));
 const SearchPage = lazy(() => import("../pages/Search"));
 const Login = lazy(() => import("../pages/Auth/Login"));
 const Register = lazy(() => import("../pages/Auth/Register"));
@@ -58,6 +60,10 @@ export function AppRoutes() {
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="pricing" element={<Pricing />} />
+        <Route path="terms" element={<PolicyPage kind="terms" />} />
+        <Route path="refunds" element={<PolicyPage kind="refunds" />} />
+        <Route path="privacy" element={<PolicyPage kind="privacy" />} />
         <Route path="dashboard" element={<MovedTo to="/learn" />} />
         <Route path="speak" element={<MovedTo to="/learn/live" />} />
         <Route path="search" element={<SearchPage />} />

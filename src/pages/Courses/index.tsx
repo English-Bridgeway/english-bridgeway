@@ -28,7 +28,7 @@ export default function Courses() {
   return (
     <>
       <PageHeader crumbs={[{ label: "Courses" }]} title="Courses"
-        description="Follow a structured path with a clear goal for every week. All courses are free and work on any device." />
+        description="Follow a structured path with a clear goal for every week. Many courses are free; prices for the others are in rupees on each course and on the Pricing page." />
       <section className="container-page py-10">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <Tabs options={levels} value={level} onChange={setLevel} label="Filter by level" />

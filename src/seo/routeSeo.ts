@@ -5,6 +5,7 @@ import { getSpokenLesson } from "../data/spokenEnglish";
 import { getQuiz, getQuizCategory, getQuizzesForCategory } from "../data/quizzes";
 import { courses, getCourse } from "../data/courses";
 import { getPost } from "../data/blog";
+import { businessInfo, policies, policyPages, subscriptionPlans } from "../data/policies";
 import type { Level, QuizQuestion, SeoFields } from "../types";
 
 /**
@@ -55,6 +56,7 @@ const orgId = () => `${siteOrigin()}/#organization`;
 const websiteId = () => `${siteOrigin()}/#website`;
 
 function organization() {
+  const biz = businessInfo();
   const sameAs = Object.values(site.social).filter((u) => u && !/^https:\/\/www\.(youtube|instagram|facebook|linkedin)\.com\/?$/.test(u));
   return {
     "@type": "EducationalOrganization",
@@ -63,8 +65,15 @@ function organization() {
     url: `${siteOrigin()}/`,
     logo: { "@type": "ImageObject", url: absoluteUrl("/icon-512.png"), width: 512, height: 512 },
     description: site.description,
-    ...(site.email && !site.email.endsWith(".example") ? { email: site.email } : {}),
-    address: { "@type": "PostalAddress", addressLocality: site.location.split(",")[0]?.trim(), addressCountry: "IN" },
+    ...(policies.business.legalName.trim() ? { legalName: policies.business.legalName.trim() } : {}),
+    ...(biz.email && !biz.email.endsWith(".example") ? { email: biz.email } : {}),
+    ...(policies.business.phone.trim() ? { telephone: biz.phone } : {}),
+    address: {
+      "@type": "PostalAddress",
+      ...(policies.business.address.trim() ? { streetAddress: biz.address.replace(/\s*\n\s*/g, ", ") } : {}),
+      addressLocality: site.location.split(",")[0]?.trim(),
+      addressCountry: "IN",
+    },
     ...(sameAs.length ? { sameAs } : {}),
   };
 }
@@ -183,6 +192,50 @@ function draftFor(path: string, search: string): Draft {
       description: `Contact ${site.name} by email, WhatsApp or the contact form. We reply within one working day.`,
       crumbs: [{ name: "Contact", path: "/contact" }],
       schema: [{ "@type": "ContactPage", url: absoluteUrl("/contact"), about: { "@id": orgId() } }],
+    };
+  }
+
+  if (section === "pricing" && parts.length === 1) {
+    const paid = courses.filter((c) => Number(c.price) > 0);
+    const offers = [
+      ...subscriptionPlans.map((p) => ({ name: p.name, price: p.price, path: "/pricing" })),
+      ...courses.map((c) => ({ name: c.title, price: Number(c.price) || 0, path: `/courses/${c.id}` })),
+    ];
+    const lowest = Math.min(...[...subscriptionPlans, ...paid].map((x) => Number(x.price)).filter((n) => n > 0));
+    return {
+      title: "Courses and Pricing (INR)",
+      description: `Prices for every ${site.name} course and subscription plan in Indian Rupees${Number.isFinite(lowest) ? `, from ₹${lowest}` : ""}. Grammar, vocabulary and spoken English lessons are free.`,
+      crumbs: [{ name: "Pricing", path: "/pricing" }],
+      schema: [
+        {
+          "@type": "OfferCatalog",
+          name: `${site.name} courses and plans`,
+          url: absoluteUrl("/pricing"),
+          itemListElement: offers.map((o) => ({
+            "@type": "Offer",
+            name: o.name,
+            price: o.price,
+            priceCurrency: "INR",
+            url: absoluteUrl(o.path),
+            seller: { "@id": orgId() },
+          })),
+        },
+      ],
+    };
+  }
+  const policyPage = parts.length === 1 ? policyPages.find((p) => p.path === `/${section}`) : undefined;
+  if (policyPage) {
+    const doc = policies[policyPage.key];
+    const about: Record<string, string> = {
+      terms: `The terms for using ${site.name} and buying its online English courses and subscription plans, including prices in INR, payment, delivery and governing law.`,
+      refunds: `How cancellations and refunds work for ${site.name} courses and subscription plans: eligibility, how to ask and how refunds are paid.`,
+      privacy: `What personal information ${site.name} collects, how it is used and shared, and how to ask for it to be corrected or deleted.`,
+    };
+    return {
+      title: doc.title,
+      description: about[policyPage.key],
+      crumbs: [{ name: doc.title, path: policyPage.path }],
+      schema: [{ "@type": "WebPage", url: absoluteUrl(policyPage.path), ...(doc.updated ? { dateModified: doc.updated } : {}), publisher: { "@id": orgId() } }],
     };
   }
 

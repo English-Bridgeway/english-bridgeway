@@ -169,6 +169,20 @@ export const localApi: AdminApi = {
       }),
     );
   },
+  async getPolicies() {
+    const db = readDemoDb();
+    owner(db);
+    return wait(clone(db.policies ?? {}));
+  },
+  async savePolicies(policies) {
+    return wait(
+      updateDemoDb((db) => {
+        log(db, owner(db).email, "Updated policies and business details");
+        db.policies = clone(policies);
+        return clone(policies);
+      }),
+    );
+  },
   async getPayments() {
     const db = readDemoDb();
     owner(db);

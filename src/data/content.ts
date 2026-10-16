@@ -6,6 +6,8 @@ import { spokenLessons } from "./spokenEnglish";
 import { quizCategories, quizzes } from "./quizzes";
 import { courses } from "./courses";
 import { blogPosts } from "./blog";
+import { policies, subscriptionPlans, type Policies } from "./policies";
+import type { SubscriptionPlan } from "../types";
 
 /**
  * Everything the admin panel can edit, as one bundle.
@@ -30,6 +32,10 @@ export type CollectionKey = keyof ContentCollections;
 export interface ContentBundle {
   site: SiteSettings;
   collections: ContentCollections;
+  /** Business details and legal pages (Admin → Policies & business). */
+  policies?: Policies;
+  /** Subscription plans for sale, for the Pricing page. */
+  plans?: SubscriptionPlan[];
 }
 
 /** The field that identifies an item (and forms its URL slug) in each collection. */
@@ -49,7 +55,7 @@ const live: ContentCollections = { grammarTopics, grammarLessons, vocabularyWord
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
 // Snapshot taken before anything is applied, used to seed the database and the demo admin.
-const bundled: ContentBundle = clone({ site, collections: live });
+const bundled: ContentBundle = clone({ site, collections: live, policies });
 
 export function getBundledContent(): ContentBundle {
   return clone(bundled);
@@ -60,6 +66,8 @@ export function applyContent(bundle: Partial<ContentBundle> & { collections?: Pa
       voice: { ...site.voice, ...(bundle.site.voice ?? {}) },
       seo: { ...site.seo, ...(bundle.site.seo ?? {}) },
     });
+  if (bundle.policies) applyPolicies(bundle.policies);
+  if (Array.isArray(bundle.plans)) subscriptionPlans.splice(0, subscriptionPlans.length, ...bundle.plans);
   for (const key of Object.keys(live) as CollectionKey[]) {
     const items = bundle.collections?.[key];
     if (Array.isArray(items)) {
@@ -68,5 +76,18 @@ export function applyContent(bundle: Partial<ContentBundle> & { collections?: Pa
       const fixed = key === "courses" ? (items as Course[]).map((c) => ({ ...c, price: Number(c.price) || 0 })) : items;
       target.splice(0, target.length, ...fixed);
     }
+  }
+}
+
+/** Saved policies over the defaults; a blank policy text keeps the default wording. */
+function applyPolicies(saved: Partial<Policies>) {
+  const defaults = bundled.policies!;
+  policies.business = { ...defaults.business, ...(saved.business ?? {}) };
+  policies.pricingNote = saved.pricingNote ?? defaults.pricingNote;
+  for (const k of ["terms", "refunds", "privacy"] as const) {
+    const doc = saved[k];
+    policies[k] = doc?.body?.trim()
+      ? { title: doc.title?.trim() || defaults[k].title, updated: doc.updated || defaults[k].updated, body: doc.body }
+      : { ...defaults[k] };
   }
 }
