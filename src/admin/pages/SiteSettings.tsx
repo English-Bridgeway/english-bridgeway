@@ -14,7 +14,8 @@ const fields: { key: keyof SiteSettings; label: string; hint?: string; wide?: bo
   { key: "url", label: "Website address", hint: "Used for canonical links, sitemap.xml and social previews, e.g. https://englishbridgeway.com (no slash at the end)." },
   { key: "email", label: "Contact email" },
   { key: "whatsapp", label: "WhatsApp number (shown)" },
-  { key: "whatsappLink", label: "WhatsApp link", hint: "https://wa.me/91XXXXXXXXXX" },
+  { key: "whatsappLink", label: "WhatsApp link", hint: "https://wa.me/91XXXXXXXXXX (country code, no + or spaces). The home page WhatsApp button chats with this number." },
+  { key: "whatsappMessage", label: "WhatsApp message", hint: "Pre-filled in the chat when a visitor taps the home page WhatsApp button.", wide: true },
   { key: "location", label: "Location" },
   { key: "hours", label: "Support hours" },
 ];

@@ -1,6 +1,7 @@
 import { useStartLearning } from "../Courses/useCourseProgress";
 import { ArrowRight, CircleCheck } from "lucide-react";
-import { Button } from "../../components/Button";
+import { Button, buttonClasses } from "../../components/Button";
+import { WhatsAppIcon } from "../../components/SocialIcons";
 import { StatCard } from "../../components/StatCard";
 import { TopicCard } from "../../components/TopicCard";
 import { LessonCard } from "../../components/LessonCard";
@@ -8,7 +9,7 @@ import { CourseCard } from "../../components/CourseCard";
 import { SectionHeading } from "../../components/SectionHeading";
 import { HeroIllustration } from "../../components/HeroIllustration";
 import { WordOfTheDay } from "../../components/WordOfTheDay";
-import { site } from "../../data/site";
+import { site, whatsappChatUrl } from "../../data/site";
 import { grammarLessons } from "../../data/grammar";
 import { vocabularyWords } from "../../data/vocabulary";
 import { spokenLessons } from "../../data/spokenEnglish";
@@ -50,9 +51,9 @@ export default function Home() {
               Learn grammar, build vocabulary, practice spoken English, and test your knowledge with simple, practical lessons.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button to={start.to} size="lg" variant="accent">
-                {start.resume ? "Continue Learning" : "Start Learning"} <ArrowRight className="h-5 w-5" aria-hidden="true" />
-              </Button>
+              <a href={whatsappChatUrl()} target="_blank" rel="noopener noreferrer" className={buttonClasses("accent", "lg")}>
+                <WhatsAppIcon className="h-5 w-5" /> Chat on WhatsApp
+              </a>
               <Button to="/courses" size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white">Explore Courses</Button>
             </div>
             <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80">

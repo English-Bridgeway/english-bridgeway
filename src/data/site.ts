@@ -8,6 +8,8 @@ export interface SiteSettings {
   email: string;
   whatsapp: string;
   whatsappLink: string;
+  /** Message pre-filled in WhatsApp when a visitor taps a "Chat on WhatsApp" button. */
+  whatsappMessage: string;
   location: string;
   hours: string;
   social: { youtube: string; instagram: string; facebook: string; linkedin: string };
@@ -36,6 +38,7 @@ export const site: SiteSettings = {
   email: "hello@englishbridgeway.example",
   whatsapp: "+91 98765 43210",
   whatsappLink: "https://wa.me/919876543210",
+  whatsappMessage: "Hi, I am interested in learning the English course.",
   location: "Pune, Maharashtra, India",
   hours: "Mon to Sat, 9:00 a.m. to 7:00 p.m. IST",
   social: {
@@ -54,6 +57,13 @@ export const site: SiteSettings = {
   voice: { name: "", pitch: 1.15, rate: 0.92 },
   seo: { ogImage: "/og-image.png", googleVerification: "", bingVerification: "", twitter: "" },
 };
+
+/** wa.me chat link with the pre-filled message. Uses the WhatsApp link's number, or the shown number if the link has none. */
+export function whatsappChatUrl(message = site.whatsappMessage): string {
+  const digits = (site.whatsappLink.match(/wa\.me\/(\d+)/)?.[1] ?? site.whatsapp).replace(/\D/g, "");
+  const text = message.trim();
+  return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
+}
 
 export const mainNav = [
   { label: "Home", to: "/" },
