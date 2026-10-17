@@ -70,6 +70,41 @@ export async function saveSiteSettings(site: Record<string, unknown>): Promise<v
   await write('site', site);
 }
 
+// ---- Business details and policy pages (Admin → Policies & business) ----
+
+const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+
+export async function getPolicies(): Promise<Record<string, unknown> | null> {
+  return read<Record<string, unknown>>('policies');
+}
+
+/** Keeps only the known fields. A blank policy text means "use the website's default wording". */
+export async function savePolicies(input: unknown): Promise<Record<string, unknown>> {
+  const r = (input ?? {}) as Record<string, Record<string, unknown> | undefined>;
+  const b = r.business ?? {};
+  const doc = (d: Record<string, unknown> | undefined) => ({
+    title: text(d?.title, 120),
+    updated: /^\d{4}-\d{2}-\d{2}$/.test(String(d?.updated ?? '')) ? String(d!.updated) : '',
+    body: text(d?.body, 60_000),
+  });
+  const policies = {
+    business: {
+      legalName: text(b.legalName, 160),
+      address: text(b.address, 400),
+      phone: text(b.phone, 40),
+      email: text(b.email, 254),
+      gstin: text(b.gstin, 20).toUpperCase(),
+      jurisdiction: text(b.jurisdiction, 80),
+    },
+    pricingNote: text((input as Record<string, unknown> | null)?.pricingNote, 400),
+    terms: doc(r.terms),
+    refunds: doc(r.refunds),
+    privacy: doc(r.privacy),
+  };
+  await write('policies', policies);
+  return policies;
+}
+
 // ---- Payments ----
 
 export async function getPaymentConfig(): Promise<PaymentConfig> {

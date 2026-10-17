@@ -21,7 +21,7 @@ const indexable = (item: { seo?: SeoFields }) => !item.seo?.noindex;
 export function getSitemapEntries(): SitemapEntry[] {
   const item = (collection: CollectionKey, key: string, path: string, lastmod?: string): SitemapEntry => ({ path, source: { collection, key }, lastmod });
   return [
-    ...["/", "/grammar", "/vocabulary", "/spoken-english", "/quiz", "/courses", "/blog", "/contact"].map((path) => ({ path })),
+    ...["/", "/grammar", "/vocabulary", "/spoken-english", "/quiz", "/courses", "/pricing", "/blog", "/contact", "/terms", "/refunds", "/privacy"].map((path) => ({ path })),
     ...grammarTopics.filter(indexable).map((t) => item("grammarTopics", t.id, `/grammar/${t.id}`)),
     ...grammarLessons.filter(indexable).map((l) => item("grammarLessons", l.id, `/grammar/${l.topicId}/${l.id}`)),
     ...vocabularyWords.filter(indexable).map((w) => item("vocabularyWords", w.id, `/vocabulary/${w.id}`)),

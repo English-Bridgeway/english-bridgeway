@@ -2,6 +2,8 @@ import { collectionIdField, getBundledContent, type CollectionKey, type ContentB
 import type { SiteSettings } from "../data/site";
 import type { AccessSettings, AdminPlan, AdminUser, AuditEntry, ContactMessage, ContentRecord, Order } from "../admin/api/types";
 import { storage } from "./storage";
+import { toPublicPlan } from "./plans";
+import type { Policies } from "../data/policies";
 
 /**
  * Demo backend for when no API is configured (VITE_API_BASE unset), e.g. the preview build.
@@ -22,6 +24,8 @@ export interface DemoDb {
   /** AI tutor provider. In demo mode the browser calls it directly with this key. */
   /** Subscription plans (added later, so may be missing). */
   plans?: AdminPlan[];
+  /** Business details and legal pages (added later, so may be missing). */
+  policies?: Policies;
   ai?: { enabled: boolean; baseUrl: string; model: string; apiKey: string; instructions: string; dailyLimit: number };
 }
 
@@ -94,5 +98,6 @@ export function demoContentBundle(): ContentBundle | null {
   const collections = Object.fromEntries(
     (Object.keys(db.content) as CollectionKey[]).map((c) => [c, [...db.content[c]].sort((a, b) => a.position - b.position).filter((r) => r.published).map((r) => r.data)]),
   ) as unknown as ContentCollections;
-  return { site: db.site, collections };
+  const plans = (db.plans ?? []).filter((p) => p.active && p.price > 0).map(toPublicPlan);
+  return { site: db.site, collections, plans, ...(db.policies ? { policies: db.policies } : {}) };
 }

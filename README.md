@@ -184,6 +184,16 @@ demo admin panel; some providers block that, so test on the real server.
 | Admins | Owners (everything) and editors (content, orders, messages); add, disable, reset passwords |
 | Activity log | Every sign-in and change, with who did it |
 
+## Policy pages and pricing (payment gateway approval)
+
+Cashfree (and most Indian payment gateways) check for these public pages before approving a website. All are server-rendered, linked from the footer and listed in `/sitemap.xml`:
+
+- `/contact`: Contact Us, with the legal business name, email, phone, WhatsApp, registered address and GSTIN.
+- `/terms`, `/refunds`, `/privacy`: Terms and Conditions, Refunds and Cancellations, Privacy Policy.
+- `/pricing`: every subscription plan and course with its price in INR, plus the free lessons.
+
+Edit the business details and the policy text in **Admin → Policies & business** (owner only; stored in the `settings` table under `policies`). The text uses `{business}`, `{address}`, `{email}`, `{phone}` and `{jurisdiction}` placeholders, so filling in the business details once updates every page. Default wording lives in `src/data/policies.ts`.
+
 ## Backend and payments (`server/`)
 
 ```bash

@@ -4,6 +4,8 @@ import type { CallLogEntry, LearnerAccess, LearnerOffer, LearnerProfile, UsageSu
 
 // Shapes shared by the admin panel and the API in server/. Keep them in sync with server/src/types.ts.
 
+import type { Policies } from "../../data/policies";
+
 export type AdminRole = "owner" | "editor";
 
 export interface AdminUser {
@@ -202,6 +204,9 @@ export interface AdminApi {
 
   getSite(): Promise<SiteSettings>;
   saveSite(site: SiteSettings): Promise<SiteSettings>;
+  /** Saved business details and policy pages; missing fields use the website's defaults. */
+  getPolicies(): Promise<Partial<Policies>>;
+  savePolicies(policies: Policies): Promise<Partial<Policies>>;
 
   getPayments(): Promise<PaymentSettings>;
   savePayments(input: PaymentSettingsInput): Promise<PaymentSettings>;

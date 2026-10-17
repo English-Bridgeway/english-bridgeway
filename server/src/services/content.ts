@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { ContentItem } from '../db';
-import { getSiteSettings } from './settings';
+import { getPolicies, getSiteSettings } from './settings';
+import { activePlans, publicPlan } from './plans';
 
 export const COLLECTIONS = [
   'grammarTopics',
@@ -48,8 +49,8 @@ export async function publicBundle() {
   for (const row of rows) {
     if (isCollection(row.collection)) collections[row.collection].push(row.data);
   }
-  const site = await getSiteSettings();
-  return { ...(site ? { site } : {}), collections };
+  const [site, policies, plans] = await Promise.all([getSiteSettings(), getPolicies(), activePlans()]);
+  return { ...(site ? { site } : {}), ...(policies ? { policies } : {}), plans: plans.map(publicPlan), collections };
 }
 
 export async function getPublishedItem(collection: CollectionKey, key: string) {

@@ -5,7 +5,7 @@ import { asyncHandler, rateLimit, requireAdmin, requireOwner } from '../middlewa
 import { adminDto, checkPassword, hashPassword, signToken, validatePassword } from '../services/auth';
 import { audit } from '../services/audit';
 import { COLLECTIONS, ID_FIELD, isCollection, toRecord } from '../services/content';
-import { getPaymentConfig, getSiteSettings, paymentSettingsForAdmin, savePaymentConfig, saveSiteSettings } from '../services/settings';
+import { getPaymentConfig, getPolicies, getSiteSettings, paymentSettingsForAdmin, savePaymentConfig, savePolicies, saveSiteSettings } from '../services/settings';
 import { testCredentials } from '../services/cashfree';
 import { OrderError, orderDto, refundOrder, syncOrder } from '../services/orders';
 import { getPlans, PlanError, savePlans } from '../services/plans';
@@ -202,6 +202,26 @@ adminRouter.put(
     await saveSiteSettings(site);
     await audit(req.admin!.email, 'Updated site settings');
     res.json(site);
+  }),
+);
+
+// ---- Business details and policy pages (owner only) ----
+
+adminRouter.get(
+  '/settings/policies',
+  requireOwner,
+  asyncHandler(async (_req, res) => {
+    res.json((await getPolicies()) ?? {});
+  }),
+);
+
+adminRouter.put(
+  '/settings/policies',
+  requireOwner,
+  asyncHandler(async (req, res) => {
+    const policies = await savePolicies(req.body);
+    await audit(req.admin!.email, 'Updated policies and business details');
+    res.json(policies);
   }),
 );
 
