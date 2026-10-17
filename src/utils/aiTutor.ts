@@ -25,7 +25,12 @@ export interface ChatTurn {
 export interface AiStatus {
   enabled: boolean;
   allowed: boolean;
-  remainingToday: number | null;
+  /** Messages left (today for paid learners, for the whole trial otherwise); null = no limit. */
+  remaining: number | null;
+  limit?: number | null;
+  period?: "day" | "trial" | "none";
+  /** Why the learner can't chat, when they can't. */
+  message?: string | null;
 }
 
 export class AiTutorError extends Error {
@@ -37,18 +42,18 @@ export class AiTutorError extends Error {
 export async function getAiStatus(token: string, demoAllowed: boolean): Promise<AiStatus> {
   if (!isLive) {
     const ai = readDemoDb().ai ?? DEMO_AI_DEFAULTS;
-    return { enabled: ai.enabled && Boolean(ai.apiKey), allowed: demoAllowed, remainingToday: null };
+    return { enabled: ai.enabled && Boolean(ai.apiKey), allowed: demoAllowed, remaining: null };
   }
   return apiFetch<AiStatus>("/ai/status", { token });
 }
 
-export async function askTutor(token: string, scenario: ScenarioId, messages: ChatTurn[], learnerName: string): Promise<{ reply: string; remainingToday: number | null }> {
+export async function askTutor(token: string, scenario: ScenarioId, messages: ChatTurn[], learnerName: string): Promise<{ reply: string; remaining: number | null; period?: AiStatus["period"] }> {
   if (!isLive) return demoAsk(scenario, messages, learnerName);
   try {
     return await apiFetch("/ai/chat", { method: "POST", token, json: { scenario, messages: messages.slice(-16) } });
   } catch (e) {
     if (e instanceof HttpError) {
-      const code = e.status === 402 ? "access" : e.status === 429 && /limit/i.test(e.message) ? "limit" : e.status === 503 ? "off" : undefined;
+      const code = e.status === 402 ? "access" : e.status === 429 && /limit|used/i.test(e.message) ? "limit" : e.status === 503 ? "off" : undefined;
       throw new AiTutorError(e.message, code);
     }
     throw new AiTutorError("Could not reach the server. Check your connection.");
@@ -88,7 +93,7 @@ async function demoAsk(scenario: ScenarioId, messages: ChatTurn[], learnerName: 
   if (!res.ok) throw new AiTutorError(`The AI service returned an error (${res.status})${data?.error?.message ? `: ${data.error.message}` : ""}`);
   const reply = String(data?.choices?.[0]?.message?.content ?? "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
   if (!reply) throw new AiTutorError("The AI service sent an empty answer. Please try again.");
-  return { reply, remainingToday: null };
+  return { reply, remaining: null };
 }
 
 // ---- Speech recognition (Chrome, Edge, Safari) ----

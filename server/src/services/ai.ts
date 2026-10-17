@@ -1,5 +1,6 @@
 import { Setting, type Learner } from '../db';
 import { decryptSecret, encryptSecret, maskSecret } from './settings';
+import { countAiMessage, limitMessage, usageSummary } from './usage';
 
 // "Speak with AI": a spoken-English tutor backed by any OpenAI-compatible chat API (Groq,
 // Google Gemini, OpenRouter, OpenAI, a local Ollama…). The provider, model and key are set in
@@ -105,18 +106,6 @@ function systemPrompt(learner: Learner, scenario: string, extra: string) {
     .join('\n');
 }
 
-// Per-learner daily message counts. In memory: fine for one API process, resets on restart.
-const usage = new Map<string, number>();
-const today = () => new Date().toISOString().slice(0, 10);
-export function usedToday(learnerId: string) {
-  return usage.get(`${today()}|${learnerId}`) ?? 0;
-}
-function countMessage(learnerId: string) {
-  const key = `${today()}|${learnerId}`;
-  usage.set(key, (usage.get(key) ?? 0) + 1);
-  if (usage.size > 50_000) for (const k of usage.keys()) if (!k.startsWith(today())) usage.delete(k);
-}
-
 export type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
 export function cleanMessages(raw: unknown): ChatMessage[] {
@@ -155,15 +144,16 @@ async function complete(cfg: AiConfig, messages: { role: string; content: string
 export async function tutorReply(learner: Learner, input: { messages?: unknown; scenario?: unknown }) {
   const cfg = await getAiConfig();
   if (!cfg.enabled) throw new AiError('Speak with AI is switched off right now.', 503, 'off');
-  if (cfg.dailyLimit && usedToday(learner.id) >= cfg.dailyLimit) {
-    throw new AiError(`You've reached today's limit of ${cfg.dailyLimit} messages. Come back tomorrow!`, 429, 'limit');
+  const { ai } = await usageSummary(learner);
+  if (ai.remaining !== null && ai.remaining <= 0) {
+    throw new AiError(limitMessage('ai', ai), ai.period === 'day' ? 429 : 402, ai.period === 'day' ? 'limit' : 'access');
   }
   const messages = cleanMessages(input.messages);
   const scenario = typeof input.scenario === 'string' && SCENARIOS[input.scenario] ? input.scenario : 'free';
   if (!messages.length || messages[messages.length - 1].role !== 'user') throw new AiError('Say something first.', 400);
-  countMessage(learner.id);
+  await countAiMessage(learner.id);
   const reply = await complete(cfg, [{ role: 'system', content: systemPrompt(learner, scenario, cfg.instructions) }, ...messages]);
-  return { reply, remainingToday: cfg.dailyLimit ? Math.max(0, cfg.dailyLimit - usedToday(learner.id)) : null };
+  return { reply, remaining: ai.remaining === null ? null : ai.remaining - 1, period: ai.period };
 }
 
 /** For the admin's "Test" button: one tiny request with the saved settings. */

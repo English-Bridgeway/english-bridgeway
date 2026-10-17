@@ -374,9 +374,15 @@ export const localApi: AdminApi = {
     return wait(
       updateDemoDb((db) => {
         const admin = owner(db);
-        db.access = { trialHours: Math.max(0, Math.min(24 * 90, Math.round(input.trialHours) || 0)), aiForBuyers: input.aiForBuyers };
-        log(db, admin.email, "Updated learner access settings", `trial ${db.access.trialHours}h`);
-        return { ...db.access };
+        const clamp = (v: number, max: number) => Math.max(0, Math.min(max, Math.round(v) || 0));
+        const next = {
+          trialHours: clamp(input.trialHours, 24 * 90), freeLessons: clamp(input.freeLessons, 50),
+          trialAiMessages: clamp(input.trialAiMessages, 100_000), trialCallMinutes: clamp(input.trialCallMinutes, 10_000),
+          paidAiPerDay: clamp(input.paidAiPerDay, 100_000), paidCallMinutesPerDay: clamp(input.paidCallMinutesPerDay, 1440),
+        };
+        db.access = next;
+        log(db, admin.email, "Updated learner access settings", `trial ${next.trialHours}h`);
+        return { ...next };
       }),
     );
   },

@@ -33,7 +33,7 @@ export default function SpeakAI() {
 
   useEffect(() => {
     if (!token) return;
-    getAiStatus(token, Boolean(access?.ai)).then(setStatus).catch(() => setStatus({ enabled: true, allowed: Boolean(access?.ai), remainingToday: null }));
+    getAiStatus(token, Boolean(access?.ai)).then(setStatus).catch(() => setStatus({ enabled: true, allowed: Boolean(access?.ai), remaining: null }));
   }, [token, access?.ai]);
 
   useEffect(() => {
@@ -111,13 +111,15 @@ export default function SpeakAI() {
     setThinking(true);
     setError(null);
     try {
-      const { reply, remainingToday } = await askTutor(token, scenario, next, user?.name ?? "friend");
+      const { reply, remaining } = await askTutor(token, scenario, next, user?.name ?? "friend");
       const all: ChatTurn[] = [...next, { role: "assistant", content: reply }];
       setTurns(all);
-      setStatus((s) => (s ? { ...s, remainingToday } : s));
+      setStatus((s) => (s ? { ...s, remaining } : s));
       speakReply(splitCorrection(reply).text, all.length - 1, fromVoice);
     } catch (e) {
       setError({ message: e instanceof Error ? e.message : "Something went wrong.", code: e instanceof AiTutorError ? e.code : undefined });
+      // Free messages used up: show the plans screen instead of the chat.
+      if (e instanceof AiTutorError && e.code === "access") setStatus((st) => (st ? { ...st, allowed: false, remaining: 0, period: "trial", message: e.message } : st));
     } finally {
       setThinking(false);
     }
@@ -142,12 +144,14 @@ export default function SpeakAI() {
         <h1 className="text-2xl font-bold sm:text-3xl">Speak with AI</h1>
         <div className="mt-6 rounded-2xl border border-line bg-white p-8 text-center shadow-card">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ink-50 text-ink-700"><Lock className="h-7 w-7" aria-hidden="true" /></span>
-          <h2 className="mt-4 text-xl font-semibold">{access?.trialEndsAt ? "Your free trial has ended" : "Speak with AI is for members"}</h2>
-          <p className="mx-auto mt-2 max-w-md text-muted">Buy a course to keep practising speaking with your AI tutor, or contact us for a plan.</p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
-            <Button to="/learn/courses">See courses</Button>
-            <Button to="/contact" variant="outline">Contact us</Button>
-          </div>
+          <h2 className="mt-4 text-xl font-semibold">{status.period === "day" ? "You've used today's messages" : status.period === "trial" ? "Your free AI messages are used up" : access?.trialEndsAt ? "Your free trial has ended" : "Speak with AI is for members"}</h2>
+          <p className="mx-auto mt-2 max-w-md text-muted">{status.message ?? "Subscribe or buy a course to keep practising speaking with your AI tutor."}</p>
+          {status.period !== "day" && (
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
+              <Button to="/learn/billing#plans">See plans</Button>
+              <Button to="/learn/courses" variant="outline">See courses</Button>
+            </div>
+          )}
         </div>
         <AccessBanner className="mt-6" />
       </div>
@@ -162,7 +166,11 @@ export default function SpeakAI() {
           <h1 className="text-2xl font-bold sm:text-3xl">Speak with AI</h1>
           <p className="mt-1 text-muted">Talk out loud with Bridget, your AI English partner. She replies by voice and fixes your mistakes.</p>
         </div>
-        {status?.remainingToday != null && <span className="text-xs text-muted">{status.remainingToday} messages left today</span>}
+        {status?.remaining != null && (
+          <span className={cn("rounded-full px-2.5 py-1 text-xs font-semibold", status.remaining <= 10 ? "bg-amber-50 text-amber-800" : "bg-ink-50 text-muted")}>
+            {status.remaining} message{status.remaining === 1 ? "" : "s"} left{status.period === "day" ? " today" : status.period === "trial" ? " in your free trial" : ""}
+          </span>
+        )}
       </div>
 
       {status && !status.enabled && (
@@ -236,7 +244,7 @@ export default function SpeakAI() {
       {error && (
         <Alert tone="error" className="mt-4">
           {error.message}
-          {error.code === "access" && <> <Link to="/learn/courses" className="font-semibold underline">See courses</Link></>}
+          {(error.code === "access" || error.code === "limit") && <> <Link to="/learn/billing#plans" className="font-semibold underline">See plans</Link></>}
         </Alert>
       )}
 

@@ -1,33 +1,62 @@
 import { Setting, type Learner, type LearnerOffer } from '../db';
 
-// What a learner can open. Free courses are open to everyone and a paid course stays open once
-// bought. On top of that, "full access" opens every course and the AI tutor: the free trial
-// right after sign-up, or the access an admin grants (N months, an end date, or unlimited).
+// What a learner can open. A bought course stays open for good, and "full access" (a
+// subscription, or access an admin grants: N months, an end date, or unlimited) opens every
+// course. The free trial after sign-up is a taste: the first lesson(s) of each course, a few AI
+// tutor messages and a couple of minutes of live calls, then the learner is asked to pay.
+// Paid learners (full access or any bought course) get daily AI and call allowances.
+// Every number here is set in Admin → Learners → Free trial and limits.
 
 export interface AccessSettings {
-  /** Hours of full access a new account gets. 0 turns the trial off. */
+  /** Hours the free trial lasts after sign-up. 0 turns the trial off. */
   trialHours: number;
-  /** Who may use Speak with AI: anyone with full access, or also learners who bought a course. */
-  aiForBuyers: boolean;
+  /** Lessons at the start of each course that trial learners can open. */
+  freeLessons: number;
+  /** AI tutor messages for the whole free trial. */
+  trialAiMessages: number;
+  /** Minutes of live calls for the whole free trial. */
+  trialCallMinutes: number;
+  /** AI tutor messages per day for paid learners (0 = no limit). */
+  paidAiPerDay: number;
+  /** Minutes of live calls per day for paid learners (0 = no limit). */
+  paidCallMinutesPerDay: number;
 }
 
-const DEFAULTS: AccessSettings = { trialHours: 24, aiForBuyers: true };
+export const ACCESS_DEFAULTS: AccessSettings = {
+  trialHours: 24,
+  freeLessons: 1,
+  trialAiMessages: 100,
+  trialCallMinutes: 2,
+  paidAiPerDay: 1000,
+  paidCallMinutesPerDay: 45,
+};
+
+const LIMITS: Record<keyof AccessSettings, number> = {
+  trialHours: 24 * 90,
+  freeLessons: 50,
+  trialAiMessages: 100_000,
+  trialCallMinutes: 10_000,
+  paidAiPerDay: 100_000,
+  paidCallMinutesPerDay: 24 * 60,
+};
+
+const clampSetting = (key: keyof AccessSettings, v: unknown, fallback: number) => {
+  const n = Number(v);
+  return v === undefined || v === null || v === '' || !Number.isFinite(n) ? fallback : Math.max(0, Math.min(LIMITS[key], Math.round(n)));
+};
 
 export async function getAccessSettings(): Promise<AccessSettings> {
   const row = await Setting.findByPk('learnerAccess');
-  const v = (row?.value ?? {}) as Partial<AccessSettings>;
-  return {
-    trialHours: Number.isFinite(Number(v.trialHours)) ? Math.max(0, Math.min(24 * 90, Number(v.trialHours))) : DEFAULTS.trialHours,
-    aiForBuyers: v.aiForBuyers ?? DEFAULTS.aiForBuyers,
-  };
+  const v = (row?.value ?? {}) as Partial<Record<keyof AccessSettings, unknown>>;
+  const out = {} as AccessSettings;
+  for (const key of Object.keys(ACCESS_DEFAULTS) as (keyof AccessSettings)[]) out[key] = clampSetting(key, v[key], ACCESS_DEFAULTS[key]);
+  return out;
 }
 
-export async function saveAccessSettings(input: Partial<AccessSettings>): Promise<AccessSettings> {
+export async function saveAccessSettings(input: Partial<Record<keyof AccessSettings, unknown>>): Promise<AccessSettings> {
   const current = await getAccessSettings();
-  const next: AccessSettings = {
-    trialHours: input.trialHours === undefined ? current.trialHours : Math.max(0, Math.min(24 * 90, Math.round(Number(input.trialHours) || 0))),
-    aiForBuyers: input.aiForBuyers === undefined ? current.aiForBuyers : Boolean(input.aiForBuyers),
-  };
+  const next = {} as AccessSettings;
+  for (const key of Object.keys(ACCESS_DEFAULTS) as (keyof AccessSettings)[]) next[key] = clampSetting(key, input[key], current[key]);
   await Setting.upsert({ key: 'learnerAccess', value: next as unknown as Record<string, unknown> });
   return next;
 }
@@ -36,7 +65,7 @@ export type AccessStatus = 'unlimited' | 'active' | 'trial' | 'expired' | 'block
 
 export interface AccessState {
   status: AccessStatus;
-  /** True while every course is open (trial, granted access or unlimited). */
+  /** True while every course is open (subscription, granted access or unlimited). The trial is not full access. */
   full: boolean;
   /** When full access ends (null when unlimited or when there is none). */
   until: string | null;
@@ -56,7 +85,7 @@ export function accessState(l: Learner, now = Date.now()): AccessState {
   if (!l.active) return { ...base, status: 'blocked', full: false, until: null };
   if (l.accessUnlimited) return { ...base, status: 'unlimited', full: true, until: null };
   if (grantedEnds > now && grantedEnds >= trialEnds) return { ...base, status: 'active', full: true, until: l.accessUntil!.toISOString() };
-  if (trialEnds > now) return { ...base, status: 'trial', full: true, until: l.trialEndsAt!.toISOString() };
+  if (trialEnds > now) return { ...base, status: 'trial', full: false, until: l.trialEndsAt!.toISOString() };
   return { ...base, status: 'expired', full: false, until: null };
 }
 

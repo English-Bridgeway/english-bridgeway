@@ -1,6 +1,6 @@
 import { collectionIdField, getBundledContent, type CollectionKey, type ContentBundle, type ContentCollections } from "../data/content";
 import type { SiteSettings } from "../data/site";
-import type { AdminPlan, AdminUser, AuditEntry, ContactMessage, ContentRecord, Order } from "../admin/api/types";
+import type { AccessSettings, AdminPlan, AdminUser, AuditEntry, ContactMessage, ContentRecord, Order } from "../admin/api/types";
 import { storage } from "./storage";
 
 /**
@@ -17,15 +17,17 @@ export interface DemoDb {
   messages: ContactMessage[];
   admins: (AdminUser & { password: string })[];
   audit: AuditEntry[];
-  /** Free trial length and who may use Speak with AI (added later, so may be missing). */
-  access?: { trialHours: number; aiForBuyers: boolean };
+  /** Free trial length and usage limits (added later, so may be missing or partial). */
+  access?: Partial<AccessSettings>;
   /** AI tutor provider. In demo mode the browser calls it directly with this key. */
   /** Subscription plans (added later, so may be missing). */
   plans?: AdminPlan[];
   ai?: { enabled: boolean; baseUrl: string; model: string; apiKey: string; instructions: string; dailyLimit: number };
 }
 
-export const DEMO_ACCESS_DEFAULTS = { trialHours: 24, aiForBuyers: true };
+export const DEMO_ACCESS_DEFAULTS: AccessSettings = {
+  trialHours: 24, freeLessons: 1, trialAiMessages: 100, trialCallMinutes: 2, paidAiPerDay: 1000, paidCallMinutesPerDay: 45,
+};
 export const DEMO_AI_DEFAULTS = { enabled: false, baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.1-8b-instant", apiKey: "", instructions: "", dailyLimit: 200 };
 
 const KEY = "english-bridgeway:demo-db";

@@ -11,6 +11,8 @@ import { courses } from "../../data/courses";
 import { formatDate, formatDateTime, timeLeft } from "../../utils/access";
 import { formatPrice } from "../../utils/format";
 import { cn } from "../../utils/cn";
+import { formatDuration } from "../../voice/callUi";
+import type { CallLogEntry, UsageSummary } from "../../types";
 
 const PROFILE_LABELS: [keyof Detail["profile"], string][] = [
   ["whatsapp", "WhatsApp"], ["dateOfBirth", "Date of birth"], ["gender", "Gender"], ["city", "City"], ["state", "State"], ["country", "Country"],
@@ -53,7 +55,7 @@ function AccessPanel({ l, onChange }: { l: Detail; onChange: (change: AccessChan
       </dl>
       {isOwner ? (
         <div className="mt-4 space-y-4 border-t border-line pt-4">
-          <p className="text-sm text-muted">Full access opens every course and Speak with AI.</p>
+          <p className="text-sm text-muted">Full access opens every course, with the paid daily AI and call allowances. A free trial opens only the first lesson(s) of each course.</p>
           <div className="flex flex-wrap items-end gap-2">
             <label className="text-sm">
               <span className="font-semibold">Give months</span>
@@ -157,6 +159,56 @@ function OfferPanel({ l, onSave }: { l: Detail; onSave: (o: Parameters<typeof ad
 }
 
 /** Admin → Learners → one learner: their details, photo, access, offer, block, note and payments. */
+const TIER_LABEL = { paid: "Paid", trial: "Free trial", none: "No access" } as const;
+
+function UsagePanel({ usage }: { usage: UsageSummary }) {
+  const period = (p: string) => (p === "day" ? "today" : p === "trial" ? "in the free trial" : "");
+  const line = (used: string, limit: string | null, p: string) => (limit === null ? `${used} ${period(p)} · no limit` : `${used} of ${limit} ${period(p)}`);
+  return (
+    <Panel title="Usage">
+      <dl className="divide-y divide-line">
+        <Row label="Plan">{TIER_LABEL[usage.tier]}{usage.tier === "trial" && usage.freeLessons !== null ? ` · first ${usage.freeLessons} lesson${usage.freeLessons === 1 ? "" : "s"} of each course` : ""}</Row>
+        <Row label="AI chat messages">{line(String(usage.ai.used), usage.ai.limit === null ? null : String(usage.ai.limit), usage.ai.period)}</Row>
+        <Row label="Live call time">{line(formatDuration(usage.call.used), usage.call.limit === null ? null : formatDuration(usage.call.limit), usage.call.period)}</Row>
+      </dl>
+      <p className="mt-2 text-xs text-muted">Change the allowances in Learners → Free trial and limits.</p>
+    </Panel>
+  );
+}
+
+const OUTCOME_LABEL: Record<CallLogEntry["outcome"], string> = {
+  completed: "Completed", "no-answer": "No answer", declined: "Declined", missed: "Missed", cancelled: "Cancelled", limit: "Minutes ran out", dropped: "Connection lost",
+};
+const DIRECTION_LABEL: Record<CallLogEntry["direction"], string> = { outgoing: "Outgoing", incoming: "Incoming", room: "Team room" };
+
+function CallsPanel({ calls }: { calls?: CallLogEntry[] }) {
+  const total = (calls ?? []).reduce((s, c) => s + c.talkSeconds, 0);
+  return (
+    <Panel title={`Call history${calls?.length ? ` · ${formatDuration(total)} talked` : ""}`}>
+      {calls?.length ? (
+        <div className="-mx-1 overflow-x-auto">
+          <table className="w-full min-w-[30rem] text-left text-sm">
+            <thead className="text-xs text-muted">
+              <tr><th className="px-1 py-2 font-medium">When</th><th className="px-1 py-2 font-medium">With</th><th className="px-1 py-2 font-medium">Type</th><th className="px-1 py-2 font-medium">Result</th><th className="px-1 py-2 text-right font-medium">Duration</th></tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {calls.map((c) => (
+                <tr key={c.id}>
+                  <td className="whitespace-nowrap px-1 py-2">{formatDateTime(c.startedAt)}</td>
+                  <td className="px-1 py-2"><span className="line-clamp-1">{c.withNames || c.roomName}</span></td>
+                  <td className="whitespace-nowrap px-1 py-2 text-muted">{DIRECTION_LABEL[c.direction]}</td>
+                  <td className="whitespace-nowrap px-1 py-2">{OUTCOME_LABEL[c.outcome]}</td>
+                  <td className="whitespace-nowrap px-1 py-2 text-right font-mono tabular-nums">{c.talkSeconds ? formatDuration(c.talkSeconds) : "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : <p className="text-sm text-muted">No live calls yet.</p>}
+    </Panel>
+  );
+}
+
 export default function LearnerDetail() {
   const { id = "" } = useParams();
   const navigate = useNavigate();
@@ -217,6 +269,7 @@ export default function LearnerDetail() {
         <div className="space-y-6">
           <AccessPanel l={l} onChange={(c) => act(() => adminApi.setLearnerAccess(l.id, c), "Access updated")} />
           <OfferPanel l={l} onSave={(o) => act(() => adminApi.setLearnerOffer(l.id, o), o ? "Offer saved" : "Offer removed")} />
+          {l.usage && <UsagePanel usage={l.usage} />}
         </div>
         <div className="space-y-6">
           <Panel title="Personal details">
@@ -251,6 +304,8 @@ export default function LearnerDetail() {
           )}
         </div>
       </div>
+
+      <div className="mt-6"><CallsPanel calls={l.calls} /></div>
 
       <Confirm open={blockOpen} title={`Block ${l.name}?`} confirmLabel="Block learner" onClose={() => setBlockOpen(false)}
         body="They are signed out on every device straight away and can't log in until you unblock them."

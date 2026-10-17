@@ -14,7 +14,7 @@ import { formatPrice } from "../../utils/format";
 
 /** Every course with the learner's progress, and which ones are open, bought or locked. */
 export default function MyCourses() {
-  const { canOpenCourse, hasCourse, priceFor, access } = useAuth();
+  const { canOpenCourse, freeLessonsFor, hasCourse, priceFor, access } = useAuth();
   const progressFor = useCourseProgress();
   const plans = usePlans();
   return (
@@ -32,9 +32,10 @@ export default function MyCourses() {
       <ul className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((c) => {
           const open = canOpenCourse(c);
+          const free = open ? 0 : freeLessonsFor(c);
           const paid = Boolean(c.price && c.price > 0);
           const p = progressFor(c);
-          const state = !paid ? "Free" : hasCourse(c.id) ? "Bought" : open ? "Open with your access" : "Locked";
+          const state = hasCourse(c.id) ? "Bought" : open ? (paid ? "Open with your access" : "Free") : free > 0 ? `${free} free lesson${free > 1 ? "s" : ""}` : "Locked";
           return (
             <li key={c.id} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card">
               <div className="relative flex h-28 items-end bg-brand-primary p-4">
@@ -54,15 +55,18 @@ export default function MyCourses() {
                   {paid && <span className="font-semibold text-ink-800">{formatPrice(priceFor(c))}</span>}
                 </p>
                 <div className="mt-auto pt-5">
-                  {open ? (
+                  {open || free > 0 ? (
                     <>
                       <ProgressBar value={p.percent} label={`${p.done} of ${p.total} lessons done`} showValue />
                       <Link to={`/learn/courses/${c.id}`} className={buttonClasses("primary", "md", "mt-4 w-full")}>
-                        <PlayCircle className="h-4 w-4" aria-hidden="true" /> {p.done ? "Continue" : "Start course"}
+                        <PlayCircle className="h-4 w-4" aria-hidden="true" /> {open ? (p.done ? "Continue" : "Start course") : `Start free lesson${free > 1 ? "s" : ""}`}
                       </Link>
+                      {!open && paid && <BuyCourse course={c} size="md" variant="outline" label="Unlock every lesson" className="mt-2" />}
                     </>
-                  ) : (
+                  ) : paid ? (
                     <BuyCourse course={c} size="md" label="Buy this course" />
+                  ) : (
+                    <Link to="/learn/billing#plans" className={buttonClasses("primary", "md", "w-full")}>See plans to unlock</Link>
                   )}
                 </div>
               </div>

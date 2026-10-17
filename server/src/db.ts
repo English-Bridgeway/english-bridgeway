@@ -263,6 +263,60 @@ AuditLog.init(
   { sequelize, tableName: 'audit_logs', underscored: true, updatedAt: false },
 );
 
+// What each learner used per day (India time): AI tutor messages and seconds on live calls.
+// Daily rows give the paid per-day limits; their sum gives the free trial's one-off allowance.
+export class LearnerUsage extends Model<InferAttributes<LearnerUsage>, InferCreationAttributes<LearnerUsage>> {
+  declare learnerId: string;
+  declare day: string;
+  declare aiMessages: CreationOptional<number>;
+  declare callSeconds: CreationOptional<number>;
+}
+
+LearnerUsage.init(
+  {
+    learnerId: { type: DataTypes.UUID, primaryKey: true },
+    day: { type: DataTypes.DATEONLY, primaryKey: true },
+    aiMessages: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    callSeconds: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+  },
+  { sequelize, tableName: 'learner_usage', underscored: true, timestamps: false },
+);
+
+export type CallDirection = 'outgoing' | 'incoming' | 'room';
+export type CallOutcome = 'completed' | 'no-answer' | 'declined' | 'missed' | 'cancelled' | 'limit' | 'dropped';
+
+// One row per learner per call: who they talked with, when, and for how long.
+export class CallLog extends Model<InferAttributes<CallLog>, InferCreationAttributes<CallLog>> {
+  declare id: CreationOptional<string>;
+  declare learnerId: string;
+  declare roomId: string;
+  declare roomName: string;
+  declare kind: 'direct' | 'team';
+  declare direction: CallDirection;
+  declare withNames: string;
+  declare startedAt: Date;
+  declare endedAt: Date;
+  declare talkSeconds: number;
+  declare outcome: CallOutcome;
+}
+
+CallLog.init(
+  {
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    learnerId: { type: DataTypes.UUID, allowNull: false },
+    roomId: { type: DataTypes.STRING(40), allowNull: false },
+    roomName: { type: DataTypes.STRING(160), allowNull: false },
+    kind: { type: DataTypes.STRING(10), allowNull: false },
+    direction: { type: DataTypes.STRING(10), allowNull: false },
+    withNames: { type: DataTypes.STRING(500), allowNull: false, defaultValue: '' },
+    startedAt: { type: DataTypes.DATE, allowNull: false },
+    endedAt: { type: DataTypes.DATE, allowNull: false },
+    talkSeconds: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    outcome: { type: DataTypes.STRING(12), allowNull: false },
+  },
+  { sequelize, tableName: 'call_logs', underscored: true, timestamps: false, indexes: [{ fields: ['learner_id', 'started_at'] }] },
+);
+
 /** Creates any missing tables. Safe to run on every start; it never drops data. */
 export async function initDatabase(): Promise<void> {
   await sequelize.authenticate();
