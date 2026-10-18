@@ -5,7 +5,8 @@ import {
   AccountError, learnerDto, loginLearner, purchasedCourseIds, registerLearner, removeAvatar, saveAvatar, signLearnerToken, updateProfile,
 } from '../services/learners';
 import { accessState, activeOffer } from '../services/access';
-import { AiError, getAiConfig, tutorReply } from '../services/ai';
+import { AiError, getAiConfig, signedOpeners, tutorReply } from '../services/ai';
+import { synthesize, TtsError, verifySpeech } from '../services/tts';
 import { callHistory, limitMessage, usageSummary } from '../services/usage';
 import { publicOrderDto } from '../services/orders';
 import { iceServersFor } from '../services/voice';
@@ -101,7 +102,30 @@ accountRouter.get(
   asyncHandler(async (req, res) => {
     const cfg = await getAiConfig();
     const { tier, ai } = await usageSummary(req.learner!);
-    res.json({ enabled: cfg.enabled, allowed: tier !== 'none' && ai.remaining !== 0, remaining: ai.remaining, limit: ai.limit, period: ai.period, message: ai.remaining === 0 ? limitMessage('ai', ai) : null });
+    res.json({
+      enabled: cfg.enabled,
+      allowed: tier !== 'none' && ai.remaining !== 0,
+      remaining: ai.remaining,
+      limit: ai.limit,
+      period: ai.period,
+      message: ai.remaining === 0 ? limitMessage('ai', ai) : null,
+      ...(await signedOpeners()),
+    });
+  }),
+);
+
+/** The tutor's reply as MP3 in the ElevenLabs voice. Only text the server signed (its own replies and openers). */
+accountRouter.post(
+  '/ai/speak',
+  requireLearner,
+  rateLimit({ windowMs: 60_000, max: 30 }),
+  asyncHandler(async (req, res) => {
+    const text = typeof req.body?.text === 'string' ? req.body.text.trim() : '';
+    if (!text || text.length > 1500 || !verifySpeech(text, req.body?.sig)) throw new TtsError('This text cannot be spoken.', 400);
+    const audio = await synthesize(text);
+    res.setHeader('Content-Type', 'audio/mpeg');
+    res.setHeader('Cache-Control', 'private, max-age=86400');
+    res.send(audio);
   }),
 );
 
@@ -154,6 +178,10 @@ const onAccountError: ErrorRequestHandler = (err, _req, res, next) => {
   }
   if (err instanceof AiError) {
     res.status(err.status).json({ message: err.message, code: err.code });
+    return;
+  }
+  if (err instanceof TtsError) {
+    res.status(err.status).json({ message: err.message });
     return;
   }
   next(err);

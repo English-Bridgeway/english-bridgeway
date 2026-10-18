@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { Op, type WhereOptions } from 'sequelize';
 import { Learner, LearnerAvatar, Order, sequelize, type LearnerOffer } from '../db';
-import { asyncHandler, requireOwner } from '../middleware';
+import { asyncHandler, rateLimit, requireOwner } from '../middleware';
 import { audit } from '../services/audit';
 import { accessState, activeOffer, addMonths, getAccessSettings, saveAccessSettings } from '../services/access';
 import { learnerDto } from '../services/learners';
 import { OrderError, orderDto } from '../services/orders';
 import { aiSettingsForAdmin, AiError, saveAiConfig, testAi } from '../services/ai';
+import { saveTtsConfig, TtsError, testTts, ttsSettingsForAdmin } from '../services/tts';
 import { getPublishedItem } from '../services/content';
 import { callHistory, usageSummary } from '../services/usage';
 
@@ -232,6 +233,7 @@ adminLearnersRouter.put(
       clearKey: b.clearKey === true,
       instructions: typeof b.instructions === 'string' ? b.instructions : undefined,
       dailyLimit: b.dailyLimit,
+      explainIn: b.explainIn,
     });
     await audit(req.admin!.email, 'Updated AI tutor settings', `${b.enabled ? 'on' : 'off'}`);
     res.json(await aiSettingsForAdmin());
@@ -246,8 +248,45 @@ adminLearnersRouter.post(
   }),
 );
 
+adminLearnersRouter.get(
+  '/settings/tts',
+  requireOwner,
+  asyncHandler(async (_req, res) => {
+    res.json(await ttsSettingsForAdmin());
+  }),
+);
+
+adminLearnersRouter.put(
+  '/settings/tts',
+  requireOwner,
+  asyncHandler(async (req, res) => {
+    const b = req.body ?? {};
+    await saveTtsConfig({
+      provider: b.provider,
+      voiceId: typeof b.voiceId === 'string' ? b.voiceId : undefined,
+      model: typeof b.model === 'string' ? b.model : undefined,
+      stability: b.stability,
+      style: b.style,
+      apiKey: typeof b.apiKey === 'string' ? b.apiKey : undefined,
+      clearKey: b.clearKey === true,
+    });
+    const saved = await ttsSettingsForAdmin();
+    await audit(req.admin!.email, 'Updated AI tutor voice', saved.provider === 'elevenlabs' ? `ElevenLabs ${saved.voiceId} (${saved.model})` : 'browser voice');
+    res.json(saved);
+  }),
+);
+
+adminLearnersRouter.post(
+  '/settings/tts/test',
+  requireOwner,
+  rateLimit({ windowMs: 60_000, max: 6 }),
+  asyncHandler(async (_req, res) => {
+    res.json(await testTts());
+  }),
+);
+
 adminLearnersRouter.use(((err, _req, res, next) => {
-  if (err instanceof AiError) {
+  if (err instanceof AiError || err instanceof TtsError) {
     res.status(err.status).json({ message: err.message });
     return;
   }

@@ -179,6 +179,8 @@ export interface AiSettings {
   apiKeyMasked: string | null;
   instructions: string;
   dailyLimit: number;
+  /** The language the tutor explains mistakes in. */
+  explainIn: "mr" | "hi" | "en";
 }
 
 export interface AiSettingsInput {
@@ -189,6 +191,22 @@ export interface AiSettingsInput {
   clearKey?: boolean;
   instructions: string;
   dailyLimit: number;
+  explainIn: AiSettings["explainIn"];
+}
+
+/** The AI tutor's voice: ElevenLabs, or the learner's browser voice. */
+export interface TtsSettings {
+  provider: "browser" | "elevenlabs";
+  voiceId: string;
+  model: string;
+  stability: number;
+  style: number;
+  apiKeyMasked: string | null;
+}
+
+export interface TtsSettingsInput extends Omit<TtsSettings, "apiKeyMasked"> {
+  apiKey?: string;
+  clearKey?: boolean;
 }
 
 export interface AdminApi {
@@ -242,6 +260,10 @@ export interface AdminApi {
   getAi(): Promise<AiSettings>;
   saveAi(input: AiSettingsInput): Promise<AiSettings>;
   testAi(): Promise<{ ok: boolean; message: string }>;
+  getTts(): Promise<TtsSettings>;
+  saveTts(input: TtsSettingsInput): Promise<TtsSettings>;
+  /** Speaks a short Marathi + English sample; `audio` is a data: URL to play. */
+  testTts(): Promise<{ ok: boolean; message: string; audio?: string }>;
 }
 
 export class ApiError extends Error {

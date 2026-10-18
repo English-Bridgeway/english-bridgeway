@@ -69,4 +69,7 @@ export const httpApi: AdminApi = {
   getAi: () => call("/settings/ai"),
   saveAi: (input) => call("/settings/ai", { method: "PUT", json: input }),
   testAi: () => call("/settings/ai/test", { json: {} }),
+  getTts: () => call("/settings/tts"),
+  saveTts: (input) => call("/settings/tts", { method: "PUT", json: input }),
+  testTts: () => call("/settings/tts/test", { json: {} }),
 };
