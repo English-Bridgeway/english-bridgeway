@@ -3,17 +3,19 @@
  * Demo mode: the browser calls the provider saved in the demo admin panel directly, so the
  * preview can be tried with your own key (it never leaves this browser).
  */
-import { apiFetch, HttpError, isLive } from "./backend";
+import { API_BASE, apiFetch, HttpError, isLive } from "./backend";
 import { DEMO_AI_DEFAULTS, readDemoDb } from "./demoStore";
+import { demoTtsReady, elevenLabsFromBrowser } from "./tutorVoice";
 
 export const SCENARIOS = [
-  { id: "free", title: "Free talk", hint: "Chat about your day, hobbies and plans", opener: "Hi! I'm Bridget, your English speaking partner. How are you today, and what did you do this morning?" },
-  { id: "interview", title: "Job interview", hint: "Practise answering interview questions", opener: "Good morning, and thank you for coming in. Please have a seat. Could you start by telling me a little about yourself?" },
-  { id: "restaurant", title: "At a restaurant", hint: "Order food and drinks", opener: "Good evening, welcome to Spice Garden! Here is the menu. Can I get you something to drink first?" },
-  { id: "shopping", title: "Shopping", hint: "Buy clothes, ask for sizes and prices", opener: "Hello! Welcome to our store. Are you looking for anything in particular today?" },
-  { id: "travel", title: "Travel", hint: "Airport check-in and hotel", opener: "Good afternoon! May I see your passport and ticket, please? Where are you flying to today?" },
-  { id: "doctor", title: "Doctor's appointment", hint: "Call a clinic and book a visit", opener: "Hello, City Care Clinic, this is the front desk. How can I help you today?" },
-  { id: "office", title: "At the office", hint: "Talk with a colleague about work", opener: "Hey, good morning! Did you have a good weekend? Are you ready for the team meeting today?" },
+  // Keep the openers the same as OPENERS in server/src/services/ai.ts (the live site uses the server's).
+  { id: "free", title: "Free talk", hint: "Chat about your day, hobbies and plans", opener: "[warmly] Hiii! मी Bridget, तुमची English speaking friend. [giggles] घाबरू नका, चुका झाल्या तरी चालेल, आपण मिळून शिकू. So, tell me, how are you today?" },
+  { id: "interview", title: "Job interview", hint: "Practise answering interview questions", opener: "[warmly] Good morning, and thank you for coming in. Please have a seat. Could you start by telling me a little about yourself?" },
+  { id: "restaurant", title: "At a restaurant", hint: "Order food and drinks", opener: "[cheerfully] Good evening, welcome to Spice Garden! Here is the menu. Can I get you something to drink first?" },
+  { id: "shopping", title: "Shopping", hint: "Buy clothes, ask for sizes and prices", opener: "[cheerfully] Hello! Welcome to our store. Are you looking for anything in particular today?" },
+  { id: "travel", title: "Travel", hint: "Airport check-in and hotel", opener: "[warmly] Good afternoon! May I see your passport and ticket, please? Where are you flying to today?" },
+  { id: "doctor", title: "Doctor's appointment", hint: "Call a clinic and book a visit", opener: "[warmly] Hello, City Care Clinic, this is the front desk. How can I help you today?" },
+  { id: "office", title: "At the office", hint: "Talk with a colleague about work", opener: "[excited] Hey, good morning! Did you have a good weekend? Are you ready for the team meeting today?" },
 ] as const;
 
 export type ScenarioId = (typeof SCENARIOS)[number]["id"];
@@ -31,6 +33,10 @@ export interface AiStatus {
   period?: "day" | "trial" | "none";
   /** Why the learner can't chat, when they can't. */
   message?: string | null;
+  /** "elevenlabs" when replies can be fetched as audio from /api/ai/speak. */
+  voice?: "elevenlabs" | "browser";
+  openers?: Partial<Record<ScenarioId, string>>;
+  openerSigs?: Partial<Record<ScenarioId, string>>;
 }
 
 export class AiTutorError extends Error {
@@ -42,12 +48,12 @@ export class AiTutorError extends Error {
 export async function getAiStatus(token: string, demoAllowed: boolean): Promise<AiStatus> {
   if (!isLive) {
     const ai = readDemoDb().ai ?? DEMO_AI_DEFAULTS;
-    return { enabled: ai.enabled && Boolean(ai.apiKey), allowed: demoAllowed, remaining: null };
+    return { enabled: ai.enabled && Boolean(ai.apiKey), allowed: demoAllowed, remaining: null, voice: demoTtsReady() ? "elevenlabs" : "browser" };
   }
   return apiFetch<AiStatus>("/ai/status", { token });
 }
 
-export async function askTutor(token: string, scenario: ScenarioId, messages: ChatTurn[], learnerName: string): Promise<{ reply: string; remaining: number | null; period?: AiStatus["period"] }> {
+export async function askTutor(token: string, scenario: ScenarioId, messages: ChatTurn[], learnerName: string): Promise<{ reply: string; remaining: number | null; period?: AiStatus["period"]; speechSig?: string }> {
   if (!isLive) return demoAsk(scenario, messages, learnerName);
   try {
     return await apiFetch("/ai/chat", { method: "POST", token, json: { scenario, messages: messages.slice(-16) } });
@@ -58,6 +64,22 @@ export async function askTutor(token: string, scenario: ScenarioId, messages: Ch
     }
     throw new AiTutorError("Could not reach the server. Check your connection.");
   }
+}
+
+/**
+ * The tutor's spoken words as MP3 in the ElevenLabs voice, or null when that voice isn't set up
+ * (the caller then uses the browser's voice). `sig` comes from the server with each reply.
+ */
+export async function tutorAudio(token: string, text: string, sig?: string): Promise<Blob | null> {
+  if (!isLive) return demoTtsReady() ? elevenLabsFromBrowser(text) : null;
+  if (!sig) return null;
+  const res = await fetch(`${API_BASE}/ai/speak`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ text, sig }),
+  });
+  if (!res.ok) throw new Error(((await res.json().catch(() => null)) as { message?: string } | null)?.message ?? `The voice failed (${res.status}).`);
+  return res.blob();
 }
 
 /** Splits "Correction: …" (the tutor's fix for the learner's sentence) from the spoken reply. */
@@ -73,10 +95,13 @@ async function demoAsk(scenario: ScenarioId, messages: ChatTurn[], learnerName: 
   const ai = readDemoDb().ai ?? DEMO_AI_DEFAULTS;
   if (!ai.enabled || !ai.apiKey) throw new AiTutorError("Speak with AI is not set up yet. Add an API key in Admin → AI tutor.", "off");
   const situation = SCENARIOS.find((s) => s.id === scenario)?.hint ?? "Free conversation";
+  const lang = { mr: "Marathi (Devanagari)", hi: "Hindi (Devanagari)", en: "simple English" }[ai.explainIn ?? "mr"];
+  // A shorter copy of systemPrompt() in server/src/services/ai.ts.
   const system = [
-    `You are "Bridget", a warm, patient spoken-English tutor talking by voice with ${learnerName.split(" ")[0]}, an Indian learner of English. Situation: ${situation} (you play the other person).`,
-    "Reply in 1 to 3 short spoken sentences, no lists or markdown, and usually end with a question.",
-    'If the learner\'s last message has a mistake, begin with one line "Correction: <corrected sentence>", then continue on a new line.',
+    `You are "Bridget", a sweet, soft-spoken, caring young woman teaching spoken English by voice to ${learnerName.split(" ")[0]}, a Marathi-speaking learner from Maharashtra. Situation: ${situation} (you play the other person).`,
+    "Be warm, playful and interested, like a kind elder sister. Reply in 1 to 3 short spoken sentences, no lists or markdown, and usually end with a question.",
+    'Sound alive: use "Hmm…", "Ooh!", "Aww", "Hehe" and one or two audio tags like [laughs softly], [giggles], [sighs], [excited], [curious], [warmly].',
+    `If the learner's last message has a mistake, begin with one line "Correction: <corrected sentence>". Then on a new line, laughing softly, kindly say it wasn't quite right and explain why in ${lang} in one short sentence, say the correct sentence and ask them to repeat it. Otherwise praise them and continue in simple English.`,
     ai.instructions,
   ].filter(Boolean).join("\n");
   let res: Response;
@@ -84,7 +109,7 @@ async function demoAsk(scenario: ScenarioId, messages: ChatTurn[], learnerName: 
     res = await fetch(`${ai.baseUrl.replace(/\/+$/, "")}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${ai.apiKey}` },
-      body: JSON.stringify({ model: ai.model, temperature: 0.7, max_tokens: 220, messages: [{ role: "system", content: system }, ...messages.slice(-16)] }),
+      body: JSON.stringify({ model: ai.model, temperature: 0.7, max_tokens: 320, messages: [{ role: "system", content: system }, ...messages.slice(-16)] }),
     });
   } catch {
     throw new AiTutorError("The browser could not reach the AI service (some providers only accept calls from a server). Connect the API server to use it.");

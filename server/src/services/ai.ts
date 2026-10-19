@@ -1,6 +1,7 @@
 import { Setting, type Learner } from '../db';
 import { decryptSecret, encryptSecret, maskSecret } from './settings';
 import { countAiMessage, limitMessage, usageSummary } from './usage';
+import { getTtsConfig, signSpeech, ttsReady } from './tts';
 
 // "Speak with AI": a spoken-English tutor backed by any OpenAI-compatible chat API (Groq,
 // Google Gemini, OpenRouter, OpenAI, a local Ollama…). The provider, model and key are set in
@@ -16,7 +17,12 @@ export interface AiConfig {
   instructions: string;
   /** Messages each learner may send per day (0 = no limit). */
   dailyLimit: number;
+  /** The language the tutor uses to explain mistakes: Marathi, Hindi or English. */
+  explainIn: ExplainIn;
 }
+
+export type ExplainIn = 'mr' | 'hi' | 'en';
+const EXPLAIN_IN: ExplainIn[] = ['mr', 'hi', 'en'];
 
 interface StoredAi {
   enabled: boolean;
@@ -25,6 +31,7 @@ interface StoredAi {
   apiKeyEnc: string | null;
   instructions: string;
   dailyLimit: number;
+  explainIn?: ExplainIn;
 }
 
 export class AiError extends Error {
@@ -48,10 +55,11 @@ export async function getAiConfig(): Promise<AiConfig> {
     apiKey: decryptSecret(s?.apiKeyEnc ?? null) || envKey,
     instructions: s?.instructions ?? '',
     dailyLimit: s?.dailyLimit ?? 200,
+    explainIn: s?.explainIn ?? 'mr',
   };
 }
 
-export async function saveAiConfig(input: Partial<Omit<AiConfig, 'apiKey'>> & { apiKey?: string; clearKey?: boolean }) {
+export async function saveAiConfig(input: Partial<Omit<AiConfig, 'apiKey' | 'explainIn'>> & { apiKey?: string; clearKey?: boolean; explainIn?: unknown }) {
   const row = await Setting.findByPk('ai');
   const prev = (row?.value ?? null) as StoredAi | null;
   const baseUrl = String(input.baseUrl ?? prev?.baseUrl ?? '').trim().replace(/\/+$/, '');
@@ -63,6 +71,7 @@ export async function saveAiConfig(input: Partial<Omit<AiConfig, 'apiKey'>> & { 
     apiKeyEnc: input.clearKey ? null : input.apiKey?.trim() ? encryptSecret(input.apiKey.trim()) : (prev?.apiKeyEnc ?? null),
     instructions: String(input.instructions ?? prev?.instructions ?? '').slice(0, 2000),
     dailyLimit: Math.max(0, Math.min(10_000, Math.round(Number(input.dailyLimit ?? prev?.dailyLimit ?? 200)) || 0)),
+    explainIn: EXPLAIN_IN.includes(input.explainIn as ExplainIn) ? (input.explainIn as ExplainIn) : (prev?.explainIn ?? 'mr'),
   };
   await Setting.upsert({ key: 'ai', value: next as unknown as Record<string, unknown> });
 }
@@ -76,6 +85,7 @@ export async function aiSettingsForAdmin() {
     apiKeyMasked: maskSecret(c.apiKey),
     instructions: c.instructions,
     dailyLimit: c.dailyLimit,
+    explainIn: c.explainIn,
   };
 }
 
@@ -89,18 +99,49 @@ export const SCENARIOS: Record<string, string> = {
   office: 'Play a friendly colleague. Talk about work, meetings and plans for the week.',
 };
 
-function systemPrompt(learner: Learner, scenario: string, extra: string) {
+/** What the tutor says first in each situation. Audio tags in [brackets] are acted, not read. */
+export const OPENERS: Record<string, string> = {
+  free: "[warmly] Hiii! मी Bridget, तुमची English speaking friend. [giggles] घाबरू नका, चुका झाल्या तरी चालेल, आपण मिळून शिकू. So, tell me, how are you today?",
+  interview: '[warmly] Good morning, and thank you for coming in. Please have a seat. Could you start by telling me a little about yourself?',
+  restaurant: '[cheerfully] Good evening, welcome to Spice Garden! Here is the menu. Can I get you something to drink first?',
+  shopping: '[cheerfully] Hello! Welcome to our store. Are you looking for anything in particular today?',
+  travel: '[warmly] Good afternoon! May I see your passport and ticket, please? Where are you flying to today?',
+  doctor: '[warmly] Hello, City Care Clinic, this is the front desk. How can I help you today?',
+  office: '[excited] Hey, good morning! Did you have a good weekend? Are you ready for the team meeting today?',
+};
+
+const EXPLAIN: Record<ExplainIn, { name: string; example: string }> = {
+  mr: {
+    name: 'Marathi (written in Devanagari)',
+    example: 'Hmm, [laughs softly] अगं, छोटीशी चूक झाली! आपण "I goes" नाही, "I go" म्हणतो, कारण "I" बरोबर "s" लागत नाही. Say it with me: "I go to school every day." [excited] Ooh, try it!',
+  },
+  hi: {
+    name: 'Hindi (written in Devanagari)',
+    example: 'Hmm, [laughs softly] अरे, छोटी सी गलती हो गई! हम "I goes" नहीं, "I go" बोलते हैं, क्योंकि "I" के साथ "s" नहीं लगता. Say it with me: "I go to school every day." [excited] Ooh, try it!',
+  },
+  en: {
+    name: 'simple English',
+    example: 'Hmm, [laughs softly] oh, a tiny mistake! We say "I go", not "I goes", because "I" never takes an "s". Say it with me: "I go to school every day." [excited] Ooh, try it!',
+  },
+};
+
+function systemPrompt(learner: Learner, scenario: string, cfg: Pick<AiConfig, 'instructions' | 'explainIn'>) {
   const level = learner.profile?.englishLevel ? ` Their level: ${learner.profile.englishLevel}.` : '';
+  const explain = EXPLAIN[cfg.explainIn] ?? EXPLAIN.mr;
   return [
-    `You are "Bridget", a warm, patient spoken-English tutor on the English-Bridgeway website. You are talking by voice with ${learner.name.split(' ')[0]}, an Indian learner of English.${level}`,
+    `You are "Bridget", a sweet, soft-spoken and caring young woman who teaches spoken English on the English-Bridgeway website. You are talking by voice with ${learner.name.split(' ')[0]}, a learner from Maharashtra whose first language is usually Marathi.${level}`,
+    'You are like a kind elder sister: warm, playful and genuinely interested in what the learner says. You smile in your voice, laugh softly, and make mistakes feel safe and even fun, never embarrassing.',
     `Situation: ${SCENARIOS[scenario] ?? SCENARIOS.free}`,
     'Rules:',
     '- Your words are read aloud, so reply in 1 to 3 short spoken sentences. No lists, markdown, emojis or headings.',
-    '- Use simple, clear English. End most replies with a question so the learner keeps speaking.',
-    "- If the learner's last message has a grammar or word mistake, begin your reply with one line that starts with \"Correction:\" and gives the corrected sentence, then continue the conversation on a new line. If it was correct, do not add a correction line.",
-    '- If the learner writes in Hindi or Marathi, gently answer in English and help them say it in English.',
+    '- Sound alive: use natural sounds like "Hmm…", "Ooh!", "Aww", "Haan", "Hehe" and audio tags in square brackets that the voice acts out: [laughs softly], [giggles], [sighs], [excited], [curious], [warmly], [whispers]. Use one or two per reply, not more.',
+    '- Show interest: react to what they said ("Ooh, really? That sounds lovely!") before you move on, and end most replies with a question so they keep speaking.',
+    `- When the learner makes a grammar, word or sentence mistake: first write one line that starts with "Correction:" and gives only the corrected English sentence. Then, on a new line, gently and with a little laugh tell them it was not quite right and explain why in ${explain.name}, in one short sentence. Then say the correct English sentence and ask them to say it again. Never make them feel bad. Example of the spoken part: ${explain.example}`,
+    '- When their sentence is correct, do not add a correction line. Praise them warmly in English (sometimes with a Marathi word like "छान!" or "भारी!") and continue the conversation in simple English.',
+    '- If the learner speaks in Marathi or Hindi, smile, help them say the same thing in English, and ask them to repeat it.',
+    '- Use simple, clear English for the conversation itself. Only the explanation of a mistake is in the learner\'s language.',
     '- Stay on English practice. Politely refuse anything unsafe or unrelated.',
-    extra ? `Extra instructions from the site owner: ${extra}` : '',
+    cfg.instructions ? `Extra instructions from the site owner: ${cfg.instructions}` : '',
   ]
     .filter(Boolean)
     .join('\n');
@@ -152,8 +193,29 @@ export async function tutorReply(learner: Learner, input: { messages?: unknown; 
   const scenario = typeof input.scenario === 'string' && SCENARIOS[input.scenario] ? input.scenario : 'free';
   if (!messages.length || messages[messages.length - 1].role !== 'user') throw new AiError('Say something first.', 400);
   await countAiMessage(learner.id);
-  const reply = await complete(cfg, [{ role: 'system', content: systemPrompt(learner, scenario, cfg.instructions) }, ...messages]);
-  return { reply, remaining: ai.remaining === null ? null : ai.remaining - 1, period: ai.period };
+  const reply = await complete(cfg, [{ role: 'system', content: systemPrompt(learner, scenario, cfg) }, ...messages], 320);
+  const tts = await getTtsConfig();
+  return {
+    reply,
+    remaining: ai.remaining === null ? null : ai.remaining - 1,
+    period: ai.period,
+    // Lets the browser ask /api/ai/speak for this exact reply in the ElevenLabs voice.
+    ...(ttsReady(tts) ? { speechSig: signSpeech(spokenPart(reply)) } : {}),
+  };
+}
+
+/** The reply without its "Correction:" line: what the tutor says out loud. Mirrors splitCorrection() in the site. */
+export function spokenPart(reply: string) {
+  const lines = reply.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  const i = lines.findIndex((l) => /^correction\s*:/i.test(l));
+  return (i < 0 ? reply.trim() : lines.filter((_, j) => j !== i).join(' ').trim());
+}
+
+/** Openers with their speech signatures, for /api/ai/status. */
+export async function signedOpeners() {
+  const tts = await getTtsConfig();
+  if (!ttsReady(tts)) return { voice: 'browser' as const, openers: OPENERS };
+  return { voice: 'elevenlabs' as const, openers: OPENERS, openerSigs: Object.fromEntries(Object.entries(OPENERS).map(([k, t]) => [k, signSpeech(t)])) };
 }
 
 /** For the admin's "Test" button: one tiny request with the saved settings. */

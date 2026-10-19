@@ -87,7 +87,9 @@ export interface SpeakOptions {
 /** Builds an utterance with the site's voice, pitch and speed. */
 export function makeUtterance(text: string, opts: SpeakOptions = {}): SpeechSynthesisUtterance {
   const u = new SpeechSynthesisUtterance(text);
-  const voice = pickVoice(opts.voiceName);
+  // Marathi or Hindi words (Devanagari) sound wrong in an English voice; use an Indian voice when there is one.
+  const indic = /[\u0900-\u097F]/.test(text) ? loadVoices().find((v) => /^mr/i.test(v.lang)) ?? loadVoices().find((v) => /^hi/i.test(v.lang)) : undefined;
+  const voice = indic ?? pickVoice(opts.voiceName);
   if (voice) u.voice = voice;
   u.lang = voice?.lang ?? "en-GB";
   u.rate = opts.rate ?? site.voice?.rate ?? 0.92;

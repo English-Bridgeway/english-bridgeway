@@ -6,13 +6,14 @@ import { Alert } from "../../components/Alert";
 import { Button } from "../../components/Button";
 import { UserAvatar } from "../Avatar";
 import { AccessBanner } from "../AccessBanner";
-import { askTutor, AiTutorError, canRecognizeSpeech, createRecognition, getAiStatus, SCENARIOS, splitCorrection, type AiStatus, type ChatTurn, type ScenarioId } from "../../utils/aiTutor";
+import { askTutor, AiTutorError, canRecognizeSpeech, createRecognition, getAiStatus, SCENARIOS, splitCorrection, tutorAudio, type AiStatus, type ChatTurn, type ScenarioId } from "../../utils/aiTutor";
 import { canSpeak, makeUtterance } from "../../utils/speech";
+import { stripAudioTags } from "../../utils/tutorVoice";
 import { cn } from "../../utils/cn";
 
 type Recognition = NonNullable<ReturnType<typeof createRecognition>>;
 
-/** Speak with AI: talk out loud with an AI English tutor (or type). Replies are read aloud in the site's voice. */
+/** Speak with AI: talk out loud with an AI English tutor (or type). Replies are read aloud in the ElevenLabs voice, or the site's voice. */
 export default function SpeakAI() {
   const { token, user, access } = useAuth();
   const [status, setStatus] = useState<AiStatus | null>(null);
@@ -29,6 +30,15 @@ export default function SpeakAI() {
   const endRef = useRef<HTMLDivElement>(null);
   const handsFreeRef = useRef(handsFree);
   handsFreeRef.current = handsFree;
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  /** Speech signatures from the server, by turn index (needed to fetch the ElevenLabs audio). */
+  const sigsRef = useRef<Record<number, string | undefined>>({});
+  /** Fetched audio, by turn index, so Listen replays without paying again. */
+  const audioUrlsRef = useRef<Record<number, string>>({});
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  /** Bumped on every new playback, so a slow ElevenLabs answer for an old turn is ignored. */
+  const playIdRef = useRef(0);
   const micSupported = canRecognizeSpeech();
 
   useEffect(() => {
@@ -40,15 +50,23 @@ export default function SpeakAI() {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   }, [turns, interim, thinking]);
 
+  const stopSpeaking = () => {
+    playIdRef.current++;
+    audioRef.current?.pause();
+    audioRef.current = null;
+    if (canSpeak()) window.speechSynthesis.cancel();
+  };
+
   // Stop talking and listening when leaving the page.
   useEffect(() => () => {
     recRef.current?.abort();
-    if (canSpeak()) window.speechSynthesis.cancel();
+    stopSpeaking();
+    Object.values(audioUrlsRef.current).forEach((u) => URL.revokeObjectURL(u));
   }, []);
 
   const startListening = useCallback(() => {
     if (!micSupported || listening) return;
-    if (canSpeak()) window.speechSynthesis.cancel();
+    stopSpeaking();
     setSpeakingIndex(null);
     const rec = createRecognition();
     if (!rec) return;
@@ -86,21 +104,46 @@ export default function SpeakAI() {
 
   const stopListening = () => recRef.current?.stop();
 
-  const speakReply = useCallback((text: string, index: number, thenListen: boolean) => {
-    if (!canSpeak()) {
-      if (thenListen) startListening();
-      return;
-    }
-    window.speechSynthesis.cancel();
-    const u = makeUtterance(text);
-    u.onend = () => {
+  /** Says `text` (the reply without its correction line) in the ElevenLabs voice, else the browser's voice. */
+  const speakReply = useCallback(async (text: string, index: number, thenListen: boolean) => {
+    stopSpeaking();
+    const id = playIdRef.current;
+    const done = () => {
+      if (playIdRef.current !== id) return;
       setSpeakingIndex(null);
       if (thenListen && handsFreeRef.current) startListening();
     };
-    u.onerror = () => setSpeakingIndex(null);
     setSpeakingIndex(index);
+
+    if (statusRef.current?.voice === "elevenlabs" && token) {
+      try {
+        let url = audioUrlsRef.current[index];
+        if (!url) {
+          const blob = await tutorAudio(token, text, sigsRef.current[index]);
+          if (blob) audioUrlsRef.current[index] = url = URL.createObjectURL(blob);
+        }
+        if (playIdRef.current !== id) return;
+        if (url) {
+          const audio = new Audio(url);
+          audioRef.current = audio;
+          audio.onended = done;
+          audio.onerror = done;
+          await audio.play();
+          return;
+        }
+      } catch {
+        // ElevenLabs failed or autoplay was blocked: fall back to the browser's voice.
+        if (playIdRef.current !== id) return;
+      }
+    }
+
+    if (!canSpeak()) return done();
+    const u = makeUtterance(stripAudioTags(text));
+    u.onend = done;
+    u.onerror = () => playIdRef.current === id && setSpeakingIndex(null);
     window.speechSynthesis.speak(u);
-  }, [startListening]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startListening, token]);
 
   const send = async (text: string, fromVoice = true) => {
     const content = text.trim();
@@ -111,11 +154,12 @@ export default function SpeakAI() {
     setThinking(true);
     setError(null);
     try {
-      const { reply, remaining } = await askTutor(token, scenario, next, user?.name ?? "friend");
+      const { reply, remaining, speechSig } = await askTutor(token, scenario, next, user?.name ?? "friend");
       const all: ChatTurn[] = [...next, { role: "assistant", content: reply }];
+      sigsRef.current[all.length - 1] = speechSig;
       setTurns(all);
       setStatus((s) => (s ? { ...s, remaining } : s));
-      speakReply(splitCorrection(reply).text, all.length - 1, fromVoice);
+      void speakReply(splitCorrection(reply).text, all.length - 1, fromVoice);
     } catch (e) {
       setError({ message: e instanceof Error ? e.message : "Something went wrong.", code: e instanceof AiTutorError ? e.code : undefined });
       // Free messages used up: show the plans screen instead of the chat.
@@ -130,12 +174,16 @@ export default function SpeakAI() {
 
   const begin = (id: ScenarioId) => {
     recRef.current?.abort();
-    if (canSpeak()) window.speechSynthesis.cancel();
+    stopSpeaking();
     const s = SCENARIOS.find((x) => x.id === id)!;
+    const opener = status?.openers?.[id] ?? s.opener;
+    Object.values(audioUrlsRef.current).forEach((u) => URL.revokeObjectURL(u));
+    audioUrlsRef.current = {};
+    sigsRef.current = { 0: status?.openerSigs?.[id] };
     setScenario(id);
     setError(null);
-    setTurns([{ role: "assistant", content: s.opener }]);
-    speakReply(s.opener, 0, true);
+    setTurns([{ role: "assistant", content: opener }]);
+    void speakReply(opener, 0, true);
   };
 
   if (status && !status.allowed) {
@@ -214,11 +262,11 @@ export default function SpeakAI() {
                   {mine ? <UserAvatar user={user} className="h-8 w-8 text-xs" /> : <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-primary text-white"><Bot className="h-4 w-4" aria-hidden="true" /></span>}
                   <div className={cn("max-w-[80%] rounded-2xl px-4 py-2.5", mine ? "rounded-br-sm bg-brand-primary text-white" : "rounded-bl-sm bg-ink-50 text-ink-900")}>
                     {correction && (
-                      <p className="mb-1.5 rounded-lg bg-amber-100 px-2.5 py-1.5 text-sm text-amber-900"><span className="font-semibold">Better: </span>{correction}</p>
+                      <p className="mb-1.5 rounded-lg bg-amber-100 px-2.5 py-1.5 text-sm text-amber-900"><span className="font-semibold">Better: </span>{stripAudioTags(correction)}</p>
                     )}
-                    <p className="leading-relaxed">{text}</p>
-                    {!mine && canSpeak() && (
-                      <button type="button" onClick={() => (speakingIndex === i ? (window.speechSynthesis.cancel(), setSpeakingIndex(null)) : speakReply(text, i, false))}
+                    <p className="leading-relaxed">{mine ? text : stripAudioTags(text)}</p>
+                    {!mine && (canSpeak() || status?.voice === "elevenlabs") && (
+                      <button type="button" onClick={() => (speakingIndex === i ? (stopSpeaking(), setSpeakingIndex(null)) : void speakReply(text, i, false))}
                         className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-ink-600 hover:text-ink-900">
                         {speakingIndex === i ? <><Square className="h-3 w-3" aria-hidden="true" /> Stop</> : <><Volume2 className="h-3.5 w-3.5" aria-hidden="true" /> Listen</>}
                       </button>

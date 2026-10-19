@@ -1,7 +1,8 @@
 import { collectionIdField, type CollectionKey } from "../../data/content";
-import { DEMO_ACCESS_DEFAULTS, DEMO_AI_DEFAULTS, newId, readDemoDb, updateDemoDb, type DemoDb } from "../../utils/demoStore";
+import { DEMO_ACCESS_DEFAULTS, DEMO_AI_DEFAULTS, DEMO_TTS_DEFAULTS, newId, readDemoDb, updateDemoDb, type DemoDb } from "../../utils/demoStore";
 import { readDemoLearners, updateDemoLearner, writeDemoLearners, type DemoLearner } from "../../utils/demoLearners";
 import { addMonths, computeAccess, offerApplies } from "../../utils/access";
+import { elevenLabsFromBrowser, TTS_SAMPLE } from "../../utils/tutorVoice";
 import { ApiError, type AdminApi, type AdminUser, type DashboardStats, type LearnerDetail, type LearnerSummary } from "./types";
 import { getSession } from "./session";
 import { normalizePlans } from "../../utils/plans";
@@ -425,7 +426,7 @@ export const localApi: AdminApi = {
     const db = readDemoDb();
     owner(db);
     const ai = { ...DEMO_AI_DEFAULTS, ...db.ai };
-    return wait({ enabled: ai.enabled, baseUrl: ai.baseUrl, model: ai.model, apiKeyMasked: mask(ai.apiKey), instructions: ai.instructions, dailyLimit: ai.dailyLimit });
+    return wait({ enabled: ai.enabled, baseUrl: ai.baseUrl, model: ai.model, apiKeyMasked: mask(ai.apiKey), instructions: ai.instructions, dailyLimit: ai.dailyLimit, explainIn: ai.explainIn });
   },
   async saveAi(input) {
     return wait(
@@ -435,10 +436,11 @@ export const localApi: AdminApi = {
         db.ai = {
           enabled: input.enabled, baseUrl: input.baseUrl.trim().replace(/\/+$/, ""), model: input.model.trim(),
           apiKey: input.clearKey ? "" : input.apiKey?.trim() || prev.apiKey, instructions: input.instructions, dailyLimit: Math.max(0, Math.round(input.dailyLimit) || 0),
+          explainIn: input.explainIn ?? prev.explainIn,
         };
         log(db, admin.email, "Updated AI tutor settings", input.enabled ? "on" : "off");
         const ai = db.ai;
-        return { enabled: ai.enabled, baseUrl: ai.baseUrl, model: ai.model, apiKeyMasked: mask(ai.apiKey), instructions: ai.instructions, dailyLimit: ai.dailyLimit };
+        return { enabled: ai.enabled, baseUrl: ai.baseUrl, model: ai.model, apiKeyMasked: mask(ai.apiKey), instructions: ai.instructions, dailyLimit: ai.dailyLimit, explainIn: ai.explainIn ?? "mr" };
       }),
     );
   },
@@ -457,6 +459,40 @@ export const localApi: AdminApi = {
       return { ok: true, message: `Connected to ${ai.model}. It said: “${String(data?.choices?.[0]?.message?.content ?? "").slice(0, 120)}”` };
     } catch {
       return { ok: false, message: "The browser could not reach the AI service. Some providers only accept calls from a server; it will work once the API server is connected." };
+    }
+  },
+  async getTts() {
+    const db = readDemoDb();
+    owner(db);
+    const { apiKey, ...t } = { ...DEMO_TTS_DEFAULTS, ...db.tts };
+    return wait({ ...t, apiKeyMasked: mask(apiKey) });
+  },
+  async saveTts(input) {
+    return wait(
+      updateDemoDb((db) => {
+        const admin = owner(db);
+        const prev = { ...DEMO_TTS_DEFAULTS, ...db.tts };
+        const clamp = (n: number, d: number) => (Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : d);
+        db.tts = {
+          provider: input.provider, voiceId: input.voiceId.trim() || DEMO_TTS_DEFAULTS.voiceId, model: input.model.trim() || DEMO_TTS_DEFAULTS.model,
+          stability: clamp(input.stability, 0.5), style: clamp(input.style, 0.6), apiKey: input.clearKey ? "" : input.apiKey?.trim() || prev.apiKey,
+        };
+        log(db, admin.email, "Updated AI tutor voice", db.tts.provider === "elevenlabs" ? `ElevenLabs ${db.tts.voiceId} (${db.tts.model})` : "browser voice");
+        const { apiKey, ...t } = db.tts;
+        return { ...t, apiKeyMasked: mask(apiKey) };
+      }),
+    );
+  },
+  async testTts() {
+    const db = readDemoDb();
+    owner(db);
+    const t = { ...DEMO_TTS_DEFAULTS, ...db.tts };
+    if (!t.apiKey) return { ok: false, message: "Add an ElevenLabs API key first." };
+    try {
+      const blob = await elevenLabsFromBrowser(TTS_SAMPLE, t);
+      return { ok: true, message: `Connected. Voice ${t.voiceId} on ${t.model} is working.`, audio: URL.createObjectURL(blob) };
+    } catch (e) {
+      return { ok: false, message: e instanceof Error ? e.message : "The test failed." };
     }
   },
 };

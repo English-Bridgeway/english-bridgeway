@@ -125,14 +125,24 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
 - API: `PATCH /api/me` (name, phone, `profile`), `PUT/DELETE /api/me/avatar` (photo as a data: URL, shrunk to 256×256 in the
   browser), `GET /api/avatars/:id`, `GET /api/ai/status`, `POST /api/ai/chat`, `GET /api/plans`, `POST /api/orders` with
   `{ planId }` (a subscription) or `{ courseId }` (one course); admin: `/api/admin/learners…`, `/api/admin/settings/access`,
-  `/api/admin/settings/ai`, `/api/admin/settings/plans`.
+  `/api/admin/settings/ai`, `/api/admin/settings/tts`, `/api/admin/settings/plans`.
 
 ## Speak with AI (`/learn/ai`)
 
 Learners talk out loud with "Bridget", an AI English tutor: the browser's speech recognition turns their voice into text
-(Chrome, Edge, Safari; typing works everywhere), the server asks the AI, and the reply is read aloud in the site's female
-Listen voice. Situations: free talk, job interview, restaurant, shopping, travel, doctor, office. When the learner makes a
-mistake the tutor shows a "Better:" correction. Hands-free mode listens again after each reply.
+(Chrome, Edge, Safari; typing works everywhere), the server asks the AI, and the reply is read aloud in the ElevenLabs
+tutor voice (or the site's female Listen voice when none is set). Situations: free talk, job interview, restaurant, shopping,
+travel, doctor, office. Bridget is sweet and playful: when the learner makes a mistake she shows a "Better:" correction,
+laughs softly, explains the mistake in Marathi (or Hindi / English, set in Admin → AI tutor → *Explain mistakes in*) and asks
+them to say the right sentence. Hands-free mode listens again after each reply.
+
+**Tutor voice (ElevenLabs).** In Admin → AI tutor → *Tutor voice*, tick *Speak replies with ElevenLabs*, paste an
+ElevenLabs API key, pick a voice (default "Sarah", `EXAVITQu4vr4xnSDxMaL`, or paste any Voice Library ID) and keep the
+`eleven_v3` model: it reads Marathi and English in one sentence and acts the audio tags Bridget writes, like `[laughs softly]`
+or `[giggles]` (the tags are hidden on screen). **Play a sample** checks it. The key stays on the server: `/api/ai/speak`
+only speaks text the server signed (its own replies and openers) and keeps recent audio in memory. `ELEVENLABS_API_KEY`,
+`ELEVENLABS_VOICE_ID` and `ELEVENLABS_MODEL` in `.env` apply when nothing is saved in the admin panel. If ElevenLabs fails,
+the browser voice takes over.
 
 **Set it up (Admin → AI tutor, owner only):** pick a provider, paste an API key, tick *Speak with AI is on*, save, then
 **Test saved settings**. Any OpenAI-compatible API works:
