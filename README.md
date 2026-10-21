@@ -234,6 +234,14 @@ npm run dev               # open http://localhost:5173/admin
   `dist/` too, so one Node process (behind Nginx/HTTPS) runs everything; build the site with `VITE_API_BASE=/api` in that case.
 - Add more admins in the panel, or from the terminal: `npm run create-admin -- you@example.com "Your Name" owner`.
 
+## Mobile app (`mobile/`)
+
+A Flutter app for Android and iOS, built from the Stitch designs, with Home, Learn (grammar,
+vocabulary, spoken English, blog), Quiz, Courses (Cashfree checkout, plans) and Profile tabs, plus
+Speak with AI by voice. It uses the same API and learner accounts as the website. See
+[mobile/README.md](mobile/README.md) to run and build it; the **Mobile app** GitHub Action builds an
+APK for every pull request that changes `mobile/`.
+
 ## Project structure
 
 ```
