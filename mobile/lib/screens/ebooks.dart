@@ -5,6 +5,7 @@ import 'package:pdfrx/pdfrx.dart';
 import '../models.dart';
 import '../nav.dart';
 import '../services/api.dart';
+import '../services/payments.dart';
 import '../state.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -160,7 +161,7 @@ class _EbookCard extends StatelessWidget {
               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Icon(Icons.lock_outline_rounded, size: 16, color: AppColors.outline),
                 const SizedBox(width: 6),
-                Expanded(child: Text(book.lockedReason ?? 'Locked', style: const TextStyle(fontSize: 12.5, color: AppColors.onSurfaceVariant, height: 1.4))),
+                Expanded(child: Text(inAppPurchases ? (book.lockedReason ?? 'Locked') : 'Opens when your account has a paid course.', style: const TextStyle(fontSize: 12.5, color: AppColors.onSurfaceVariant, height: 1.4))),
               ]),
           ]),
         ),
