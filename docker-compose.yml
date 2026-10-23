@@ -57,6 +57,11 @@ services:
       TURN_URLS: ${TURN_URLS:-}
       TURN_SECRET: ${TURN_SECRET:-}
       VOICE_MAX_ROOM_SIZE: ${VOICE_MAX_ROOM_SIZE:-6}
+      # E-book PDFs and covers live in the ebooks-data volume.
+      EBOOKS_DIR: /app/uploads/ebooks
+      EBOOK_MAX_MB: ${EBOOK_MAX_MB:-100}
+    volumes:
+      - ebooks-data:/app/uploads/ebooks
 
   web:
     build:
@@ -111,3 +116,4 @@ services:
 
 volumes:
   db-data:
+  ebooks-data:

@@ -20,6 +20,7 @@ const LearnerDetail = lazy(() => import("./pages/LearnerDetail"));
 const AiTutor = lazy(() => import("./pages/AiTutor"));
 const Plans = lazy(() => import("./pages/Plans"));
 const Policies = lazy(() => import("./pages/Policies"));
+const Ebooks = lazy(() => import("./pages/Ebooks"));
 
 function Gate() {
   const { admin, isOwner } = useAdmin();
@@ -32,6 +33,7 @@ function Gate() {
           <Route path="content/:collection" element={<ContentList />} />
           <Route path="content/:collection/new" element={<ContentEdit />} />
           <Route path="content/:collection/edit/:key" element={<ContentEdit />} />
+          <Route path="ebooks" element={<Ebooks />} />
           <Route path="orders" element={<Orders />} />
           <Route path="messages" element={<Messages />} />
           <Route path="learners" element={<Learners />} />

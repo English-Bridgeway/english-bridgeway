@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Bot, CreditCard, ExternalLink, GraduationCap, LayoutDashboard, LogOut, Menu, Mic, UserRound, X } from "lucide-react";
+import { Bot, CreditCard, ExternalLink, GraduationCap, LayoutDashboard, Library, LogOut, Menu, Mic, UserRound, X } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Logo } from "../components/Logo";
@@ -12,6 +12,7 @@ import { cn } from "../utils/cn";
 const nav: { to: string; label: string; icon: LucideIcon; end?: boolean }[] = [
   { to: "/learn", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/learn/courses", label: "My courses", icon: GraduationCap },
+  { to: "/learn/ebooks", label: "E-books", icon: Library },
   { to: "/learn/ai", label: "Speak with AI", icon: Bot },
   { to: "/learn/live", label: "Speak Live", icon: Mic },
   { to: "/learn/billing", label: "Plan & payments", icon: CreditCard },

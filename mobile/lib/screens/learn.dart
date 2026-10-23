@@ -7,6 +7,7 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import 'ai_tutor.dart';
 import 'blog.dart';
+import 'ebooks.dart';
 import 'grammar.dart';
 import 'shell.dart';
 import 'spoken.dart';
@@ -34,6 +35,8 @@ class LearnScreen extends StatelessWidget {
           () => push(context, const SpokenListScreen())),
       (Icons.record_voice_over_rounded, 'Speak with AI', 'Talk with Bridget, your AI tutor', AppColors.navy, AppColors.yellow,
           () => push(context, const AiTutorScreen())),
+      (Icons.local_library_outlined, 'E-books', 'PDF books to read and download', AppColors.amberText, AppColors.amberSoft,
+          () => push(context, const EbooksScreen())),
       (Icons.quiz_outlined, 'Quizzes', '${progress.quizScores.length} of ${data.quizzes.length} taken', AppColors.indigo, AppColors.sky,
           () => MainShell.of(context).select(2)),
       (Icons.article_outlined, 'Blog', '${data.blogPosts.length} articles with tips', AppColors.navy, const Color(0xFFE5E7F5),
