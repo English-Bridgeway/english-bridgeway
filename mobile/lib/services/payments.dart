@@ -8,6 +8,11 @@ import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 
 import 'api.dart';
 
+/// False in the Google Play build (`--dart-define=IN_APP_PURCHASES=false`): Play doesn't allow
+/// selling courses through Cashfree, so that build has no prices or buy buttons. Courses bought
+/// on the website still unlock through the learner's account.
+const inAppPurchases = bool.fromEnvironment('IN_APP_PURCHASES', defaultValue: true);
+
 class PaymentResult {
   final bool paid;
   final String message;

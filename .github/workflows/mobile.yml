@@ -84,6 +84,7 @@ jobs:
         run: >-
           flutter build appbundle --release
           --build-number=${{ github.run_number }}
+          --dart-define=IN_APP_PURCHASES=false
           --dart-define=API_BASE=${{ inputs.api_base || 'https://englishbridgeway.com/api' }}
       - uses: actions/upload-artifact@v4
         with:

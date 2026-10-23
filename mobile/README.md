@@ -74,6 +74,10 @@ Before publishing:
   (`base64 -w0 upload-keystore.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and
   `ANDROID_KEY_PASSWORD`, then run the workflow by hand. The `english-bridgeway-aab` artifact is
   the file to upload to Google Play. Its version code is the run number, so every run can be uploaded.
+- **No buying in the Play build**: Google Play requires its own billing for digital courses, so the
+  bundle is built with `--dart-define=IN_APP_PURCHASES=false`. That build shows no prices, plans or
+  buy buttons; learners buy on the website and their courses unlock in the app after they log in.
+  The APK from pull requests keeps Cashfree checkout for testing.
 - **App id**: `com.englishbridgeway.english_bridgeway` (Android `applicationId`, iOS bundle id).
   Change it before the first upload if you want another one; it can't change afterwards.
 - **iOS**: open `ios/Runner.xcworkspace`, pick your team under Signing & Capabilities. Microphone,
