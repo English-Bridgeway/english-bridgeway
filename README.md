@@ -127,6 +127,40 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
   `{ planId }` (a subscription) or `{ courseId }` (one course); admin: `/api/admin/learners…`, `/api/admin/settings/access`,
   `/api/admin/settings/ai`, `/api/admin/settings/tts`, `/api/admin/settings/plans`.
 
+## E-books (`/learn/ebooks`)
+
+- **Admin → E-books** (owners and editors): add an e-book (title, author, description, optional cover image), upload its
+  **PDF** (up to `EBOOK_MAX_MB`, 100 MB by default, with a progress bar), choose **who can read it** (every learner with a paid
+  course or plan, or only the buyers of one course), publish/hide, reorder, replace the PDF or delete it.
+- **Who can read:** learners who bought any course, or who have full access (a subscription, or access the admin granted).
+  An e-book tied to one course opens for that course's buyers and for full-access learners. Free-trial learners and visitors
+  see the library with a lock and the reason. The rule is `canOpen()` in `server/src/services/ebooks.ts`.
+- **Reading and downloading:** learners open e-books from **E-books** in the portal (website) or **Learn → E-books** in the app
+  (in-app PDF reader). The PDF has no public URL: `POST /api/ebooks/:id/link` checks access and returns a link signed for that
+  learner (4 hours to read, 10 minutes to download), and `GET /api/ebooks/:id/file` checks the signature **and the learner's
+  access again** on every request, so a refund, a block or hiding the e-book stops old links at once. A learner who can read a
+  PDF can still save it, as with any PDF; the links just can't be shared or reused after they expire.
+- **Storage:** PDFs and covers are files in `EBOOKS_DIR` (`server/uploads/ebooks` by default; the `ebooks-data` volume in
+  Docker), with their details in the `ebooks` table. Back up that volume along with the database.
+- **Host Nginx:** uploads are as big as the PDF, so give the admin upload path a larger limit in the host's Nginx (the Docker
+  Nginx already does), e.g. inside the `server { }` block for englishbridgeway.com:
+
+  ```nginx
+  location /api/admin/ebooks/ {
+    client_max_body_size 200m;
+    proxy_request_buffering off;
+    proxy_read_timeout 10m;
+    proxy_pass http://127.0.0.1:8080;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+  ```
+- API: `GET /api/ebooks` (each e-book with `unlocked` for the signed-in learner), `POST /api/ebooks/:id/link`
+  `{ download }`, `GET /api/ebooks/:id/file?…` (signed), `GET /api/ebooks/:id/cover`; admin: `GET/POST /api/admin/ebooks`,
+  `PUT/DELETE /api/admin/ebooks/:id`, `PUT /api/admin/ebooks/:id/file` (raw PDF body, `?name=`), `PUT/DELETE
+  /api/admin/ebooks/:id/cover` (raw image body), `POST /api/admin/ebooks/reorder`.
+
 ## Speak with AI (`/learn/ai`)
 
 Learners talk out loud with "Bridget", an AI English tutor: the browser's speech recognition turns their voice into text
@@ -188,6 +222,7 @@ demo admin panel; some providers block that, so test on the real server.
 | Dashboard | Revenue, paid and pending orders, unread messages, content counts, recent activity |
 | Content | Add, edit, hide/publish, reorder and delete grammar topics and lessons, vocabulary, spoken English lessons, quiz categories, quizzes (with questions), courses (price, curriculum) and blog posts |
 | Orders & payments | Every course order with Cashfree payment ID and UTR, status filters, search, "Check" against Cashfree, refunds, CSV export |
+| E-books | Upload PDF e-books with covers, choose which paid learners can read them, publish, reorder |
 | Messages | Contact form inbox: read, reply by email, archive, delete |
 | Site settings | Site name, tagline, contact details, social links, home-page numbers, Listen voice |
 | Payment gateway | Turn payments on/off, sandbox or production, Cashfree App ID and Secret key (stored encrypted), key test, webhook URL |
@@ -237,7 +272,7 @@ npm run dev               # open http://localhost:5173/admin
 ## Mobile app (`mobile/`)
 
 A Flutter app for Android and iOS, built from the Stitch designs, with Home, Learn (grammar,
-vocabulary, spoken English, blog), Quiz, Courses (Cashfree checkout, plans) and Profile tabs, plus
+vocabulary, spoken English, e-books, blog), Quiz, Courses (Cashfree checkout, plans) and Profile tabs, plus
 Speak with AI by voice. It uses the same API and learner accounts as the website. See
 [mobile/README.md](mobile/README.md) to run and build it; the **Mobile app** GitHub Action builds an
 APK for every pull request that changes `mobile/`.

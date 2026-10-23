@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import path from 'path';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -21,6 +22,9 @@ export const config = {
   publicSiteUrl: (process.env.PUBLIC_SITE_URL || 'http://localhost:5173').replace(/\/$/, ''),
   apiPublicUrl: (process.env.API_PUBLIC_URL || '').replace(/\/$/, ''),
   corsOrigins: list(process.env.CORS_ORIGIN),
+  // Uploaded e-book PDFs and covers. In Docker this is the ebooks-data volume.
+  ebooksDir: path.resolve(process.env.EBOOKS_DIR || 'uploads/ebooks'),
+  ebookMaxMb: Math.max(1, Number(process.env.EBOOK_MAX_MB || 100)),
   voice: {
     // Public STUN servers let two browsers find each other's address. They are enough for
     // most home and mobile networks; TURN (below) relays audio when a direct path is blocked.

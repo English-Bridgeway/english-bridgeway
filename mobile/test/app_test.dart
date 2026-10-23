@@ -10,13 +10,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final _homeList = find.descendant(of: find.byType(RefreshIndicator), matching: find.byType(Scrollable)).first;
 
-Future<void> pumpApp(WidgetTester tester) async {
+Future<void> pumpApp(WidgetTester tester, {Future<http.Response> Function(http.Request)? handler}) async {
   // The asset cache holds a future from the previous test's zone; start fresh.
   rootBundle.clear();
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   // Offline: the app falls back to the bundled content.
-  final api = Api(client: MockClient((_) async => http.Response('{"message":"offline"}', 503)));
+  final api = Api(client: MockClient(handler ?? (_) async => http.Response('{"message":"offline"}', 503)));
   await tester.binding.setSurfaceSize(const Size(412, 915));
   await tester.pumpWidget(BridgewayApp(api: api, prefs: prefs, theme: buildTheme(googleFonts: false).copyWith(textTheme: buildTheme(googleFonts: false).textTheme.apply(fontFamily: 'Roboto'))));
   // Loading the bundled content uses real async work (asset decoding), so let it run.
@@ -27,6 +27,25 @@ Future<void> pumpApp(WidgetTester tester) async {
 }
 
 void main() {
+  testWidgets('e-books list shows open and locked e-books from the server', (tester) async {
+    const books = '[{"id":"b1","title":"Grammar Handbook","author":"EB","description":"","fileSize":2097152,"unlocked":true},'
+        '{"id":"b2","title":"Phrase Book","author":"","description":"","courseTitle":"Spoken English in 30 Days","unlocked":false,'
+        '"lockedReason":"This e-book comes with the course."}]';
+    await pumpApp(tester, handler: (req) async => req.url.path.endsWith('/ebooks')
+        ? http.Response(books, 200, headers: {'content-type': 'application/json'})
+        : http.Response('{"message":"offline"}', 503));
+    await tester.tap(find.text('Learn').last);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('E-books'), 300, scrollable: find.byType(Scrollable).last);
+    await tester.tap(find.text('E-books'));
+    await tester.pumpAndSettle();
+    expect(find.text('Grammar Handbook'), findsOneWidget);
+    expect(find.text('Read'), findsOneWidget);
+    expect(find.text('PDF · 2.0 MB'), findsOneWidget);
+    expect(find.text('This e-book comes with the course.'), findsOneWidget);
+    expect(find.text('Log in to read'), findsOneWidget);
+  });
+
   testWidgets('home shows the hero, streak card and sections from the bundled content', (tester) async {
     await pumpApp(tester);
     expect(find.text('Start Learning'), findsOneWidget);

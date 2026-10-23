@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import {
-  Bot, BookOpen, CreditCard, Contact, Crown, ExternalLink, FileText, GraduationCap, History, Inbox, Languages, LayoutDashboard, ListChecks,
+  Bot, BookOpen, CreditCard, Contact, Crown, ExternalLink, FileText, GraduationCap, History, Inbox, Languages, LayoutDashboard, Library, ListChecks,
   LogOut, Menu, MessagesSquare, Scale, Settings, ShieldCheck, ShoppingBag, UserRound, Users, X,
 } from "lucide-react";
 import { useAdmin } from "../AdminContext";
@@ -25,6 +25,7 @@ const sections: { title?: string; items: NavItem[] }[] = [
       { to: "/admin/content/quizzes", label: "Quizzes", icon: ListChecks },
       { to: "/admin/content/courses", label: "Courses", icon: GraduationCap },
       { to: "/admin/content/blogPosts", label: "Blog posts", icon: FileText },
+      { to: "/admin/ebooks", label: "E-books", icon: Library },
     ],
   },
   {

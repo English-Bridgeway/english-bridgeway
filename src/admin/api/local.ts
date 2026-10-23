@@ -32,6 +32,9 @@ function log(db: DemoDb, email: string, action: string, target: string | null = 
   db.audit = db.audit.slice(0, 500);
 }
 
+const noEbooks = (): Promise<never> =>
+  Promise.reject(new ApiError("E-books need the live server: PDFs are stored there, not in this demo browser. Run the site with VITE_API_BASE set.", 400));
+
 const mask = (s: string) => (s ? `••••••${s.slice(-4)}` : null);
 
 function paymentsView(db: DemoDb) {
@@ -422,6 +425,17 @@ export const localApi: AdminApi = {
       }),
     );
   },
+  // E-books are PDFs kept on the server, so the in-browser demo can't store them.
+  async listEbooks() {
+    current(readDemoDb());
+    return wait([]);
+  },
+  saveEbook: noEbooks,
+  deleteEbook: noEbooks,
+  reorderEbooks: noEbooks,
+  uploadEbookFile: noEbooks,
+  uploadEbookCover: noEbooks,
+  removeEbookCover: noEbooks,
   async getAi() {
     const db = readDemoDb();
     owner(db);

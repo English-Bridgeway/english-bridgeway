@@ -9,7 +9,7 @@ same learner accounts as the website, so whatever the admin panel changes shows 
 | Tab | Screens |
 | --- | --- |
 | Home | Hero, streak and current lesson, stats, learning paths, new lessons, popular courses, word of the day |
-| Learn | Grammar (topics, lessons with rules, examples, mistakes and practice), Vocabulary (search, categories, saved words), Spoken English (dialogues with listen buttons), Speak with AI, Blog |
+| Learn | Grammar (topics, lessons with rules, examples, mistakes and practice), Vocabulary (search, categories, saved words), Spoken English (dialogues with listen buttons), Speak with AI, E-books, Blog |
 | Quiz | Quiz categories, quiz runner with instant feedback and a review, best scores |
 | Courses | Course list, course page with curriculum and trial locks, Cashfree checkout, subscription plans |
 | Profile | Log in / sign up, profile photo, plan and usage, edit profile, orders, contact form, policies, log out of all devices |
@@ -24,6 +24,10 @@ same learner accounts as the website, so whatever the admin panel changes shows 
   content it downloaded, and refreshes from `GET /api/content` on start (pull down to refresh).
 - **Progress** (finished lessons, quiz scores, saved words, streak) is kept on the phone, like
   the website keeps it in the browser.
+- **E-books**: Learn → E-books lists the PDFs from Admin → E-books. Learners with a paid course
+  (bought on the website or in the app) read them in the app (`pdfrx` viewer) or download them
+  (the phone's browser saves the PDF); others see a lock and why. The server checks access for
+  every PDF request.
 - **Access rules** match the website: free trial lessons per course, bought courses, plans and
   special offer prices all come from `GET /api/me`.
 
@@ -34,8 +38,8 @@ Not in the app yet: Speak Live (the WebRTC calls and team rooms). Learners use i
 
 `GET /content`, `GET /payments/config`, `POST /messages`, `POST /auth/register`, `POST /auth/login`,
 `GET|PATCH /me`, `PUT|DELETE /me/avatar`, `GET /avatars/:id`, `GET /me/orders`, `POST /me/logout-all`,
-`POST /orders`, `GET /orders/:id`, `GET /ai/status`, `POST /ai/chat`, `POST /ai/speak`.
-No server changes were needed. Mobile apps don't send an `Origin` header, so `CORS_ORIGINS` doesn't
+`POST /orders`, `GET /orders/:id`, `GET /ai/status`, `POST /ai/chat`, `POST /ai/speak`, `GET /ebooks`,
+`POST /ebooks/:id/link`, `GET /ebooks/:id/file` (signed link), `GET /ebooks/:id/cover`. Mobile apps don't send an `Origin` header, so `CORS_ORIGINS` doesn't
 need the app.
 
 ## Run it

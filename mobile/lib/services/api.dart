@@ -129,6 +129,16 @@ class Api {
   Future<OrderSummary> order(String orderId) async =>
       OrderSummary.fromJson(Map<String, dynamic>.from(await get('/orders/${Uri.encodeComponent(orderId)}') as Map));
 
+  // ---- E-books ----
+
+  /// Published e-books, each marked unlocked or not for the signed-in learner.
+  Future<List<Ebook>> ebooks() async =>
+      (await get('/ebooks') as List).map((b) => Ebook.fromJson(Map<String, dynamic>.from(b as Map))).toList();
+
+  /// A short-lived signed URL to the PDF. The server refuses (403) learners without a paid course.
+  Future<String> ebookLink(String id, {bool download = false}) async =>
+      absolute('${(await post('/ebooks/${Uri.encodeComponent(id)}/link', {'download': download}) as Map)['url']}');
+
   // ---- Speak with AI ----
 
   Future<Map<String, dynamic>> aiStatus() async => Map<String, dynamic>.from(await get('/ai/status') as Map);

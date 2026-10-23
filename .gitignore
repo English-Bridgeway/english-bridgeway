@@ -4,3 +4,4 @@ dist-preview
 dist-ssr
 *.tsbuildinfo
 .env
+uploads

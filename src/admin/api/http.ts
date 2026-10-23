@@ -1,7 +1,7 @@
 import { apiFetch, HttpError } from "../../utils/backend";
 import type { CollectionKey } from "../../data/content";
 import type { SiteSettings } from "../../data/site";
-import { ApiError, type AdminApi, type AdminSession, type AdminUser, type LearnerDetail, type LearnerSummary } from "./types";
+import { ApiError, type AdminApi, type AdminEbook, type AdminSession, type AdminUser, type LearnerDetail, type LearnerSummary } from "./types";
 import { API_BASE } from "../../utils/backend";
 import { getSession, notifyUnauthorized } from "./session";
 
@@ -23,6 +23,34 @@ const enc = encodeURIComponent;
 /** Photo paths come relative to the API (/avatars/…). */
 const withBase = <T extends LearnerSummary>(l: T): T => (l.avatarUrl?.startsWith("/avatars/") ? { ...l, avatarUrl: `${API_BASE}${l.avatarUrl}` } : l);
 const learner = (p: Promise<LearnerDetail>) => p.then(withBase);
+
+/** Cover paths come relative to the API (/ebooks/…). */
+const ebook = (b: AdminEbook): AdminEbook => (b.coverUrl?.startsWith("/") ? { ...b, coverUrl: `${API_BASE}${b.coverUrl}` } : b);
+
+/** Sends a file as the raw request body. XHR rather than fetch, for upload progress on big PDFs. */
+function upload<T>(path: string, file: File, onProgress?: (fraction: number) => void): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", `${API_BASE}/admin${path}`);
+    xhr.setRequestHeader("Authorization", `Bearer ${getSession()?.token ?? ""}`);
+    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.setRequestHeader("Accept", "application/json");
+    if (onProgress) xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () => {
+      let data: { message?: string } = {};
+      try {
+        data = JSON.parse(xhr.responseText);
+      } catch {
+        // Nginx answers 413 with HTML.
+      }
+      if (xhr.status >= 200 && xhr.status < 300) return resolve(data as T);
+      if (xhr.status === 401) notifyUnauthorized();
+      reject(new ApiError(data.message || (xhr.status === 413 ? "The file is too big for the server. Raise client_max_body_size in Nginx." : `Upload failed (${xhr.status})`), xhr.status));
+    };
+    xhr.onerror = () => reject(new ApiError("The upload stopped. Check your connection and try again.", 0));
+    xhr.send(file);
+  });
+}
 
 /** Admin API backed by the server in server/ (VITE_API_BASE). */
 export const httpApi: AdminApi = {
@@ -66,6 +94,14 @@ export const httpApi: AdminApi = {
   saveAccessSettings: (input) => call("/settings/access", { method: "PUT", json: input }),
   getPlans: () => call("/settings/plans"),
   savePlans: (plans) => call("/settings/plans", { method: "PUT", json: { plans } }),
+  listEbooks: () => call<AdminEbook[]>("/ebooks").then((rows) => rows.map(ebook)),
+  saveEbook: (input, id) => call<AdminEbook>(id ? `/ebooks/${enc(id)}` : "/ebooks", { method: id ? "PUT" : "POST", json: input }).then(ebook),
+  deleteEbook: (id) => call(`/ebooks/${enc(id)}`, { method: "DELETE" }),
+  reorderEbooks: (ids) => call<AdminEbook[]>("/ebooks/reorder", { json: { ids } }).then((rows) => rows.map(ebook)),
+  uploadEbookFile: (id, file, onProgress) =>
+    upload<AdminEbook>(`/ebooks/${enc(id)}/file?name=${enc(file.name)}`, new File([file], file.name, { type: "application/pdf" }), onProgress).then(ebook),
+  uploadEbookCover: (id, file) => upload<AdminEbook>(`/ebooks/${enc(id)}/cover`, file).then(ebook),
+  removeEbookCover: (id) => call<AdminEbook>(`/ebooks/${enc(id)}/cover`, { method: "DELETE" }).then(ebook),
   getAi: () => call("/settings/ai"),
   saveAi: (input) => call("/settings/ai", { method: "PUT", json: input }),
   testAi: () => call("/settings/ai/test", { json: {} }),
