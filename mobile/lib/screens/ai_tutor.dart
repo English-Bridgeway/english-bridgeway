@@ -6,6 +6,7 @@ import 'package:speech_to_text/speech_to_text.dart';
 import '../models.dart';
 import '../nav.dart';
 import '../services/api.dart';
+import '../services/payments.dart';
 import '../services/speech.dart';
 import '../state.dart';
 import '../theme.dart';
@@ -220,9 +221,11 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
                           ? _gate(
                               icon: Icons.lock_outline_rounded,
                               title: 'Your AI messages are used up',
-                              message: '${_status!['message'] ?? 'Get a plan to keep practising with Bridget.'}',
-                              action: 'See plans',
-                              onAction: () => push(context, const PlansScreen()),
+                              message: inAppPurchases
+                                  ? '${_status!['message'] ?? 'Get a plan to keep practising with Bridget.'}'
+                                  : 'You have used the AI messages in your account for now.',
+                              action: inAppPurchases ? 'See plans' : null,
+                              onAction: inAppPurchases ? () => push(context, const PlansScreen()) : null,
                             )
                           : _chat(),
     );

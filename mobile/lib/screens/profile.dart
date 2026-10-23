@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../nav.dart';
 import '../services/api.dart';
+import '../services/payments.dart';
 import '../state.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
@@ -37,7 +38,7 @@ class ProfileScreen extends StatelessWidget {
                 ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Text('Learn with your account', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 6),
-                    Text('Log in to buy courses, talk with the AI tutor and use your website account on this phone.',
+                    Text(inAppPurchases ? 'Log in to buy courses, talk with the AI tutor and use your website account on this phone.' : 'Log in to open your courses, talk with the AI tutor and use your website account on this phone.',
                         style: TextStyle(color: Colors.white.withValues(alpha: 0.9), height: 1.5)),
                     const SizedBox(height: 16),
                     AppButton('Create free account', onPressed: () => push(context, const AuthScreen(startWithRegister: true))),
@@ -98,7 +99,7 @@ class ProfileScreen extends StatelessWidget {
               _Item(Icons.receipt_long_outlined, 'My orders', () => push(context, const OrdersScreen())),
             ],
             _Item(Icons.bookmark_border_rounded, 'Saved words (${progress.favoriteWords.length})', () => push(context, const VocabularyScreen(favoritesOnly: true))),
-            _Item(Icons.workspace_premium_outlined, 'Plans and pricing', () => push(context, const PlansScreen())),
+            if (inAppPurchases) _Item(Icons.workspace_premium_outlined, 'Plans and pricing', () => push(context, const PlansScreen())),
             _Item(Icons.menu_book_outlined, 'My courses', () => MainShell.of(context).select(3)),
           ]),
           const SizedBox(height: 14),

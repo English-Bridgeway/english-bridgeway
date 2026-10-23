@@ -54,7 +54,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
         const SizedBox(height: 16),
         for (final c in courses) Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 14), child: CourseCard(course: c)),
         if (courses.isEmpty) const EmptyState(icon: Icons.school_outlined, title: 'No courses here yet', message: 'Try another level.'),
-        if (data.plans.isNotEmpty)
+        if (inAppPurchases && data.plans.isNotEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
             child: AppCard(
@@ -108,7 +108,7 @@ class CourseCard extends StatelessWidget {
                 Row(children: [
                   Icon(appIcon(course.icon), color: Colors.white, size: 26),
                   const Spacer(),
-                  Pill(owned ? 'Unlocked' : course.isPaid ? formatPrice(auth.priceFor(course)) : 'Free',
+                  Pill(owned ? 'Unlocked' : course.isPaid ? (inAppPurchases ? formatPrice(auth.priceFor(course)) : 'Premium') : 'Free',
                       background: AppColors.yellow, foreground: AppColors.navy),
                 ]),
                 const SizedBox(height: 10),
@@ -163,6 +163,7 @@ class _CourseScreenState extends State<CourseScreen> {
   @override
   void initState() {
     super.initState();
+    if (!inAppPurchases) return;
     context.read<Api>().paymentsEnabled().then((v) {
       if (mounted) setState(() => _paymentsOn = v);
     }).catchError((_) {
@@ -192,7 +193,11 @@ class _CourseScreenState extends State<CourseScreen> {
     void openLesson(int index) {
       final l = lessons[index];
       if (!auth.canOpenLesson(course, index)) {
-        showBuySheet(context, course);
+        if (inAppPurchases) {
+          showBuySheet(context, course);
+        } else {
+          showSnack(context, 'This lesson is part of the full course.');
+        }
         return;
       }
       if (l.href == null) {
@@ -207,6 +212,10 @@ class _CourseScreenState extends State<CourseScreen> {
     if (!locked) {
       cta = AppButton(p.done > 0 ? 'Continue course' : 'Start course',
           leading: Icons.play_circle_rounded, onPressed: nextIndex < 0 ? null : () => openLesson(nextIndex));
+    } else if (!inAppPurchases) {
+      cta = auth.signedIn
+          ? AppButton('Refresh my courses', leading: Icons.refresh_rounded, onPressed: auth.refresh)
+          : AppButton('Log in to open your courses', leading: Icons.lock_rounded, onPressed: () => push(context, const AuthScreen()));
     } else if (_paymentsOn == false) {
       cta = AppButton('Contact us to enrol', onPressed: () => push(context, const ContactScreen()));
     } else if (!auth.signedIn) {
@@ -229,7 +238,7 @@ class _CourseScreenState extends State<CourseScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Wrap(spacing: 6, runSpacing: 6, children: [
                 LevelChip(course.level),
-                Pill(course.isPaid ? formatPrice(course.price) : 'Free', background: AppColors.yellow),
+                Pill(course.isPaid ? (inAppPurchases ? formatPrice(course.price) : 'Premium') : 'Free', background: AppColors.yellow),
               ]),
               const SizedBox(height: 12),
               Wrap(spacing: 14, runSpacing: 6, children: [
@@ -261,7 +270,7 @@ class _CourseScreenState extends State<CourseScreen> {
                     style: const TextStyle(fontSize: 12, color: AppColors.outline),
                   ),
                 ),
-                if (locked && auth.signedIn && data.plans.isNotEmpty && _paymentsOn != false) ...[
+                if (inAppPurchases && locked && auth.signedIn && data.plans.isNotEmpty && _paymentsOn != false) ...[
                   const SizedBox(height: 10),
                   AppButton('Or get every course with a plan', kind: ButtonKind.ghost, onPressed: () => push(context, const PlansScreen())),
                 ],
@@ -356,6 +365,10 @@ class _CourseScreenState extends State<CourseScreen> {
   String _accessNote(Course course, AuthStore auth, bool locked) {
     final a = auth.account;
     if (locked) {
+      if (!inAppPurchases) {
+        final free = auth.signedIn ? auth.freeLessonsFor(course) : 0;
+        return '${free > 0 ? 'The first $free lesson${free == 1 ? ' is' : 's are'} free on your trial. ' : ''}Courses in your account open here.';
+      }
       if (_paymentsOn == false) return 'Online payment is not available right now.';
       if (!auth.signedIn) return 'New here? Sign up for a free trial and try the first lessons.';
       final free = auth.freeLessonsFor(course);
@@ -425,7 +438,7 @@ class NextCourseLessonButton extends StatelessWidget {
       final auth = context.read<AuthStore>();
       if (!auth.canOpenLesson(course, next)) {
         Navigator.of(context).pop();
-        showSnack(context, 'Buy the course to open the next lesson.');
+        showSnack(context, inAppPurchases ? 'Buy the course to open the next lesson.' : 'The next lesson is part of the full course.');
         return;
       }
       final screen = screenFor(context.read<ContentStore>().data, lessons[next].href!, course: course, lessonIndex: next);
@@ -490,6 +503,7 @@ class PlansScreen extends StatelessWidget {
 
 /// Collects the buyer's name and mobile number, then opens Cashfree checkout.
 Future<void> showBuySheet(BuildContext context, Course? course, {SubscriptionPlan? plan}) async {
+  if (!inAppPurchases) return;
   final auth = context.read<AuthStore>();
   if (!auth.signedIn) {
     push(context, const AuthScreen());

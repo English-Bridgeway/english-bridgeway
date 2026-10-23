@@ -65,9 +65,19 @@ workflow by hand (Actions → Mobile app → Run workflow) to build against anot
 
 Before publishing:
 
-- **Android signing**: release builds are signed with the debug key for now. Create an upload
-  keystore and add a `signingConfigs.release` block in `android/app/build.gradle.kts`
-  ([Flutter guide](https://docs.flutter.dev/deployment/android#sign-the-app)).
+- **Android signing**: create an upload keystore once and keep it (and its passwords) safe:
+  `keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload`.
+  To build on your computer, put the file in `android/app/` and write `android/key.properties`
+  (`storeFile=upload-keystore.jks`, `storePassword=…`, `keyAlias=upload`, `keyPassword=…`); both are
+  git-ignored. Without that file, release builds are signed with the debug key.
+- **Signed bundle from GitHub**: add the repository secrets `ANDROID_KEYSTORE_BASE64`
+  (`base64 -w0 upload-keystore.jks`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and
+  `ANDROID_KEY_PASSWORD`, then run the workflow by hand. The `english-bridgeway-aab` artifact is
+  the file to upload to Google Play. Its version code is the run number, so every run can be uploaded.
+- **No buying in the Play build**: Google Play requires its own billing for digital courses, so the
+  bundle is built with `--dart-define=IN_APP_PURCHASES=false`. That build shows no prices, plans or
+  buy buttons; learners buy on the website and their courses unlock in the app after they log in.
+  The APK from pull requests keeps Cashfree checkout for testing.
 - **App id**: `com.englishbridgeway.english_bridgeway` (Android `applicationId`, iOS bundle id).
   Change it before the first upload if you want another one; it can't change afterwards.
 - **iOS**: open `ios/Runner.xcworkspace`, pick your team under Signing & Capabilities. Microphone,
