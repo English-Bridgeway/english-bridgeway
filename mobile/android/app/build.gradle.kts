@@ -51,6 +51,10 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
+            // R8 strips plugin methods that are only called from Dart through JNI (shared_preferences
+            // getAll), which made the release app stop on the launch screen. Keep all code.
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

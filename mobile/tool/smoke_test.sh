@@ -21,7 +21,11 @@ grep -E "FATAL EXCEPTION|AndroidRuntime: |E/flutter|Unhandled Exception" "$OUT/l
   echo "::warning title=device log::${line//%/%25}"
 done
 
-if adb shell pidof "$PKG" > /dev/null; then
+if grep -qE "FATAL EXCEPTION|Unhandled Exception" "$OUT/logcat.txt"; then
+  echo "::error::The app threw an error while starting (see the device log annotations)."
+  tail -n 200 "$OUT/app-log.txt"
+  exit 1
+elif adb shell pidof "$PKG" > /dev/null; then
   echo "App is running after 40 seconds."
 else
   echo "::error::The app is not running 40 seconds after launch (it crashed or closed)."
