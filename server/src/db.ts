@@ -317,6 +317,47 @@ CallLog.init(
   { sequelize, tableName: 'call_logs', underscored: true, timestamps: false, indexes: [{ fields: ['learner_id', 'started_at'] }] },
 );
 
+// E-books: PDFs the admin uploads. The PDF and cover image are files in config.ebooksDir
+// (a Docker volume); only learners with a paid course can open them (services/ebooks.ts).
+export class Ebook extends Model<InferAttributes<Ebook>, InferCreationAttributes<Ebook>> {
+  declare id: CreationOptional<string>;
+  declare title: string;
+  declare author: CreationOptional<string>;
+  declare description: CreationOptional<string>;
+  /** Only learners who bought this course (or have full access) can open it; null = any paid learner. */
+  declare courseId: CreationOptional<string | null>;
+  declare published: CreationOptional<boolean>;
+  declare position: CreationOptional<number>;
+  /** The uploaded PDF's original name and size; null until a PDF is uploaded. */
+  declare fileName: CreationOptional<string | null>;
+  declare fileSize: CreationOptional<number | null>;
+  declare fileUpdatedAt: CreationOptional<Date | null>;
+  declare coverMime: CreationOptional<string | null>;
+  declare coverUpdatedAt: CreationOptional<Date | null>;
+  declare createdAt: CreationOptional<Date>;
+  declare updatedAt: CreationOptional<Date>;
+}
+
+Ebook.init(
+  {
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    title: { type: DataTypes.STRING(200), allowNull: false },
+    author: { type: DataTypes.STRING(120), allowNull: false, defaultValue: '' },
+    description: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
+    courseId: { type: DataTypes.STRING(160), allowNull: true },
+    published: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    position: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    fileName: { type: DataTypes.STRING(200), allowNull: true },
+    fileSize: { type: DataTypes.INTEGER, allowNull: true },
+    fileUpdatedAt: { type: DataTypes.DATE, allowNull: true },
+    coverMime: { type: DataTypes.STRING(30), allowNull: true },
+    coverUpdatedAt: { type: DataTypes.DATE, allowNull: true },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
+  },
+  { sequelize, tableName: 'ebooks', underscored: true },
+);
+
 /** Creates any missing tables. Safe to run on every start; it never drops data. */
 export async function initDatabase(): Promise<void> {
   await sequelize.authenticate();

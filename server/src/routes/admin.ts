@@ -11,6 +11,7 @@ import { OrderError, orderDto, refundOrder, syncOrder } from '../services/orders
 import { getPlans, PlanError, savePlans } from '../services/plans';
 import { config } from '../config';
 import { adminLearnersRouter } from './adminLearners';
+import { adminEbooksRouter } from './adminEbooks';
 
 export const adminRouter = Router();
 
@@ -37,6 +38,7 @@ adminRouter.post(
 adminRouter.use(requireAdmin);
 
 adminRouter.use(adminLearnersRouter);
+adminRouter.use(adminEbooksRouter);
 
 adminRouter.get('/me', (req, res) => {
   res.json(adminDto(req.admin!));

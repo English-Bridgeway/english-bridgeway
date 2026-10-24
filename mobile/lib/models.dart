@@ -411,3 +411,21 @@ class ChatMessage {
   ChatMessage(this.role, this.content, [this.speechSig]);
   Map<String, dynamic> toJson() => {'role': role, 'content': content};
 }
+
+/// An e-book (PDF) from GET /api/ebooks. `unlocked` is the server's answer for this learner.
+class Ebook {
+  final String id, title, author, description;
+  final String? courseTitle, coverUrl, lockedReason;
+  final int? fileSize;
+  final bool unlocked;
+  Ebook(this.id, this.title, this.author, this.description, this.courseTitle, this.coverUrl, this.fileSize, this.unlocked, this.lockedReason);
+  factory Ebook.fromJson(Map<String, dynamic> j) => Ebook(_s(j['id']), _s(j['title']), _s(j['author']), _s(j['description']),
+      j['courseTitle'] as String?, j['coverUrl'] as String?, j['fileSize'] == null ? null : _i(j['fileSize']), j['unlocked'] == true,
+      j['lockedReason'] as String?);
+
+  String get sizeLabel {
+    final b = fileSize ?? 0;
+    if (b <= 0) return 'PDF';
+    return b >= 1024 * 1024 ? 'PDF · ${(b / (1024 * 1024)).toStringAsFixed(1)} MB' : 'PDF · ${(b / 1024).ceil()} KB';
+  }
+}

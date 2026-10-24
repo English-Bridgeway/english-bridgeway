@@ -209,6 +209,32 @@ export interface TtsSettingsInput extends Omit<TtsSettings, "apiKeyMasked"> {
   clearKey?: boolean;
 }
 
+/** An e-book (PDF) in Admin → E-books. URLs are relative to the API (/ebooks/…). */
+export interface AdminEbook {
+  id: string;
+  title: string;
+  author: string;
+  description: string;
+  /** Only buyers of this course (or learners with full access) can open it; null = any paid learner. */
+  courseId: string | null;
+  courseTitle: string | null;
+  published: boolean;
+  position: number;
+  fileName: string | null;
+  fileSize: number | null;
+  coverUrl: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+
+export interface EbookInput {
+  title: string;
+  author: string;
+  description: string;
+  courseId: string | null;
+  published: boolean;
+}
+
 export interface AdminApi {
   mode: "live" | "demo";
   login(email: string, password: string): Promise<AdminSession>;
@@ -256,6 +282,15 @@ export interface AdminApi {
   getPlans(): Promise<AdminPlan[]>;
   savePlans(plans: AdminPlan[]): Promise<AdminPlan[]>;
   saveAccessSettings(input: AccessSettings): Promise<AccessSettings>;
+
+  listEbooks(): Promise<AdminEbook[]>;
+  saveEbook(input: EbookInput, id?: string): Promise<AdminEbook>;
+  deleteEbook(id: string): Promise<void>;
+  reorderEbooks(ids: string[]): Promise<AdminEbook[]>;
+  /** Uploads the PDF; `onProgress` gets 0..1 while it is sent. */
+  uploadEbookFile(id: string, file: File, onProgress?: (fraction: number) => void): Promise<AdminEbook>;
+  uploadEbookCover(id: string, file: File): Promise<AdminEbook>;
+  removeEbookCover(id: string): Promise<AdminEbook>;
 
   getAi(): Promise<AiSettings>;
   saveAi(input: AiSettingsInput): Promise<AiSettings>;

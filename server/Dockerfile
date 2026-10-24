@@ -14,6 +14,8 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=build /app/dist ./dist
 COPY seed ./seed
+# Uploaded e-books; Docker copies this owner onto a new ebooks-data volume.
+RUN mkdir -p /app/uploads/ebooks && chown -R node:node /app/uploads
 USER node
 EXPOSE 4000
 # On start the API creates its tables, loads seed/content.json into an empty database
