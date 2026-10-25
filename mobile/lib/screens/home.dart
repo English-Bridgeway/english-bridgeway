@@ -8,6 +8,7 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import 'auth.dart';
 import 'courses.dart';
+import 'dashboard.dart';
 import 'grammar.dart';
 import 'quiz.dart';
 import 'shell.dart';
@@ -22,14 +23,16 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final content = context.watch<ContentStore>();
     final data = content.data;
+    // Signed in, Home is the learner's dashboard; visitors see the welcome page.
+    final signedIn = context.watch<AuthStore>().signedIn;
     return Scaffold(
-      appBar: const BrandBar('Home'),
+      appBar: BrandBar(signedIn ? 'Dashboard' : 'Home'),
       body: RefreshIndicator(
         onRefresh: () async {
           await content.refresh();
           if (context.mounted) await context.read<AuthStore>().refresh();
         },
-        child: ListView(
+        child: signedIn ? const DashboardView() : ListView(
           padding: const EdgeInsets.only(bottom: 32),
           children: [
             const _Hero(),

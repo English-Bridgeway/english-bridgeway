@@ -8,12 +8,21 @@ same learner accounts as the website, so whatever the admin panel changes shows 
 
 | Tab | Screens |
 | --- | --- |
-| Home | Hero, streak and current lesson, stats, learning paths, new lessons, popular courses, word of the day |
+| Home | Signed out: hero, streak and current lesson, stats, learning paths, new lessons, popular courses, word of the day. Signed in: **dashboard** with greeting, streak, lessons done, quiz average, this week's activity, the course in progress with Resume, shortcuts, up next (grammar, speaking, quiz), my courses, word of the day |
 | Learn | Grammar (topics, lessons with rules, examples, mistakes and practice), Vocabulary (search, categories, saved words), Spoken English (dialogues with listen buttons), Speak with AI, E-books, Blog |
 | Quiz | Quiz categories, quiz runner with instant feedback and a review, best scores |
 | Courses | Course list, course page with curriculum and trial locks, Cashfree checkout, subscription plans |
 | Profile | Log in / sign up, profile photo, plan and usage, edit profile, orders, contact form, policies, log out of all devices |
 
+- **Welcome pages**: three pages on the first start after an install (what the app teaches, the
+  AI tutor call with the mic on by itself and mistakes explained in Marathi, the dashboard), then
+  Create account / Log in / Explore first. Seen once (`onboarding-done` in shared preferences).
+- **Update popup**: on start the app checks for a newer version. Installed from Google Play, it uses
+  Play's in-app update (update priority 4 or 5 in the Play Developer API makes it required). Installed
+  from the APK, it reads `GET /api/app/version` and offers the APK published in **Admin → Mobile app**;
+  "Update now" opens the download in the browser, and Android installs it over the old app (data
+  and login are kept because it's signed with the same key). "Later" asks again a day later; a
+  version marked **Required update** in the admin blocks the app until it's updated.
 - **Speak with AI**: chat with Bridget by typing or speaking (speech-to-text). Replies are read
   aloud in the ElevenLabs voice when the server has it set up (`/api/ai/speak`), otherwise in the
   phone's voice. Corrections show in a yellow box. Situations: free talk, interview, restaurant,
@@ -39,7 +48,7 @@ Not in the app yet: Speak Live (the WebRTC calls and team rooms). Learners use i
 `GET /content`, `GET /payments/config`, `POST /messages`, `POST /auth/register`, `POST /auth/login`,
 `GET|PATCH /me`, `PUT|DELETE /me/avatar`, `GET /avatars/:id`, `GET /me/orders`, `POST /me/logout-all`,
 `POST /orders`, `GET /orders/:id`, `GET /ai/status`, `POST /ai/chat`, `POST /ai/speak`, `GET /ebooks`,
-`POST /ebooks/:id/link`, `GET /ebooks/:id/file` (signed link), `GET /ebooks/:id/cover`. Mobile apps don't send an `Origin` header, so `CORS_ORIGINS` doesn't
+`POST /ebooks/:id/link`, `GET /ebooks/:id/file` (signed link), `GET /ebooks/:id/cover`, `GET /app/version`, `GET /app/android.apk`. Mobile apps don't send an `Origin` header, so `CORS_ORIGINS` doesn't
 need the app.
 
 ## Run it
@@ -54,6 +63,23 @@ flutter run --dart-define=API_BASE=http://10.0.2.2:4000/api   # local server fro
 ```
 
 `flutter analyze` and `flutter test` should both pass.
+
+## Releasing an update to APK users
+
+1. Raise `version:` in `pubspec.yaml` when the release has something new (for example `1.1.0` to `1.2.0`).
+2. Push to `main` (or run **Actions → Mobile app → Run workflow**). The run summary shows the version
+   and the build number, which is the run number.
+3. Download the `english-bridgeway-apk` artifact, unzip it, and in **Admin → Mobile app** upload
+   `app-release.apk` with that version, build number and a few lines of "What's new".
+
+Phones with an older build show the update popup the next time the app starts. The build number
+must be the one from the same run as the APK, or phones will keep asking to update.
+
+Android only installs an update signed with the same key as the installed app. The workflow signs
+the APK with the upload key when the `ANDROID_KEYSTORE_*` secrets are set (see below); without them
+each run gets a temporary key, the run summary warns, and that APK can't be published as an update.
+A phone that has an APK with a temporary key (any APK built before the secrets were added) needs to
+uninstall it once and install a signed APK; after that, updates install over it.
 
 ## Build for the stores
 
@@ -98,8 +124,8 @@ lib/
   models.dart          content and account types (mirror src/types on the website)
   state.dart           ContentStore, AuthStore (access rules), ProgressStore
   nav.dart             push() and openHref() for website paths in course curricula
-  services/            api.dart, payments.dart (Cashfree), speech.dart (text-to-speech)
+  services/            api.dart, payments.dart (Cashfree), speech.dart (text-to-speech), updates.dart (update popup)
   widgets/common.dart  cards, pills, buttons, headers, listen button
-  screens/             one file per area (home, grammar, vocabulary, spoken, quiz, courses, ai_tutor, profile…)
+  screens/             one file per area (onboarding, home, dashboard, grammar, vocabulary, spoken, quiz, courses, ai_tutor, profile…)
 assets/content.json    copy of server/seed/content.json (refresh it when the seed changes)
 ```

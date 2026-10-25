@@ -32,8 +32,49 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      # Phones only install an update signed with the same key as the app they have, so the APK
+      # is signed with the upload key when the secrets are there (the same key as the Play build).
+      - name: Sign with the upload key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::No ANDROID_KEYSTORE_* secrets, so this APK has a temporary key: phones can't update to it over an older APK. Add the secrets (mobile/README.md)."
+            echo "APK_KEY=temporary" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+          cat > android/key.properties <<PROPS
+          storeFile=upload-keystore.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          PROPS
+          sed -i 's/^ *//' android/key.properties
+          echo "APK_KEY=upload" >> "$GITHUB_ENV"
+      # The build number is the run number, so every APK is newer than the last one and phones
+      # can be offered it in Admin → Mobile app (the version and build are in the run summary).
       - name: Build APK
-        run: flutter build apk --release --dart-define=API_BASE=${{ inputs.api_base || 'https://englishbridgeway.com/api' }}
+        run: >-
+          flutter build apk --release
+          --build-number=${{ github.run_number }}
+          --dart-define=API_BASE=${{ inputs.api_base || 'https://englishbridgeway.com/api' }}
+      - name: Summary
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed -E 's/version: *([^+]*).*/\1/')
+          {
+            echo "### Android APK"
+            echo ""
+            echo "Version **$VERSION**, build number **${{ github.run_number }}**."
+            if [ "$APK_KEY" = upload ]; then
+              echo "To send it to phones: download english-bridgeway-apk below, then Admin → Mobile app → Publish a new version."
+            else
+              echo "⚠️ Signed with a temporary key (no ANDROID_KEYSTORE_* secrets). Don't publish it as an update: phones can't install it over their app."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: english-bridgeway-apk

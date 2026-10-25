@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   Bot, BookOpen, CreditCard, Contact, Crown, ExternalLink, FileText, GraduationCap, History, Inbox, Languages, LayoutDashboard, Library, ListChecks,
-  LogOut, Menu, MessagesSquare, Scale, Settings, ShieldCheck, ShoppingBag, UserRound, Users, X,
+  LogOut, Menu, MessagesSquare, Smartphone, Scale, Settings, ShieldCheck, ShoppingBag, UserRound, Users, X,
 } from "lucide-react";
 import { useAdmin } from "../AdminContext";
 import { adminApi } from "../api";
@@ -44,6 +44,7 @@ const sections: { title?: string; items: NavItem[] }[] = [
       { to: "/admin/settings/plans", label: "Subscription plans", icon: Crown, ownerOnly: true },
       { to: "/admin/settings/policies", label: "Policies & business", icon: Scale, ownerOnly: true },
       { to: "/admin/settings/ai", label: "AI tutor", icon: Bot, ownerOnly: true },
+      { to: "/admin/settings/app", label: "Mobile app", icon: Smartphone, ownerOnly: true },
       { to: "/admin/admins", label: "Admins", icon: Users, ownerOnly: true },
       { to: "/admin/activity", label: "Activity log", icon: History },
     ],

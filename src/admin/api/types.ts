@@ -235,6 +235,25 @@ export interface EbookInput {
   published: boolean;
 }
 
+/** The Android APK offered to learners who installed the app outside Google Play (Admin → Mobile app). */
+export interface AppRelease {
+  versionName: string;
+  buildNumber: number;
+  /** Builds older than this must update first. 0 = never force. */
+  minBuild: number;
+  notes: string;
+  fileSize: number;
+  sha256: string;
+  uploadedAt: string;
+}
+
+export interface AppReleaseInput {
+  versionName: string;
+  buildNumber: number;
+  minBuild: number;
+  notes: string;
+}
+
 export interface AdminApi {
   mode: "live" | "demo";
   login(email: string, password: string): Promise<AdminSession>;
@@ -291,6 +310,11 @@ export interface AdminApi {
   uploadEbookFile(id: string, file: File, onProgress?: (fraction: number) => void): Promise<AdminEbook>;
   uploadEbookCover(id: string, file: File): Promise<AdminEbook>;
   removeEbookCover(id: string): Promise<AdminEbook>;
+
+  getAppRelease(): Promise<AppRelease | null>;
+  /** Publishes a new APK; `onProgress` gets 0..1 while it is sent. */
+  uploadApk(file: File, input: AppReleaseInput, onProgress?: (fraction: number) => void): Promise<AppRelease>;
+  updateAppRelease(input: Pick<AppReleaseInput, "minBuild" | "notes">): Promise<AppRelease>;
 
   getAi(): Promise<AiSettings>;
   saveAi(input: AiSettingsInput): Promise<AiSettings>;

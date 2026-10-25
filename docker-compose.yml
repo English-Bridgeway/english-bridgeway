@@ -60,8 +60,11 @@ services:
       # E-book PDFs and covers live in the ebooks-data volume.
       EBOOKS_DIR: /app/uploads/ebooks
       EBOOK_MAX_MB: ${EBOOK_MAX_MB:-100}
+      # The Android APK from Admin → Mobile app lives in the app-data volume.
+      APP_DIR: /app/uploads/app
     volumes:
       - ebooks-data:/app/uploads/ebooks
+      - app-data:/app/uploads/app
 
   web:
     build:
@@ -117,3 +120,4 @@ services:
 volumes:
   db-data:
   ebooks-data:
+  app-data:

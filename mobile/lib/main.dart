@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'screens/auth.dart';
+import 'screens/onboarding.dart';
 import 'screens/shell.dart';
 import 'services/api.dart';
 import 'services/speech.dart';
@@ -38,6 +40,7 @@ class BridgewayApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider.value(value: api),
+        Provider.value(value: prefs),
         ChangeNotifierProvider(create: (_) => ContentStore(api, prefs)..load()),
         ChangeNotifierProvider(create: (_) => AuthStore(api, prefs)..refresh()),
         ChangeNotifierProvider(create: (_) => ProgressStore(prefs)),
@@ -45,6 +48,7 @@ class BridgewayApp extends StatelessWidget {
       child: MaterialApp(
         title: 'English-Bridgeway',
         debugShowCheckedModeBanner: false,
+        navigatorKey: rootNavigatorKey,
         theme: theme ?? buildTheme(),
         home: const _Loader(),
       ),
@@ -52,9 +56,28 @@ class BridgewayApp extends StatelessWidget {
   }
 }
 
-/// Shows the splash until the content (bundled, cached or live) is in.
-class _Loader extends StatelessWidget {
+/// The app's root navigator, for screens opened from outside a page (after the welcome pages).
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
+/// Shows the splash until the content (bundled, cached or live) is in, then the welcome pages
+/// on the first start, then the app.
+class _Loader extends StatefulWidget {
   const _Loader();
+  @override
+  State<_Loader> createState() => _LoaderState();
+}
+
+class _LoaderState extends State<_Loader> {
+  late bool _onboarded = context.read<SharedPreferences>().getBool(onboardingDoneKey) ?? false;
+
+  void _finishOnboarding(OnboardingExit exit) {
+    context.read<SharedPreferences>().setBool(onboardingDoneKey, true);
+    setState(() => _onboarded = true);
+    if (exit == OnboardingExit.explore) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) => rootNavigatorKey.currentState
+        ?.push(MaterialPageRoute(builder: (_) => AuthScreen(startWithRegister: exit == OnboardingExit.register))));
+  }
+
   @override
   Widget build(BuildContext context) {
     final content = context.watch<ContentStore>();
@@ -62,6 +85,7 @@ class _Loader extends StatelessWidget {
     Speech.instance
       ..rate = content.data.site.voiceRate
       ..pitch = content.data.site.voicePitch;
+    if (!_onboarded) return OnboardingScreen(onDone: _finishOnboarding);
     return const MainShell();
   }
 }

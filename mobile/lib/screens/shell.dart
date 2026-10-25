@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../nav.dart';
 import '../services/api.dart';
+import '../services/updates.dart';
 import '../state.dart';
 import '../theme.dart';
 import 'courses.dart';
@@ -29,6 +31,14 @@ class MainShellState extends State<MainShell> {
   // Each tab keeps its own stack, so the bottom bar stays visible while browsing (as in the designs).
   final _navigators = List.generate(5, (_) => GlobalKey<NavigatorState>());
   static const _tabs = [HomeScreen(), LearnScreen(), QuizHomeScreen(), CoursesScreen(), ProfileScreen()];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) Updates.check(context, context.read<Api>(), context.read<SharedPreferences>());
+    });
+  }
 
   void select(int i) {
     if (i == index) {

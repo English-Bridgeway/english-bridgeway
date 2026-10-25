@@ -233,9 +233,10 @@ class ProgressStore extends ChangeNotifier {
     _save();
   }
 
+  /// Keeps the most recently opened course last, so Home can resume it.
   void startCourse(String id) {
-    if (startedCourses.contains(id)) return;
-    startedCourses = [...startedCourses, id];
+    if (startedCourses.lastOrNull == id) return;
+    startedCourses = [...startedCourses.where((c) => c != id), id];
     _save();
   }
 

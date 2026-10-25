@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:english_bridgeway/main.dart';
 import 'package:english_bridgeway/services/api.dart';
 import 'package:english_bridgeway/theme.dart';
@@ -10,17 +12,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final _homeList = find.descendant(of: find.byType(RefreshIndicator), matching: find.byType(Scrollable)).first;
 
-Future<void> pumpApp(WidgetTester tester, {Future<http.Response> Function(http.Request)? handler}) async {
+Future<void> pumpApp(WidgetTester tester,
+    {Future<http.Response> Function(http.Request)? handler, Map<String, Object> prefs = const {}, String until = 'Start Learning'}) async {
   // The asset cache holds a future from the previous test's zone; start fresh.
   rootBundle.clear();
-  SharedPreferences.setMockInitialValues({});
-  final prefs = await SharedPreferences.getInstance();
+  // The welcome pages are seen unless a test leaves them out.
+  SharedPreferences.setMockInitialValues({'onboarding-done': true, ...prefs});
+  final store = await SharedPreferences.getInstance();
   // Offline: the app falls back to the bundled content.
   final api = Api(client: MockClient(handler ?? (_) async => http.Response('{"message":"offline"}', 503)));
   await tester.binding.setSurfaceSize(const Size(412, 915));
-  await tester.pumpWidget(BridgewayApp(api: api, prefs: prefs, theme: buildTheme(googleFonts: false).copyWith(textTheme: buildTheme(googleFonts: false).textTheme.apply(fontFamily: 'Roboto'))));
+  await tester.pumpWidget(BridgewayApp(api: api, prefs: store, theme: buildTheme(googleFonts: false).copyWith(textTheme: buildTheme(googleFonts: false).textTheme.apply(fontFamily: 'Roboto'))));
   // Loading the bundled content uses real async work (asset decoding), so let it run.
-  for (var i = 0; i < 100 && find.text('Start Learning').evaluate().isEmpty; i++) {
+  for (var i = 0; i < 100 && find.text(until).evaluate().isEmpty; i++) {
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pump(const Duration(milliseconds: 100));
   }
@@ -91,5 +95,42 @@ void main() {
     await tester.tap(find.text('Profile').last);
     await tester.pumpAndSettle();
     expect(find.text('Create free account'), findsOneWidget);
+  });
+
+  testWidgets('a new install shows the three welcome pages, then the app', (tester) async {
+    await pumpApp(tester, prefs: {'onboarding-done': false}, until: 'Learn English, step by step');
+    expect(find.text('Learn English, step by step'), findsOneWidget);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Call Bridget, your AI tutor'), findsOneWidget);
+    expect(find.textContaining('Marathi'), findsWidgets);
+    await tester.tap(find.text('Next'));
+    await tester.pumpAndSettle();
+    expect(find.text('Your progress, all in one place'), findsOneWidget);
+    await tester.tap(find.text('Explore first'));
+    await tester.pumpAndSettle();
+    expect(find.text('Start Learning'), findsOneWidget);
+    expect((await SharedPreferences.getInstance()).getBool('onboarding-done'), isTrue);
+  });
+
+  testWidgets('signed in, home is a dashboard that resumes the course in progress', (tester) async {
+    await pumpApp(tester, until: 'CONTINUE YOUR COURSE', prefs: {
+      'auth-token': 't',
+      'auth-user': jsonEncode({'id': 'u1', 'name': 'Asha Patil', 'email': 'asha@example.com', 'avatarInitials': 'AP'}),
+      'learning': jsonEncode({
+        'completedLessons': ['nouns/countable-uncountable'],
+        'startedCourses': ['beginner-english', 'grammar-basics'],
+        'activeDays': [DateTime.now().toIso8601String().substring(0, 10)],
+      }),
+    });
+    expect(find.text('Asha'), findsOneWidget);
+    expect(find.text('Dashboard'), findsOneWidget);
+    expect(find.text('CONTINUE YOUR COURSE'), findsOneWidget);
+    expect(find.text('Grammar Basics'), findsOneWidget);
+    expect(find.textContaining('Lesson 2 of 11'), findsOneWidget);
+    expect(find.text('Resume'), findsOneWidget);
+    expect(find.text('Call Bridget'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('My courses'), 300, scrollable: _homeList);
+    expect(find.text('Beginner English'), findsOneWidget);
   });
 }

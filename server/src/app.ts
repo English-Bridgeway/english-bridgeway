@@ -6,6 +6,7 @@ import { accountRouter } from './routes/account';
 import { adminRouter } from './routes/admin';
 import { webhookRouter } from './routes/webhooks';
 import { ebooksRouter } from './routes/ebooks';
+import { appRouter } from './routes/app';
 import { OrderError } from './services/orders';
 import { invalidateRenderedPages, serveWebsite, websiteBuildDir } from './services/ssr';
 
@@ -39,6 +40,7 @@ export function createApp() {
   app.use('/api/admin', adminRouter);
   app.use('/api', accountRouter);
   app.use('/api', ebooksRouter);
+  app.use('/api', appRouter);
   app.use('/api', publicRouter);
   app.use('/api', (_req, res) => {
     res.status(404).json({ message: 'Not found' });

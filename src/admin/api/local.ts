@@ -35,6 +35,9 @@ function log(db: DemoDb, email: string, action: string, target: string | null = 
 const noEbooks = (): Promise<never> =>
   Promise.reject(new ApiError("E-books need the live server: PDFs are stored there, not in this demo browser. Run the site with VITE_API_BASE set.", 400));
 
+const noApp = (): Promise<never> =>
+  Promise.reject(new ApiError("App updates need the live server: the APK is stored there, not in this demo browser. Run the site with VITE_API_BASE set.", 400));
+
 const mask = (s: string) => (s ? `••••••${s.slice(-4)}` : null);
 
 function paymentsView(db: DemoDb) {
@@ -436,6 +439,12 @@ export const localApi: AdminApi = {
   uploadEbookFile: noEbooks,
   uploadEbookCover: noEbooks,
   removeEbookCover: noEbooks,
+  async getAppRelease() {
+    current(readDemoDb());
+    return wait(null);
+  },
+  uploadApk: noApp,
+  updateAppRelease: noApp,
   async getAi() {
     const db = readDemoDb();
     owner(db);

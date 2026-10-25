@@ -1,7 +1,7 @@
 import { apiFetch, HttpError } from "../../utils/backend";
 import type { CollectionKey } from "../../data/content";
 import type { SiteSettings } from "../../data/site";
-import { ApiError, type AdminApi, type AdminEbook, type AdminSession, type AdminUser, type LearnerDetail, type LearnerSummary } from "./types";
+import { ApiError, type AdminApi, type AdminEbook, type AdminSession, type AppRelease, type AdminUser, type LearnerDetail, type LearnerSummary } from "./types";
 import { API_BASE } from "../../utils/backend";
 import { getSession, notifyUnauthorized } from "./session";
 
@@ -102,6 +102,12 @@ export const httpApi: AdminApi = {
     upload<AdminEbook>(`/ebooks/${enc(id)}/file?name=${enc(file.name)}`, new File([file], file.name, { type: "application/pdf" }), onProgress).then(ebook),
   uploadEbookCover: (id, file) => upload<AdminEbook>(`/ebooks/${enc(id)}/cover`, file).then(ebook),
   removeEbookCover: (id) => call<AdminEbook>(`/ebooks/${enc(id)}/cover`, { method: "DELETE" }).then(ebook),
+  getAppRelease: () => call<{ release: AppRelease | null }>("/app/release").then((r) => r.release),
+  uploadApk: (file, input, onProgress) => {
+    const q = new URLSearchParams({ versionName: input.versionName, buildNumber: String(input.buildNumber), minBuild: String(input.minBuild), notes: input.notes });
+    return upload<{ release: AppRelease }>(`/app/apk?${q}`, new File([file], file.name, { type: "application/vnd.android.package-archive" }), onProgress).then((r) => r.release);
+  },
+  updateAppRelease: (input) => call<{ release: AppRelease }>("/app/release", { method: "PUT", json: input }).then((r) => r.release),
   getAi: () => call("/settings/ai"),
   saveAi: (input) => call("/settings/ai", { method: "PUT", json: input }),
   testAi: () => call("/settings/ai/test", { json: {} }),

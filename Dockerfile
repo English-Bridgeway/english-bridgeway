@@ -33,8 +33,8 @@ COPY server/seed ./seed
 COPY --from=site /app/dist ./web/dist
 COPY --from=site /app/dist-ssr ./web/dist-ssr
 ENV WEB_DIST=/app/web/dist
-# Uploaded e-books; Docker copies this owner onto a new ebooks-data volume.
-RUN mkdir -p /app/uploads/ebooks && chown -R node:node /app/uploads
+# Uploaded e-books and the app APK; Docker copies this owner onto new volumes.
+RUN mkdir -p /app/uploads/ebooks /app/uploads/app && chown -R node:node /app/uploads
 USER node
 EXPOSE 4000
 # On start the API creates its tables, loads seed/content.json into an empty database
