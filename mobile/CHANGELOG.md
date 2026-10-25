@@ -3,6 +3,13 @@
 Each `## <version>` section becomes the notes of that GitHub Release (see
 `.github/workflows/mobile-release.yml`). Write for learners, newest first.
 
+## 1.1.0
+
+- **Welcome pages**: three pages on first install show what the app does: lessons, calling Bridget, and your dashboard
+- **Your dashboard**: after you log in, Home shows the course you're working on with Resume, your streak, lessons done, quiz average and this week's activity
+- **Shortcuts**: one tap to call Bridget, Grammar, Vocabulary, Speaking, Quizzes, E-books, Saved words and Courses
+- **Update popup**: the app tells you when a new version is out and downloads it for you
+
 ## 1.0.0 (2026-10-25)
 
 The first release of the English-Bridgeway app for Android. It uses the same account,
