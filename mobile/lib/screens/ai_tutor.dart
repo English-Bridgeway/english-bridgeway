@@ -30,7 +30,7 @@ const _scenarios = [
 
 String _withoutTags(String s) => s.replaceAll(RegExp(r'\[[^\]]*\]\s*'), '').trim();
 
-/// Bridget's picture (the office photo). Until it is bundled, a gradient is shown instead.
+/// Bridget's picture: Dia in the office.
 const tutorPhoto = 'assets/bridget.jpg';
 
 /// Speak with AI: a voice call (or a typed chat) with Bridget, the AI tutor (POST /api/ai/chat).
@@ -70,14 +70,17 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
   void initState() {
     super.initState();
     // While the microphone is in use iOS routes sound to the earpiece; keep her on the speaker.
-    _player.setAudioContext(AudioContext(
-      iOS: AudioContextIOS(category: AVAudioSessionCategory.playAndRecord, options: const {
-        AVAudioSessionOptions.defaultToSpeaker,
-        AVAudioSessionOptions.allowBluetooth,
-        AVAudioSessionOptions.allowBluetoothA2DP,
-      }),
-      android: const AudioContextAndroid(contentType: AndroidContentType.speech, usageType: AndroidUsageType.media, audioFocus: AndroidAudioFocus.gain),
-    )).catchError((_) {});
+    _player
+        .setAudioContext(
+          AudioContext(
+            iOS: AudioContextIOS(
+              category: AVAudioSessionCategory.playAndRecord,
+              options: const {AVAudioSessionOptions.defaultToSpeaker, AVAudioSessionOptions.allowBluetooth, AVAudioSessionOptions.allowBluetoothA2DP},
+            ),
+            android: const AudioContextAndroid(contentType: AndroidContentType.speech, usageType: AndroidUsageType.media, audioFocus: AndroidAudioFocus.gain),
+          ),
+        )
+        .catchError((_) {});
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
@@ -100,7 +103,9 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
         _status = s;
         _statusError = null;
         _remaining = s['remaining'] as int?;
-        _voiceNote = s['voice'] == 'elevenlabs' ? null : "Bridget's own voice is switched off on the server, so the phone's voice is used. Turn it on in Admin → AI tutor → Tutor voice.";
+        _voiceNote = s['voice'] == 'elevenlabs'
+            ? null
+            : "Bridget's own voice is switched off on the server, so the phone's voice is used. Turn it on in Admin → AI tutor → Tutor voice.";
       });
       _start(_scenario);
     } on ApiError catch (e) {
@@ -179,7 +184,10 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
     final api = context.read<Api>();
     _stopVoice();
     final id = _playId;
-    final parts = [for (var i = 0; i < m.parts.length; i++) if (onlyPart == null || onlyPart == i) i];
+    final parts = [
+      for (var i = 0; i < m.parts.length; i++)
+        if (onlyPart == null || onlyPart == i) i,
+    ];
     // Ask for every part's audio at once so there is no gap between them.
     final audio = {for (final i in parts) i: _audio(api, m.parts[i])};
     for (final i in parts) {
@@ -240,8 +248,8 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
   }
 
   void _toBottom() => WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent + 200, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
-      });
+    if (_scroll.hasClients) _scroll.animateTo(_scroll.position.maxScrollExtent + 200, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+  });
 
   Future<void> _toggleMic() async {
     if (_listening) {
@@ -255,11 +263,16 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
   Future<void> _startListening() async {
     if (_listening || !mounted) return;
     _stopVoice();
-    _sttReady = _sttReady || await _stt.initialize(onStatus: (s) {
-      if ((s == 'done' || s == 'notListening') && mounted) setState(() => _listening = false);
-    }, onError: (_) {
-      if (mounted) setState(() => _listening = false);
-    });
+    _sttReady =
+        _sttReady ||
+        await _stt.initialize(
+          onStatus: (s) {
+            if ((s == 'done' || s == 'notListening') && mounted) setState(() => _listening = false);
+          },
+          onError: (_) {
+            if (mounted) setState(() => _listening = false);
+          },
+        );
     if (!mounted) return;
     if (!_sttReady) {
       showSnack(context, 'Speech recognition is not available. Allow the microphone, or type your answer.');
@@ -268,7 +281,12 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
     setState(() => _listening = true);
     await _stt.listen(
       listenOptions: SpeechListenOptions(
-          localeId: 'en_IN', partialResults: true, listenMode: ListenMode.dictation, listenFor: const Duration(seconds: 60), pauseFor: const Duration(seconds: 3)),
+        localeId: 'en_IN',
+        partialResults: true,
+        listenMode: ListenMode.dictation,
+        listenFor: const Duration(seconds: 60),
+        pauseFor: const Duration(seconds: 3),
+      ),
       onResult: (r) {
         if (!mounted) return;
         setState(() => _input.text = r.recognizedWords);
@@ -283,8 +301,8 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthStore>();
-    final ready = auth.signedIn && _statusError == null && _status != null && _status!['enabled'] == true &&
-        !(_status!['allowed'] != true && _messages.length <= 1);
+    final ready =
+        auth.signedIn && _statusError == null && _status != null && _status!['enabled'] == true && !(_status!['allowed'] != true && _messages.length <= 1);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Speak with AI'),
@@ -329,50 +347,63 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
               },
             )
           : _statusError != null
-              ? _gate(icon: Icons.wifi_off_rounded, title: 'Could not connect', message: _statusError!, action: 'Try again', onAction: _load)
-              : _status == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : _status!['enabled'] != true
-                      ? _gate(icon: Icons.power_settings_new_rounded, title: 'Speak with AI is off', message: 'The AI tutor is switched off right now. Please try again later.')
-                      : !ready
-                          ? _gate(
-                              icon: Icons.lock_outline_rounded,
-                              title: 'Your AI messages are used up',
-                              message: inAppPurchases
-                                  ? '${_status!['message'] ?? 'Get a plan to keep practising with Bridget.'}'
-                                  : 'You have used the AI messages in your account for now.',
-                              action: inAppPurchases ? 'See plans' : null,
-                              onAction: inAppPurchases ? () => push(context, const PlansScreen()) : null,
-                            )
-                          : Column(children: [
-                              _scenarioChips(),
-                              if (_remaining != null)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Text('$_remaining message${_remaining == 1 ? '' : 's'} left${_status?['period'] == 'day' ? ' today' : ''}',
-                                      style: const TextStyle(fontSize: 12, color: AppColors.outline)),
-                                ),
-                              Expanded(child: _callView ? _call() : _chat()),
-                              if (_voiceNote != null) _note(),
-                              if (_error != null)
-                                Container(
-                                  width: double.infinity,
-                                  margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(color: AppColors.errorSoft, borderRadius: BorderRadius.circular(12)),
-                                  child: Text(_error!, style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
-                                ),
-                              _composer(),
-                            ]),
+          ? _gate(icon: Icons.wifi_off_rounded, title: 'Could not connect', message: _statusError!, action: 'Try again', onAction: _load)
+          : _status == null
+          ? const Center(child: CircularProgressIndicator())
+          : _status!['enabled'] != true
+          ? _gate(
+              icon: Icons.power_settings_new_rounded,
+              title: 'Speak with AI is off',
+              message: 'The AI tutor is switched off right now. Please try again later.',
+            )
+          : !ready
+          ? _gate(
+              icon: Icons.lock_outline_rounded,
+              title: 'Your AI messages are used up',
+              message: inAppPurchases
+                  ? '${_status!['message'] ?? 'Get a plan to keep practising with Bridget.'}'
+                  : 'You have used the AI messages in your account for now.',
+              action: inAppPurchases ? 'See plans' : null,
+              onAction: inAppPurchases ? () => push(context, const PlansScreen()) : null,
+            )
+          : Column(
+              children: [
+                _scenarioChips(),
+                if (_remaining != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '$_remaining message${_remaining == 1 ? '' : 's'} left${_status?['period'] == 'day' ? ' today' : ''}',
+                      style: const TextStyle(fontSize: 12, color: AppColors.outline),
+                    ),
+                  ),
+                Expanded(child: _callView ? _call() : _chat()),
+                if (_voiceNote != null) _note(),
+                if (_error != null)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(color: AppColors.errorSoft, borderRadius: BorderRadius.circular(12)),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                _composer(),
+              ],
+            ),
     );
   }
 
-  Widget _gate({required IconData icon, required String title, required String message, String? action, VoidCallback? onAction}) =>
-      ListView(padding: const EdgeInsets.all(16), children: [
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(color: AppColors.indigo, borderRadius: BorderRadius.circular(AppRadius.card)),
-          child: Column(children: [
+  Widget _gate({required IconData icon, required String title, required String message, String? action, VoidCallback? onAction}) => ListView(
+    padding: const EdgeInsets.all(16),
+    children: [
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(color: AppColors.indigo, borderRadius: BorderRadius.circular(AppRadius.card)),
+        child: Column(
+          children: [
             Container(
               width: 72,
               height: 72,
@@ -380,64 +411,74 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
               child: Icon(icon, size: 36, color: AppColors.navy),
             ),
             const SizedBox(height: 16),
-            Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+            ),
             const SizedBox(height: 8),
-            Text(message, textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: 0.9), height: 1.5)),
-            if (action != null) ...[
-              const SizedBox(height: 18),
-              AppButton(action, onPressed: onAction),
-            ],
-          ]),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.9), height: 1.5),
+            ),
+            if (action != null) ...[const SizedBox(height: 18), AppButton(action, onPressed: onAction)],
+          ],
         ),
-      ]);
+      ),
+    ],
+  );
 
   Widget _scenarioChips() => SizedBox(
-        height: 52,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-          itemCount: _scenarios.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 8),
-          itemBuilder: (_, i) {
-            final (id, label, icon) = _scenarios[i];
-            final selected = id == _scenario;
-            return ChoiceChip(
-              avatar: Icon(icon, size: 16, color: selected ? Colors.white : AppColors.indigo),
-              label: Text(label),
-              selected: selected,
-              showCheckmark: false,
-              onSelected: (_) => _start(id),
-              selectedColor: AppColors.indigo,
-              backgroundColor: Colors.white,
-              labelStyle: TextStyle(color: selected ? Colors.white : AppColors.navy, fontWeight: FontWeight.w600, fontSize: 13),
-              side: BorderSide(color: selected ? AppColors.indigo : AppColors.borderSky),
-              shape: const StadiumBorder(),
-            );
-          },
-        ),
-      );
+    height: 52,
+    child: ListView.separated(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+      itemCount: _scenarios.length,
+      separatorBuilder: (_, _) => const SizedBox(width: 8),
+      itemBuilder: (_, i) {
+        final (id, label, icon) = _scenarios[i];
+        final selected = id == _scenario;
+        return ChoiceChip(
+          avatar: Icon(icon, size: 16, color: selected ? Colors.white : AppColors.indigo),
+          label: Text(label),
+          selected: selected,
+          showCheckmark: false,
+          onSelected: (_) => _start(id),
+          selectedColor: AppColors.indigo,
+          backgroundColor: Colors.white,
+          labelStyle: TextStyle(color: selected ? Colors.white : AppColors.navy, fontWeight: FontWeight.w600, fontSize: 13),
+          side: BorderSide(color: selected ? AppColors.indigo : AppColors.borderSky),
+          shape: const StadiumBorder(),
+        );
+      },
+    ),
+  );
 
   Widget _note() => Container(
-        width: double.infinity,
-        margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-        padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-        decoration: BoxDecoration(color: AppColors.amberSoft, borderRadius: BorderRadius.circular(12)),
-        child: Row(children: [
-          const Icon(Icons.info_outline_rounded, size: 18, color: AppColors.amberText),
-          const SizedBox(width: 8),
-          Expanded(child: Text(_voiceNote!, style: const TextStyle(fontSize: 12, color: AppColors.amberText, height: 1.35))),
-          IconButton(
-            visualDensity: VisualDensity.compact,
-            tooltip: 'Hide',
-            icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.amberText),
-            onPressed: () => setState(() => _voiceNote = null),
-          ),
-        ]),
-      );
+    width: double.infinity,
+    margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+    padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+    decoration: BoxDecoration(color: AppColors.amberSoft, borderRadius: BorderRadius.circular(12)),
+    child: Row(
+      children: [
+        const Icon(Icons.info_outline_rounded, size: 18, color: AppColors.amberText),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(_voiceNote!, style: const TextStyle(fontSize: 12, color: AppColors.amberText, height: 1.35)),
+        ),
+        IconButton(
+          visualDensity: VisualDensity.compact,
+          tooltip: 'Hide',
+          icon: const Icon(Icons.close_rounded, size: 16, color: AppColors.amberText),
+          onPressed: () => setState(() => _voiceNote = null),
+        ),
+      ],
+    ),
+  );
 
   /// What the learner said that a tutor reply corrects, so its wrong words can be marked.
-  ({String wrong, String right})? _mistakeFor(int userIndex) =>
-      userIndex + 1 < _messages.length ? _messages[userIndex + 1].mistake : null;
+  ({String wrong, String right})? _mistakeFor(int userIndex) => userIndex + 1 < _messages.length ? _messages[userIndex + 1].mistake : null;
 
   /// The call: her photo, what she is doing, and the latest exchange as live captions.
   Widget _call() {
@@ -447,118 +488,166 @@ class _AiTutorScreenState extends State<AiTutorScreen> {
     final state = _listening
         ? 'Listening…'
         : _sending
-            ? 'Thinking…'
-            : speaking
-                ? 'Speaking…'
-                : _handsFree
-                    ? 'Tap the mic and say something'
-                    : 'Tap the mic to talk';
-    return ListView(controller: _scroll, padding: const EdgeInsets.fromLTRB(16, 4, 16, 16), children: [
-      ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.card),
-        child: AspectRatio(
-          aspectRatio: 4 / 3,
-          child: Stack(fit: StackFit.expand, children: [
-            Image.asset(
-              tutorPhoto,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Container(
-                decoration: const BoxDecoration(gradient: LinearGradient(colors: [AppColors.indigo, AppColors.navy], begin: Alignment.topLeft, end: Alignment.bottomRight)),
-                alignment: Alignment.center,
-                child: const CircleAvatar(radius: 52, backgroundColor: AppColors.yellow, child: Text('B', style: TextStyle(fontSize: 44, fontWeight: FontWeight.w800, color: AppColors.navy))),
+        ? 'Thinking…'
+        : speaking
+        ? 'Speaking…'
+        : _handsFree
+        ? 'Tap the mic and say something'
+        : 'Tap the mic to talk';
+    // Her photo stays in view; the captions scroll under it.
+    return LayoutBuilder(
+      builder: (context, box) => Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              child: SizedBox(
+                height: (box.maxHeight * 0.42).clamp(160.0, box.maxWidth - 32),
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      tutorPhoto,
+                      fit: BoxFit.cover,
+                      alignment: const Alignment(0, -0.6),
+                      errorBuilder: (_, _, _) => Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(colors: [AppColors.indigo, AppColors.navy], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        ),
+                        alignment: Alignment.center,
+                        child: const CircleAvatar(
+                          radius: 52,
+                          backgroundColor: AppColors.yellow,
+                          child: Text(
+                            'B',
+                            style: TextStyle(fontSize: 44, fontWeight: FontWeight.w800, color: AppColors.navy),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(begin: Alignment.center, end: Alignment.bottomCenter, colors: [Colors.transparent, Color(0xCC0D1640)]),
+                      ),
+                    ),
+                    Positioned(
+                      left: 16,
+                      right: 16,
+                      bottom: 14,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Bridget',
+                                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  state,
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                          ),
+                          _Bars(active: speaking || _listening, color: _listening ? AppColors.yellow : Colors.white),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const DecoratedBox(
-              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.center, end: Alignment.bottomCenter, colors: [Colors.transparent, Color(0xCC0D1640)])),
+          ),
+          Expanded(
+            child: ListView(
+              controller: _scroll,
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              children: [
+                if (lastUser > 0 && lastUser < lastTutor) ...[_UserBubble(_messages[lastUser].content, mistake: _mistakeFor(lastUser))],
+                if (_listening && _input.text.isNotEmpty) _UserBubble(_input.text, live: true),
+                if (_sending) const _Typing(),
+                if (lastTutor >= 0 && !_sending)
+                  _TutorTurn(
+                    message: _messages[lastTutor],
+                    speakingPart: identical(_speakingMessage, _messages[lastTutor]) ? _speakingPart : null,
+                    onSpeak: (i) => _speak(_messages[lastTutor], onlyPart: i),
+                  ),
+              ],
             ),
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 14,
-              child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                    const Text('Bridget', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 2),
-                    Text(state, style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontWeight: FontWeight.w600)),
-                  ]),
-                ),
-                _Bars(active: speaking || _listening, color: _listening ? AppColors.yellow : Colors.white),
-              ]),
-            ),
-          ]),
-        ),
+          ),
+        ],
       ),
-      const SizedBox(height: 14),
-      if (lastUser > 0 && lastUser < lastTutor) ...[
-        _UserBubble(_messages[lastUser].content, mistake: _mistakeFor(lastUser)),
-      ],
-      if (_listening && _input.text.isNotEmpty) _UserBubble(_input.text, live: true),
-      if (_sending) const _Typing(),
-      if (lastTutor >= 0 && !_sending)
-        _TutorTurn(
-          message: _messages[lastTutor],
-          speakingPart: identical(_speakingMessage, _messages[lastTutor]) ? _speakingPart : null,
-          onSpeak: (i) => _speak(_messages[lastTutor], onlyPart: i),
-        ),
-    ]);
+    );
   }
 
   Widget _chat() => ListView.builder(
-        controller: _scroll,
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-        itemCount: _messages.length + (_sending ? 1 : 0),
-        itemBuilder: (_, i) {
-          if (i == _messages.length) return const _Typing();
-          final m = _messages[i];
-          return m.role == 'user'
-              ? _UserBubble(m.content, mistake: _mistakeFor(i))
-              : _TutorTurn(message: m, speakingPart: identical(_speakingMessage, m) ? _speakingPart : null, onSpeak: (p) => _speak(m, onlyPart: p));
-        },
-      );
+    controller: _scroll,
+    padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+    itemCount: _messages.length + (_sending ? 1 : 0),
+    itemBuilder: (_, i) {
+      if (i == _messages.length) return const _Typing();
+      final m = _messages[i];
+      return m.role == 'user'
+          ? _UserBubble(m.content, mistake: _mistakeFor(i))
+          : _TutorTurn(
+              message: m,
+              speakingPart: identical(_speakingMessage, m) ? _speakingPart : null,
+              onSpeak: (p) => _speak(m, onlyPart: p),
+            );
+    },
+  );
 
   Widget _composer() => SafeArea(
-        top: false,
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          decoration: const BoxDecoration(color: Colors.white, boxShadow: floatingShadow),
-          child: Row(children: [
-            Material(
-              color: _listening ? AppColors.error : AppColors.yellow,
-              shape: const CircleBorder(),
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: _sending ? null : _toggleMic,
-                child: SizedBox(
-                  width: 52,
-                  height: 52,
-                  child: Icon(_listening ? Icons.stop_rounded : Icons.mic_rounded, color: _listening ? Colors.white : AppColors.navy),
-                ),
+    top: false,
+    child: Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+      decoration: const BoxDecoration(color: Colors.white, boxShadow: floatingShadow),
+      child: Row(
+        children: [
+          Material(
+            color: _listening ? AppColors.error : AppColors.yellow,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: _sending ? null : _toggleMic,
+              child: SizedBox(
+                width: 52,
+                height: 52,
+                child: Icon(_listening ? Icons.stop_rounded : Icons.mic_rounded, color: _listening ? Colors.white : AppColors.navy),
               ),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextField(
-                controller: _input,
-                minLines: 1,
-                maxLines: 4,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => _send(),
-                decoration: InputDecoration(
-                  hintText: _listening ? 'Listening… speak now' : 'Type or tap the mic and speak',
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              controller: _input,
+              minLines: 1,
+              maxLines: 4,
+              textInputAction: TextInputAction.send,
+              onSubmitted: (_) => _send(),
+              decoration: InputDecoration(
+                hintText: _listening ? 'Listening… speak now' : 'Type or tap the mic and speak',
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               ),
             ),
-            const SizedBox(width: 8),
-            IconButton.filled(
-              onPressed: _sending ? null : () => _send(),
-              style: IconButton.styleFrom(backgroundColor: AppColors.indigo, minimumSize: const Size(48, 48)),
-              icon: const Icon(Icons.send_rounded, color: Colors.white),
-            ),
-          ]),
-        ),
-      );
+          ),
+          const SizedBox(width: 8),
+          IconButton.filled(
+            onPressed: _sending ? null : () => _send(),
+            style: IconButton.styleFrom(backgroundColor: AppColors.indigo, minimumSize: const Size(48, 48)),
+            icon: const Icon(Icons.send_rounded, color: Colors.white),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 /// Sound bars that move while she speaks or the mic listens.
@@ -594,17 +683,21 @@ class _BarsState extends State<_Bars> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _c,
-        builder: (_, _) => Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
-          for (var i = 0; i < 4; i++)
-            Container(
-              width: 5,
-              height: widget.active ? 8 + 18 * (0.5 + 0.5 * _wave(_c.value * 6.283 + i * 1.3)) : 6,
-              margin: const EdgeInsets.only(left: 3),
-              decoration: BoxDecoration(color: widget.color, borderRadius: BorderRadius.circular(3)),
-            ),
-        ]),
-      );
+    animation: _c,
+    builder: (_, _) => Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        for (var i = 0; i < 4; i++)
+          Container(
+            width: 5,
+            height: widget.active ? 8 + 18 * (0.5 + 0.5 * _wave(_c.value * 6.283 + i * 1.3)) : 6,
+            margin: const EdgeInsets.only(left: 3),
+            decoration: BoxDecoration(color: widget.color, borderRadius: BorderRadius.circular(3)),
+          ),
+      ],
+    ),
+  );
 
   static double _wave(double x) {
     // A cheap sine without dart:math.
@@ -630,26 +723,35 @@ class _UserBubble extends StatelessWidget {
         decoration: BoxDecoration(
           color: live ? AppColors.indigo.withValues(alpha: 0.6) : AppColors.indigo,
           borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(18), topRight: Radius.circular(18), bottomLeft: Radius.circular(18), bottomRight: Radius.circular(4)),
+            topLeft: Radius.circular(18),
+            topRight: Radius.circular(18),
+            bottomLeft: Radius.circular(18),
+            bottomRight: Radius.circular(4),
+          ),
         ),
         child: at < 0
             ? Text(text, style: base)
-            : Text.rich(TextSpan(style: base, children: [
-                TextSpan(text: text.substring(0, at)),
-                // The words she corrected: marked, as on paper.
+            : Text.rich(
                 TextSpan(
-                  text: text.substring(at, at + mistake!.wrong.length),
-                  style: const TextStyle(
-                    color: AppColors.error,
-                    backgroundColor: AppColors.errorSoft,
-                    fontWeight: FontWeight.w700,
-                    decoration: TextDecoration.lineThrough,
-                    decorationColor: AppColors.error,
-                    decorationThickness: 2,
-                  ),
+                  style: base,
+                  children: [
+                    TextSpan(text: text.substring(0, at)),
+                    // The words she corrected: marked, as on paper.
+                    TextSpan(
+                      text: text.substring(at, at + mistake!.wrong.length),
+                      style: const TextStyle(
+                        color: AppColors.error,
+                        backgroundColor: AppColors.errorSoft,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.lineThrough,
+                        decorationColor: AppColors.error,
+                        decorationThickness: 2,
+                      ),
+                    ),
+                    TextSpan(text: text.substring(at + mistake!.wrong.length)),
+                  ],
                 ),
-                TextSpan(text: text.substring(at + mistake!.wrong.length)),
-              ])),
+              ),
       ),
     );
   }
@@ -662,10 +764,7 @@ class _TutorTurn extends StatelessWidget {
   final int? speakingPart;
   final void Function(int part) onSpeak;
 
-  static const _labels = {
-    'explain': ('Why we say it', Icons.translate_rounded),
-    'say': ('Say it in English', Icons.record_voice_over_rounded),
-  };
+  static const _labels = {'explain': ('Why we say it', Icons.translate_rounded), 'say': ('Say it in English', Icons.record_voice_over_rounded)};
 
   @override
   Widget build(BuildContext context) {
@@ -673,36 +772,59 @@ class _TutorTurn extends StatelessWidget {
     final correction = message.correction;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10, right: 24),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const CircleAvatar(radius: 16, backgroundColor: AppColors.yellow, child: Text('B', style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.navy))),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (mistake != null || (correction != null && correction.isNotEmpty))
-              Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: AppColors.amberSoft, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.yellow)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  if (mistake != null)
-                    Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, runSpacing: 6, children: [
-                      _Chip(mistake.wrong, wrong: true),
-                      const Icon(Icons.arrow_forward_rounded, size: 18, color: AppColors.amberText),
-                      _Chip(mistake.right, wrong: false),
-                    ]),
-                  if (mistake != null && correction != null && correction.isNotEmpty) const SizedBox(height: 8),
-                  if (correction != null && correction.isNotEmpty)
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Icon(Icons.spellcheck_rounded, size: 18, color: AppColors.amberText),
-                      const SizedBox(width: 8),
-                      Expanded(child: Text(correction, style: const TextStyle(fontWeight: FontWeight.w600, height: 1.4))),
-                    ]),
-                ]),
-              ),
-            for (var i = 0; i < message.parts.length; i++) _part(i),
-          ]),
-        ),
-      ]),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _Avatar(),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (mistake != null || (correction != null && correction.isNotEmpty))
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 6),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.amberSoft,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.yellow),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (mistake != null)
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              _Chip(mistake.wrong, wrong: true),
+                              const Icon(Icons.arrow_forward_rounded, size: 18, color: AppColors.amberText),
+                              _Chip(mistake.right, wrong: false),
+                            ],
+                          ),
+                        if (mistake != null && correction != null && correction.isNotEmpty) const SizedBox(height: 8),
+                        if (correction != null && correction.isNotEmpty)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(Icons.spellcheck_rounded, size: 18, color: AppColors.amberText),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(correction, style: const TextStyle(fontWeight: FontWeight.w600, height: 1.4)),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
+                for (var i = 0; i < message.parts.length; i++) _part(i),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -716,32 +838,53 @@ class _TutorTurn extends StatelessWidget {
       decoration: BoxDecoration(
         color: p.kind == 'say' ? AppColors.successSoft : Colors.white,
         border: Border.all(color: active ? AppColors.indigo : AppColors.borderSky.withValues(alpha: 0.7), width: active ? 2 : 1),
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), topRight: Radius.circular(18), bottomLeft: Radius.circular(18), bottomRight: Radius.circular(18)),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(4),
+          topRight: Radius.circular(18),
+          bottomLeft: Radius.circular(18),
+          bottomRight: Radius.circular(18),
+        ),
         boxShadow: cardShadow,
       ),
-      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Flexible(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (label != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(label.$2, size: 14, color: p.kind == 'say' ? AppColors.success : AppColors.indigo),
-                  const SizedBox(width: 4),
-                  Text(label.$1.toUpperCase(),
-                      style: TextStyle(fontSize: 11, letterSpacing: 0.6, fontWeight: FontWeight.w800, color: p.kind == 'say' ? AppColors.success : AppColors.indigo)),
-                ]),
-              ),
-            Text(_withoutTags(p.text), style: TextStyle(height: 1.45, fontWeight: p.kind == 'say' ? FontWeight.w700 : FontWeight.w400)),
-          ]),
-        ),
-        IconButton(
-          visualDensity: VisualDensity.compact,
-          tooltip: 'Listen',
-          icon: Icon(active ? Icons.graphic_eq_rounded : Icons.volume_up_rounded, size: 18, color: AppColors.indigo),
-          onPressed: () => onSpeak(i),
-        ),
-      ]),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (label != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(label.$2, size: 14, color: p.kind == 'say' ? AppColors.success : AppColors.indigo),
+                        const SizedBox(width: 4),
+                        Text(
+                          label.$1.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 11,
+                            letterSpacing: 0.6,
+                            fontWeight: FontWeight.w800,
+                            color: p.kind == 'say' ? AppColors.success : AppColors.indigo,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                Text(_withoutTags(p.text), style: TextStyle(height: 1.45, fontWeight: p.kind == 'say' ? FontWeight.w700 : FontWeight.w400)),
+              ],
+            ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            tooltip: 'Listen',
+            icon: Icon(active ? Icons.graphic_eq_rounded : Icons.volume_up_rounded, size: 18, color: AppColors.indigo),
+            onPressed: () => onSpeak(i),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -752,33 +895,58 @@ class _Chip extends StatelessWidget {
   final bool wrong;
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(color: wrong ? AppColors.errorSoft : AppColors.successSoft, borderRadius: BorderRadius.circular(999)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(wrong ? Icons.close_rounded : Icons.check_rounded, size: 15, color: wrong ? AppColors.error : AppColors.success),
-          const SizedBox(width: 4),
-          Flexible(
-            child: Text(text,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: wrong ? AppColors.error : AppColors.success,
-                  decoration: wrong ? TextDecoration.lineThrough : null,
-                  decorationColor: AppColors.error,
-                )),
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(color: wrong ? AppColors.errorSoft : AppColors.successSoft, borderRadius: BorderRadius.circular(999)),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(wrong ? Icons.close_rounded : Icons.check_rounded, size: 15, color: wrong ? AppColors.error : AppColors.success),
+        const SizedBox(width: 4),
+        Flexible(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: wrong ? AppColors.error : AppColors.success,
+              decoration: wrong ? TextDecoration.lineThrough : null,
+              decorationColor: AppColors.error,
+            ),
           ),
-        ]),
-      );
+        ),
+      ],
+    ),
+  );
+}
+
+/// Bridget's face in the chat.
+class _Avatar extends StatelessWidget {
+  const _Avatar();
+  @override
+  Widget build(BuildContext context) => const CircleAvatar(
+    radius: 16,
+    backgroundColor: AppColors.yellow,
+    foregroundImage: AssetImage(tutorPhoto),
+    child: Text(
+      'B',
+      style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.navy),
+    ),
+  );
 }
 
 class _Typing extends StatelessWidget {
   const _Typing();
   @override
   Widget build(BuildContext context) => const Padding(
-        padding: EdgeInsets.only(bottom: 10),
-        child: Row(children: [
-          CircleAvatar(radius: 16, backgroundColor: AppColors.yellow, child: Text('B', style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.navy))),
-          SizedBox(width: 8),
-          Text('Bridget is thinking…', style: TextStyle(color: AppColors.outline, fontStyle: FontStyle.italic)),
-        ]),
-      );
+    padding: EdgeInsets.only(bottom: 10),
+    child: Row(
+      children: [
+        _Avatar(),
+        SizedBox(width: 8),
+        Text(
+          'Bridget is thinking…',
+          style: TextStyle(color: AppColors.outline, fontStyle: FontStyle.italic),
+        ),
+      ],
+    ),
+  );
 }
