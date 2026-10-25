@@ -14,10 +14,12 @@ same learner accounts as the website, so whatever the admin panel changes shows 
 | Courses | Course list, course page with curriculum and trial locks, Cashfree checkout, subscription plans |
 | Profile | Log in / sign up, profile photo, plan and usage, edit profile, orders, contact form, policies, log out of all devices |
 
-- **Speak with AI**: chat with Bridget by typing or speaking (speech-to-text). Replies are read
-  aloud in the ElevenLabs voice when the server has it set up (`/api/ai/speak`), otherwise in the
-  phone's voice. Corrections show in a yellow box. Situations: free talk, interview, restaurant,
-  shopping, travel, doctor, office.
+- **Speak with AI**: a call with Bridget (her photo is `assets/bridget.jpg`), with the chat as a
+  second view. Each reply comes in parts (`parts` from `POST /api/ai/chat`): the mistake struck out
+  next to the right words, a Marathi explanation, the English to repeat, then the next question.
+  Every part plays in the ElevenLabs voice (`/api/ai/speak`), or the phone's voice if the server
+  has no ElevenLabs key, and the app says why. Mic auto-on reopens the mic after she finishes.
+  Situations: free talk, interview, restaurant, shopping, travel, doctor, office.
 - **Listen buttons** on words, examples and dialogue lines use the phone's text-to-speech with the
   rate and pitch from Admin → Site settings → Listen voice.
 - **Offline first**: the app ships with a copy of `server/seed/content.json`, shows the last
@@ -66,6 +68,22 @@ flutter build ipa --release        # iOS (on a Mac with Xcode)
 The GitHub Action in `.github/workflows/mobile.yml` runs analyze and tests and builds an APK on
 every pull request that touches `mobile/`. Download it from the run's **Artifacts**. Run the
 workflow by hand (Actions → Mobile app → Run workflow) to build against another API.
+
+## Releases
+
+Every version gets a GitHub Release with the APK attached and notes for learners
+(`.github/workflows/mobile-release.yml`):
+
+1. Add a `## 1.2.0` section at the top of `CHANGELOG.md` saying what's new, and merge it.
+2. Go to Actions → Mobile release → Run workflow and enter `1.2.0`.
+3. The workflow runs the tests, builds the APK, opens it on an emulator, and publishes
+   **English-Bridgeway app v1.2.0** under Releases (tag `app-v1.2.0-build10200`) with
+   `english-bridgeway-v1.2.0.apk` attached. Phones with the app see the update offer.
+
+The version code is `major*10000 + minor*100 + patch`, so each release installs over the one before.
+With the `ANDROID_KEYSTORE_*` secrets set (below), the APK is signed with your release key and
+updates keep the learner's login. Without them, each release uses a one-off key, so learners
+must uninstall the old app first. The release notes then say so.
 
 Before publishing:
 
