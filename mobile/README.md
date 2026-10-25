@@ -14,6 +14,15 @@ same learner accounts as the website, so whatever the admin panel changes shows 
 | Courses | Course list, course page with curriculum and trial locks, Cashfree checkout, subscription plans |
 | Profile | Log in / sign up, profile photo, plan and usage, edit profile, orders, contact form, policies, log out of all devices |
 
+- **Welcome pages**: three pages on the first start after an install (what the app teaches, the
+  AI tutor call with the mic on by itself and mistakes explained in Marathi, the dashboard), then
+  Create account / Log in / Explore first. Seen once (`onboarding-done` in shared preferences).
+- **Update popup**: on start the app checks for a newer version. Installed from Google Play, it uses
+  Play's in-app update (update priority 4 or 5 in the Play Developer API makes it required). Installed
+  from the APK, it reads `GET /api/app/version` and offers the latest GitHub Release (or an APK uploaded in **Admin → Mobile app**);
+  "Update now" opens the download in the browser, and Android installs it over the old app (data
+  and login are kept because it's signed with the same key). "Later" asks again a day later; a
+  version marked **Required update** in the admin blocks the app until it's updated.
 - **Speak with AI**: a call with Bridget (her photo is `assets/bridget.jpg`), with the chat as a
   second view. Each reply comes in parts (`parts` from `POST /api/ai/chat`): the mistake struck out
   next to the right words, a Marathi explanation, the English to repeat, then the next question.
