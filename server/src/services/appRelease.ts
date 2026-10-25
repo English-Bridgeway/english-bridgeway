@@ -10,6 +10,10 @@ import { EbookError, receive } from './ebooks';
 // The admin uploads the APK built by GitHub Actions (Admin → Mobile app) with its build number;
 // the app asks GET /api/app/version on start and offers the download when its own build is older.
 // Play Store installs update through Google Play instead (in-app updates), so they never use this.
+//
+// The latest GitHub Release counts too (APP_GITHUB_REPO, the public repo by default): a release
+// tagged like `app-v1.1.0-build10100` with an .apk asset is offered without an admin upload. Whichever
+// of the two has the higher build number wins.
 
 export class AppReleaseError extends Error {
   constructor(message: string, public readonly status = 400) {
@@ -98,9 +102,88 @@ export function apkFile(): string {
   return apkPath();
 }
 
-/** What the app reads on start. The download URL is relative to the API (/app/android.apk). */
+export interface GithubRelease {
+  versionName: string;
+  buildNumber: number;
+  notes: string;
+  size: number;
+  url: string;
+  page: string;
+  publishedAt: string;
+}
+
+const githubRepo = () => (process.env.APP_GITHUB_REPO ?? 'English-Bridgeway/english-bridgeway').trim();
+let githubCache: { at: number; value: GithubRelease | null } | null = null;
+
+/** The "- " items of a release body (mobile/CHANGELOG.md) before its "## Install" section, without markdown bold. */
+export function releaseNotes(body: string): string {
+  const items: string[] = [];
+  for (const line of body.split(/\r?\n/)) {
+    if (/^#{1,3}\s*install/i.test(line.trim())) break;
+    const m = /^\s*[-*]\s+(.+)$/.exec(line);
+    if (m) items.push(m[1]!.replace(/\*\*|__/g, '').trim());
+  }
+  return items.slice(0, 6).join('\n').slice(0, 2000);
+}
+
+/** Reads a release's tag ("app-v1.1.0-build42") and its first .apk asset. */
+export function parseGithubRelease(r: unknown): GithubRelease | null {
+  const rel = r as { tag_name?: string; body?: string; html_url?: string; published_at?: string; draft?: boolean; prerelease?: boolean;
+    assets?: { name?: string; size?: number; browser_download_url?: string }[] } | null;
+  if (!rel || rel.draft || rel.prerelease) return null;
+  const tag = String(rel.tag_name ?? '');
+  const build = Number(/build[-_.]?(\d+)/i.exec(tag)?.[1]);
+  const version = /v?(\d+(?:\.\d+){0,3})/.exec(tag)?.[1] ?? '';
+  const apk = rel.assets?.find((a) => String(a.name ?? '').toLowerCase().endsWith('.apk') && a.browser_download_url);
+  if (!build || !version || !apk) return null;
+  return {
+    versionName: version,
+    buildNumber: build,
+    notes: releaseNotes(String(rel.body ?? '')),
+    size: Number(apk.size) || 0,
+    url: apk.browser_download_url!,
+    page: String(rel.html_url ?? ''),
+    publishedAt: String(rel.published_at ?? ''),
+  };
+}
+
+/** The latest GitHub Release with an APK, checked at most every 10 minutes. Null when there is none or GitHub is unreachable. */
+export async function latestGithubRelease(): Promise<GithubRelease | null> {
+  const repo = githubRepo();
+  if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) return null;
+  if (githubCache && Date.now() - githubCache.at < 10 * 60_000) return githubCache.value;
+  let value: GithubRelease | null = githubCache?.value ?? null;
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
+      headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'english-bridgeway-server' },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) value = parseGithubRelease(await res.json());
+    else if (res.status === 404) value = null;
+  } catch {
+    // Keep the last answer; try again after the cache time.
+  }
+  githubCache = { at: Date.now(), value };
+  return value;
+}
+
+/** What the app reads on start. An uploaded APK's URL is relative to the API (/app/android.apk). */
 export async function publicVersion() {
-  const r = await getRelease();
+  const [r, gh] = await Promise.all([getRelease(), latestGithubRelease()]);
+  if (gh && (!r || gh.buildNumber > r.buildNumber)) {
+    return {
+      android: {
+        versionName: gh.versionName,
+        buildNumber: gh.buildNumber,
+        // "Required update" in the admin still applies to phones older than the uploaded build.
+        minBuild: r?.minBuild ?? 0,
+        notes: gh.notes,
+        size: gh.size,
+        sha256: null,
+        url: gh.url,
+      },
+    };
+  }
   return {
     android: r && {
       versionName: r.versionName,

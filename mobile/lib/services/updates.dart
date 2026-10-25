@@ -11,7 +11,7 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import 'api.dart';
 
-/// A newer build than the one installed (GET /api/app/version, published in Admin → Mobile app).
+/// A newer build than the one installed (GET /api/app/version: the latest GitHub Release or an APK from Admin → Mobile app).
 class AppRelease {
   final String versionName, notes, url;
   final int buildNumber, minBuild, size;

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
-import { FileUp, Save, Smartphone } from "lucide-react";
-import { adminApi, type AppRelease } from "../api";
+import { ExternalLink, FileUp, Package, Save, Smartphone } from "lucide-react";
+import { adminApi, type AppRelease, type GithubAppRelease } from "../api";
 import { useAdmin } from "../AdminContext";
 import { ErrorNote, Loading, PageTitle, Panel, inputClass, useLoad } from "../ui";
 import { Button } from "../../components/Button";
@@ -64,8 +64,8 @@ function Publish({ current, onDone }: { current: AppRelease | null; onDone: (r: 
         </label>
         <label className="block text-sm font-semibold">
           Build number
-          <input className={`${inputClass} mt-1.5 font-normal`} value={buildNumber} onChange={(e) => setBuildNumber(e.target.value.replace(/\D/g, ""))} required inputMode="numeric" placeholder="e.g. 42" />
-          <span className="mt-1 block text-xs font-normal text-muted">The GitHub Actions run number (#42). It must match the APK, or phones keep asking to update.</span>
+          <input className={`${inputClass} mt-1.5 font-normal`} value={buildNumber} onChange={(e) => setBuildNumber(e.target.value.replace(/\D/g, ""))} required inputMode="numeric" placeholder="e.g. 10100" />
+          <span className="mt-1 block text-xs font-normal text-muted">From the run summary (version 1.1.0 is build 10100). It must match the APK, or phones keep asking to update.</span>
         </label>
         <label className="block text-sm font-semibold sm:col-span-2">
           What's new <span className="font-normal text-muted">(optional, shown in the update popup)</span>
@@ -137,25 +137,50 @@ function Current({ release, onDone }: { release: AppRelease; onDone: (r: AppRele
   );
 }
 
+/** The latest GitHub Release: offered to phones automatically when its build is the newest. */
+function GithubPanel({ github, uploaded }: { github: GithubAppRelease; uploaded: AppRelease | null }) {
+  const live = !uploaded || github.buildNumber > uploaded.buildNumber;
+  return (
+    <Panel title="Latest GitHub Release" className="mb-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700"><Package className="h-5 w-5" aria-hidden="true" /></span>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">Version {github.versionName} <span className="font-normal text-muted">(build {github.buildNumber})</span></p>
+          <p className="text-xs text-muted">
+            {github.size > 0 && `${formatBytes(github.size)} · `}
+            {live ? "Phones on older builds are offered this one." : `Not offered: the uploaded build ${uploaded!.buildNumber} is newer.`}
+          </p>
+        </div>
+        {github.page && (
+          <a href={github.page} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold text-ink-700 hover:underline">
+            Open release <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+          </a>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
 /** Admin → Mobile app: the APK that phones outside Google Play update to. */
 export default function MobileAppPage() {
   // Wrapped, so "no version yet" (null) isn't mistaken for "still loading".
-  const loaded = useLoad(() => adminApi.getAppRelease().then((release) => ({ release })));
+  const loaded = useLoad(() => adminApi.getAppRelease());
   if (loaded.error) return <ErrorNote message={loaded.error} onRetry={loaded.reload} />;
   if (!loaded.data) return <Loading />;
-  const current = loaded.data.release;
-  const done = (r: AppRelease) => loaded.setData({ release: r });
+  const { release: current, github } = loaded.data;
+  const done = (r: AppRelease) => loaded.setData({ release: r, github });
   return (
     <div className="max-w-3xl">
       <PageTitle
         title="Mobile app"
-        description="Learners who installed the APK see an “Update available” popup when you publish a newer build here. Google Play installs update through the Play Store."
+        description="Learners who installed the APK see an “Update available” popup when a newer build is out: the latest GitHub Release (automatic) or an APK you publish here. Google Play installs update through the Play Store."
       />
       {adminApi.mode === "demo" && (
         <Alert tone="warning" title="Demo mode" className="mb-6">The APK is stored on the server, so publishing needs the live site (VITE_API_BASE).</Alert>
       )}
-      {current ? <Current key={current.buildNumber} release={current} onDone={done} /> : (
-        <Alert tone="info" title="No version published yet" className="mb-6">Phones won't see an update until you publish the first APK.</Alert>
+      {github && <GithubPanel github={github} uploaded={current} />}
+      {current ? <Current key={current.buildNumber} release={current} onDone={done} /> : !github && (
+        <Alert tone="info" title="No version published yet" className="mb-6">Phones won't see an update until a GitHub Release with an APK exists or you publish one here.</Alert>
       )}
       <Publish current={current} onDone={done} />
     </div>

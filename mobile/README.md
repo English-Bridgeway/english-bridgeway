@@ -67,13 +67,17 @@ flutter run --dart-define=API_BASE=http://10.0.2.2:4000/api   # local server fro
 ## Releasing an update to APK users
 
 1. Raise `version:` in `pubspec.yaml` when the release has something new (for example `1.1.0` to `1.2.0`).
-2. Push to `main` (or run **Actions → Mobile app → Run workflow**). The run summary shows the version
-   and the build number, which is the run number.
-3. Download the `english-bridgeway-apk` artifact, unzip it, and in **Admin → Mobile app** upload
-   `app-release.apk` with that version, build number and a few lines of "What's new".
+2. Publish a GitHub Release (**Actions → Mobile release**). The server reads the latest release
+   (tag `app-v1.1.0-build10100`, an `.apk` asset) and phones are offered it; the "- " lines of its
+   notes before "## Install" show in the popup. Nothing else to do.
+3. Or, without a release: take the `english-bridgeway-apk` artifact from a **Mobile app** run and upload
+   `app-release.apk` in **Admin → Mobile app** with the version and build number from the run summary.
+   The admin page also has **Required update**, which applies to releases too.
 
-Phones with an older build show the update popup the next time the app starts. The build number
-must be the one from the same run as the APK, or phones will keep asking to update.
+The build number comes from the version (major × 10000 + minor × 100 + patch, so 1.1.0 is 10100).
+
+Phones with an older build show the update popup the next time the app starts. An uploaded APK's
+build number must match the APK, or phones will keep asking to update.
 
 Android only installs an update signed with the same key as the installed app. The workflow signs
 the APK with the upload key when the `ANDROID_KEYSTORE_*` secrets are set (see below); without them

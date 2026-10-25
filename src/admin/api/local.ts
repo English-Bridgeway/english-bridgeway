@@ -441,7 +441,7 @@ export const localApi: AdminApi = {
   removeEbookCover: noEbooks,
   async getAppRelease() {
     current(readDemoDb());
-    return wait(null);
+    return wait({ release: null, github: null });
   },
   uploadApk: noApp,
   updateAppRelease: noApp,

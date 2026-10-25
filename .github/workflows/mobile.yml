@@ -55,20 +55,25 @@ jobs:
           PROPS
           sed -i 's/^ *//' android/key.properties
           echo "APK_KEY=upload" >> "$GITHUB_ENV"
-      # The build number is the run number, so every APK is newer than the last one and phones
-      # can be offered it in Admin → Mobile app (the version and build are in the run summary).
+      # The build number comes from the version (1.1.0 → 10100), as in mobile-release.yml, so a
+      # newer version always installs over an older one. Both are in the run summary.
+      - name: Version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed -E 's/version: *([^+]*).*/\1/')
+          IFS=. read -r MAJOR MINOR PATCH <<< "$VERSION"
+          echo "APP_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "APP_BUILD=$((MAJOR * 10000 + MINOR * 100 + ${PATCH:-0}))" >> "$GITHUB_ENV"
       - name: Build APK
         run: >-
           flutter build apk --release
-          --build-number=${{ github.run_number }}
+          --build-name=$APP_VERSION --build-number=$APP_BUILD
           --dart-define=API_BASE=${{ inputs.api_base || 'https://englishbridgeway.com/api' }}
       - name: Summary
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed -E 's/version: *([^+]*).*/\1/')
           {
             echo "### Android APK"
             echo ""
-            echo "Version **$VERSION**, build number **${{ github.run_number }}**."
+            echo "Version **$APP_VERSION**, build number **$APP_BUILD**."
             if [ "$APK_KEY" = upload ]; then
               echo "To send it to phones: download english-bridgeway-apk below, then Admin → Mobile app → Publish a new version."
             else

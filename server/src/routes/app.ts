@@ -1,7 +1,7 @@
 import { Router, type ErrorRequestHandler } from 'express';
 import { asyncHandler, requireOwner } from '../middleware';
 import { audit } from '../services/audit';
-import { apkFile, AppReleaseError, getRelease, publicVersion, updateRelease, uploadApk } from '../services/appRelease';
+import { apkFile, AppReleaseError, getRelease, latestGithubRelease, publicVersion, updateRelease, uploadApk } from '../services/appRelease';
 
 // The Android app's update check and APK download (see services/appRelease.ts).
 export const appRouter = Router();
@@ -37,7 +37,8 @@ export const adminAppRouter = Router();
 adminAppRouter.get(
   '/app/release',
   asyncHandler(async (_req, res) => {
-    res.json({ release: await getRelease() });
+    const [release, github] = await Promise.all([getRelease(), latestGithubRelease()]);
+    res.json({ release, github });
   }),
 );
 
