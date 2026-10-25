@@ -25,6 +25,8 @@ export const config = {
   // Uploaded e-book PDFs and covers. In Docker this is the ebooks-data volume.
   ebooksDir: path.resolve(process.env.EBOOKS_DIR || 'uploads/ebooks'),
   ebookMaxMb: Math.max(1, Number(process.env.EBOOK_MAX_MB || 100)),
+  // The Android APK offered to learners who installed the app outside Google Play.
+  appDir: path.resolve(process.env.APP_DIR || 'uploads/app'),
   voice: {
     // Public STUN servers let two browsers find each other's address. They are enough for
     // most home and mobile networks; TURN (below) relays audio when a direct path is blocked.

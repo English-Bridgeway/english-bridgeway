@@ -277,6 +277,27 @@ Speak with AI by voice. It uses the same API and learner accounts as the website
 [mobile/README.md](mobile/README.md) to run and build it; the **Mobile app** GitHub Action builds an
 APK for every pull request that changes `mobile/`.
 
+**App updates:** learners who installed the APK get an "Update available" popup when a newer build is
+out: the latest GitHub Release with an APK (`APP_GITHUB_REPO`, this repo by default; checked every
+10 minutes) or an APK the owner uploads in **Admin → Mobile app** (tick **Required update** only when old
+versions must stop). The APK
+is stored in `APP_DIR` (`server/uploads/app`; the `app-data` volume in Docker) and served at
+`GET /api/app/android.apk`; `GET /api/app/version` tells the app what's newest. Google Play installs
+update through Play instead. The host Nginx needs a bigger upload limit for this path too, next to
+the e-books one:
+
+```nginx
+location /api/admin/app/ {
+  client_max_body_size 200m;
+  proxy_request_buffering off;
+  proxy_read_timeout 10m;
+  proxy_pass http://127.0.0.1:8080;
+  proxy_set_header Host $host;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
 ## Project structure
 
 ```

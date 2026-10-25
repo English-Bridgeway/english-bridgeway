@@ -162,7 +162,7 @@ export async function deleteEbook(id: string) {
 }
 
 /** Streams the request body to a temporary file next to `target`, refusing anything over `max` bytes. */
-async function receive(body: Readable, target: string, max: number, tooBig: string): Promise<{ size: number; head: Buffer; tmp: string }> {
+export async function receive(body: Readable, target: string, max: number, tooBig: string): Promise<{ size: number; head: Buffer; tmp: string }> {
   await fs.promises.mkdir(path.dirname(target), { recursive: true });
   const tmp = `${target}.${crypto.randomBytes(6).toString('hex')}.part`;
   let size = 0;

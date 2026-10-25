@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 import '../nav.dart';
@@ -126,7 +127,14 @@ class ProfileScreen extends StatelessWidget {
             ]),
           ],
           const SizedBox(height: 20),
-          Center(child: Text('${site.name} · App 1.0.0', style: const TextStyle(fontSize: 12, color: AppColors.outline))),
+          // The build number is what Admin → Mobile app compares against.
+          FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (_, snap) => Center(
+              child: Text(snap.hasData ? '${site.name} · App ${snap.data!.version} (${snap.data!.buildNumber})' : site.name,
+                  style: const TextStyle(fontSize: 12, color: AppColors.outline)),
+            ),
+          ),
         ]),
       ),
     );

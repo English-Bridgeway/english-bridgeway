@@ -29,6 +29,35 @@ String courseLessonKey(Course course, int index, String? href) {
   return (done: done, total: lessons.length);
 }
 
+/// The lesson to continue: the first one not done yet (else the first one that opens).
+int nextCourseLesson(Course course, ProgressStore progress) {
+  final lessons = course.allLessons;
+  for (var i = 0; i < lessons.length; i++) {
+    if (lessons[i].href != null && !progress.isComplete(courseLessonKey(course, i, lessons[i].href))) return i;
+  }
+  return lessons.indexWhere((l) => l.href != null);
+}
+
+/// Opens a course lesson, or explains why it can't open (locked, or not written yet).
+void openCourseLesson(BuildContext context, Course course, int index) {
+  final auth = context.read<AuthStore>();
+  final l = course.allLessons[index];
+  if (!auth.canOpenLesson(course, index)) {
+    if (inAppPurchases) {
+      showBuySheet(context, course);
+    } else {
+      showSnack(context, 'This lesson is part of the full course.');
+    }
+    return;
+  }
+  if (l.href == null) {
+    showSnack(context, 'This lesson is coming soon.');
+    return;
+  }
+  context.read<ProgressStore>().startCourse(course.id);
+  openHref(context, l.href!, course: course, lessonIndex: index);
+}
+
 class CoursesScreen extends StatefulWidget {
   const CoursesScreen({super.key, this.standalone = false});
   final bool standalone;
@@ -182,31 +211,8 @@ class _CourseScreenState extends State<CourseScreen> {
     }
     final p = courseProgress(course, progress);
     final locked = course.isPaid && !auth.canOpenCourse(course);
-    final lessons = course.allLessons;
-    final nextIndex = () {
-      for (var i = 0; i < lessons.length; i++) {
-        if (lessons[i].href != null && !progress.isComplete(courseLessonKey(course, i, lessons[i].href))) return i;
-      }
-      return lessons.indexWhere((l) => l.href != null);
-    }();
-
-    void openLesson(int index) {
-      final l = lessons[index];
-      if (!auth.canOpenLesson(course, index)) {
-        if (inAppPurchases) {
-          showBuySheet(context, course);
-        } else {
-          showSnack(context, 'This lesson is part of the full course.');
-        }
-        return;
-      }
-      if (l.href == null) {
-        showSnack(context, 'This lesson is coming soon.');
-        return;
-      }
-      progress.startCourse(course.id);
-      openHref(context, l.href!, course: course, lessonIndex: index);
-    }
+    final nextIndex = nextCourseLesson(course, progress);
+    void openLesson(int index) => openCourseLesson(context, course, index);
 
     Widget cta;
     if (!locked) {

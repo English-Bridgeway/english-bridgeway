@@ -8,7 +8,7 @@ same learner accounts as the website, so whatever the admin panel changes shows 
 
 | Tab | Screens |
 | --- | --- |
-| Home | Hero, streak and current lesson, stats, learning paths, new lessons, popular courses, word of the day |
+| Home | Signed out: hero, streak and current lesson, stats, learning paths, new lessons, popular courses, word of the day. Signed in: **dashboard** with greeting, streak, lessons done, quiz average, this week's activity, the course in progress with Resume, shortcuts, up next (grammar, speaking, quiz), my courses, word of the day |
 | Learn | Grammar (topics, lessons with rules, examples, mistakes and practice), Vocabulary (search, categories, saved words), Spoken English (dialogues with listen buttons), Speak with AI, E-books, Blog |
 | Quiz | Quiz categories, quiz runner with instant feedback and a review, best scores |
 | Courses | Course list, course page with curriculum and trial locks, Cashfree checkout, subscription plans |
@@ -41,7 +41,7 @@ Not in the app yet: Speak Live (the WebRTC calls and team rooms). Learners use i
 `GET /content`, `GET /payments/config`, `POST /messages`, `POST /auth/register`, `POST /auth/login`,
 `GET|PATCH /me`, `PUT|DELETE /me/avatar`, `GET /avatars/:id`, `GET /me/orders`, `POST /me/logout-all`,
 `POST /orders`, `GET /orders/:id`, `GET /ai/status`, `POST /ai/chat`, `POST /ai/speak`, `GET /ebooks`,
-`POST /ebooks/:id/link`, `GET /ebooks/:id/file` (signed link), `GET /ebooks/:id/cover`. Mobile apps don't send an `Origin` header, so `CORS_ORIGINS` doesn't
+`POST /ebooks/:id/link`, `GET /ebooks/:id/file` (signed link), `GET /ebooks/:id/cover`, `GET /app/version`, `GET /app/android.apk`. Mobile apps don't send an `Origin` header, so `CORS_ORIGINS` doesn't
 need the app.
 
 ## Run it
@@ -56,6 +56,27 @@ flutter run --dart-define=API_BASE=http://10.0.2.2:4000/api   # local server fro
 ```
 
 `flutter analyze` and `flutter test` should both pass.
+
+## Releasing an update to APK users
+
+1. Raise `version:` in `pubspec.yaml` when the release has something new (for example `1.1.0` to `1.2.0`).
+2. Publish a GitHub Release (**Actions → Mobile release**). The server reads the latest release
+   (tag `app-v1.1.0-build10100`, an `.apk` asset) and phones are offered it; the "- " lines of its
+   notes before "## Install" show in the popup. Nothing else to do.
+3. Or, without a release: take the `english-bridgeway-apk` artifact from a **Mobile app** run and upload
+   `app-release.apk` in **Admin → Mobile app** with the version and build number from the run summary.
+   The admin page also has **Required update**, which applies to releases too.
+
+The build number comes from the version (major × 10000 + minor × 100 + patch, so 1.1.0 is 10100).
+
+Phones with an older build show the update popup the next time the app starts. An uploaded APK's
+build number must match the APK, or phones will keep asking to update.
+
+Android only installs an update signed with the same key as the installed app. The workflow signs
+the APK with the upload key when the `ANDROID_KEYSTORE_*` secrets are set (see below); without them
+each run gets a temporary key, the run summary warns, and that APK can't be published as an update.
+A phone that has an APK with a temporary key (any APK built before the secrets were added) needs to
+uninstall it once and install a signed APK; after that, updates install over it.
 
 ## Build for the stores
 
@@ -116,8 +137,8 @@ lib/
   models.dart          content and account types (mirror src/types on the website)
   state.dart           ContentStore, AuthStore (access rules), ProgressStore
   nav.dart             push() and openHref() for website paths in course curricula
-  services/            api.dart, payments.dart (Cashfree), speech.dart (text-to-speech)
+  services/            api.dart, payments.dart (Cashfree), speech.dart (text-to-speech), updates.dart (update popup)
   widgets/common.dart  cards, pills, buttons, headers, listen button
-  screens/             one file per area (home, grammar, vocabulary, spoken, quiz, courses, ai_tutor, profile…)
+  screens/             one file per area (onboarding, home, dashboard, grammar, vocabulary, spoken, quiz, courses, ai_tutor, profile…)
 assets/content.json    copy of server/seed/content.json (refresh it when the seed changes)
 ```

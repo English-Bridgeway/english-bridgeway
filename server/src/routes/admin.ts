@@ -12,6 +12,7 @@ import { getPlans, PlanError, savePlans } from '../services/plans';
 import { config } from '../config';
 import { adminLearnersRouter } from './adminLearners';
 import { adminEbooksRouter } from './adminEbooks';
+import { adminAppRouter } from './app';
 
 export const adminRouter = Router();
 
@@ -39,6 +40,7 @@ adminRouter.use(requireAdmin);
 
 adminRouter.use(adminLearnersRouter);
 adminRouter.use(adminEbooksRouter);
+adminRouter.use(adminAppRouter);
 
 adminRouter.get('/me', (req, res) => {
   res.json(adminDto(req.admin!));

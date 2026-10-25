@@ -235,6 +235,36 @@ export interface EbookInput {
   published: boolean;
 }
 
+/** The Android APK offered to learners who installed the app outside Google Play (Admin → Mobile app). */
+export interface AppRelease {
+  versionName: string;
+  buildNumber: number;
+  /** Builds older than this must update first. 0 = never force. */
+  minBuild: number;
+  notes: string;
+  fileSize: number;
+  sha256: string;
+  uploadedAt: string;
+}
+
+/** The latest GitHub Release with an APK (tag like app-v1.1.0-build10100); phones get it when it's newer. */
+export interface GithubAppRelease {
+  versionName: string;
+  buildNumber: number;
+  notes: string;
+  size: number;
+  url: string;
+  page: string;
+  publishedAt: string;
+}
+
+export interface AppReleaseInput {
+  versionName: string;
+  buildNumber: number;
+  minBuild: number;
+  notes: string;
+}
+
 export interface AdminApi {
   mode: "live" | "demo";
   login(email: string, password: string): Promise<AdminSession>;
@@ -291,6 +321,11 @@ export interface AdminApi {
   uploadEbookFile(id: string, file: File, onProgress?: (fraction: number) => void): Promise<AdminEbook>;
   uploadEbookCover(id: string, file: File): Promise<AdminEbook>;
   removeEbookCover(id: string): Promise<AdminEbook>;
+
+  getAppRelease(): Promise<{ release: AppRelease | null; github: GithubAppRelease | null }>;
+  /** Publishes a new APK; `onProgress` gets 0..1 while it is sent. */
+  uploadApk(file: File, input: AppReleaseInput, onProgress?: (fraction: number) => void): Promise<AppRelease>;
+  updateAppRelease(input: Pick<AppReleaseInput, "minBuild" | "notes">): Promise<AppRelease>;
 
   getAi(): Promise<AiSettings>;
   saveAi(input: AiSettingsInput): Promise<AiSettings>;
