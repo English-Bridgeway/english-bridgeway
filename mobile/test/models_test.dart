@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:english_bridgeway/models.dart';
-import 'package:english_bridgeway/screens/ai_tutor.dart';
 import 'package:english_bridgeway/widgets/common.dart';
 import 'package:flutter_test/flutter_test.dart';
 

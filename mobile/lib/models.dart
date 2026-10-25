@@ -408,8 +408,58 @@ class ChatMessage {
   final String role; // user | assistant
   final String content;
   final String? speechSig;
-  ChatMessage(this.role, this.content, [this.speechSig]);
+
+  /// The tutor's reply in parts, spoken one after another: explain (in Marathi), say (the English
+  /// to repeat), next (the conversation goes on). Older servers send one text; see [ChatMessage.tutor].
+  final List<TutorPart> parts;
+
+  /// The learner's wrong words and the right ones, to highlight.
+  final ({String wrong, String right})? mistake;
+  final String? correction;
+
+  ChatMessage(this.role, this.content, [this.speechSig, this.parts = const [], this.mistake, this.correction]);
+
+  /// A reply from POST /api/ai/chat (or an opener, with [opener]).
+  factory ChatMessage.tutor(Map<String, dynamic> r, {bool opener = false}) {
+    final content = '${r['reply'] ?? ''}';
+    final sig = r['speechSig'] as String?;
+    final raw = r['parts'];
+    if (raw is List && raw.isNotEmpty) {
+      final m = r['mistake'];
+      return ChatMessage(
+        'assistant',
+        content,
+        sig,
+        [
+          for (final p in raw.whereType<Map>())
+            if ('${p['text'] ?? ''}'.trim().isNotEmpty) TutorPart('${p['kind'] ?? 'next'}', '${p['text']}'.trim(), p['sig'] as String?),
+        ],
+        m is Map && '${m['wrong'] ?? ''}'.isNotEmpty ? (wrong: '${m['wrong']}', right: '${m['right']}') : null,
+        r['correction'] as String?,
+      );
+    }
+    // One text with an optional "Correction:" line (openers, older servers).
+    final (said, correction) = opener ? (content.trim(), null) : splitCorrection(content);
+    return ChatMessage('assistant', content, sig, [TutorPart('next', said, sig)], null, correction);
+  }
+
   Map<String, dynamic> toJson() => {'role': role, 'content': content};
+}
+
+class TutorPart {
+  final String kind; // explain | say | next
+  final String text;
+  final String? sig;
+  const TutorPart(this.kind, this.text, this.sig);
+}
+
+/// The tutor's reply without its "Correction:" line, and that line. Mirrors spokenPart() on the server.
+(String, String?) splitCorrection(String reply) {
+  final lines = reply.split(RegExp(r'\n+')).map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
+  final i = lines.indexWhere((l) => RegExp(r'^correction\s*:', caseSensitive: false).hasMatch(l));
+  if (i < 0) return (reply.trim(), null);
+  final correction = lines[i].replaceFirst(RegExp(r'^correction\s*:\s*', caseSensitive: false), '');
+  return ([for (var j = 0; j < lines.length; j++) if (j != i) lines[j]].join(' ').trim(), correction);
 }
 
 /// An e-book (PDF) from GET /api/ebooks. `unlocked` is the server's answer for this learner.
