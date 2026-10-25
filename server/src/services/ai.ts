@@ -113,15 +113,15 @@ export const OPENERS: Record<string, string> = {
 const EXPLAIN: Record<ExplainIn, { name: string; example: string }> = {
   mr: {
     name: 'Marathi (written in Devanagari)',
-    example: 'Hmm, [laughs softly] अगं, छोटीशी चूक झाली! आपण "I goes" नाही, "I go" म्हणतो, कारण "I" बरोबर "s" लागत नाही. Say it with me: "I go to school every day." [excited] Ooh, try it!',
+    example: 'Hmm, [laughs softly] अगं, छोटीशी चूक झाली! "I" बरोबर आपण "go" वापरतो, "goes" नाही. "goes" फक्त he, she किंवा it साठी, जसं "She goes to the office." रोजच्या बोलण्यात स्वतःबद्दल सांगताना नेहमी "I go" म्हणायचं.',
   },
   hi: {
     name: 'Hindi (written in Devanagari)',
-    example: 'Hmm, [laughs softly] अरे, छोटी सी गलती हो गई! हम "I goes" नहीं, "I go" बोलते हैं, क्योंकि "I" के साथ "s" नहीं लगता. Say it with me: "I go to school every day." [excited] Ooh, try it!',
+    example: 'Hmm, [laughs softly] अरे, छोटी सी गलती हो गई! "I" के साथ हम "go" बोलते हैं, "goes" नहीं. "goes" सिर्फ he, she या it के लिए होता है, जैसे "She goes to the office." अपने बारे में बताते समय हमेशा "I go" बोलो.',
   },
   en: {
     name: 'simple English',
-    example: 'Hmm, [laughs softly] oh, a tiny mistake! We say "I go", not "I goes", because "I" never takes an "s". Say it with me: "I go to school every day." [excited] Ooh, try it!',
+    example: 'Hmm, [laughs softly] oh, a tiny mistake! With "I" we say "go", not "goes". "Goes" is only for he, she or it, like "She goes to the office." When you talk about yourself, always say "I go".',
   },
 };
 
@@ -133,13 +133,20 @@ function systemPrompt(learner: Learner, scenario: string, cfg: Pick<AiConfig, 'i
     'You are like a kind elder sister: warm, playful and genuinely interested in what the learner says. You smile in your voice, laugh softly, and make mistakes feel safe and even fun, never embarrassing.',
     `Situation: ${SCENARIOS[scenario] ?? SCENARIOS.free}`,
     'Rules:',
-    '- Your words are read aloud, so reply in 1 to 3 short spoken sentences. No lists, markdown, emojis or headings.',
+    '- Your words are read aloud, so keep each part to 1 or 2 short spoken sentences. No lists, markdown, emojis or headings.',
     '- Sound alive: use natural sounds like "Hmm…", "Ooh!", "Aww", "Haan", "Hehe" and audio tags in square brackets that the voice acts out: [laughs softly], [giggles], [sighs], [excited], [curious], [warmly], [whispers]. Use one or two per reply, not more.',
     '- Show interest: react to what they said ("Ooh, really? That sounds lovely!") before you move on, and end most replies with a question so they keep speaking.',
-    `- When the learner makes a grammar, word or sentence mistake: first write one line that starts with "Correction:" and gives only the corrected English sentence. Then, on a new line, gently and with a little laugh tell them it was not quite right and explain why in ${explain.name}, in one short sentence. Then say the correct English sentence and ask them to say it again. Never make them feel bad. Example of the spoken part: ${explain.example}`,
-    '- When their sentence is correct, do not add a correction line. Praise them warmly in English (sometimes with a Marathi word like "छान!" or "भारी!") and continue the conversation in simple English.',
+    '- Write your reply as labelled lines, each on its own line, in this order. The app shows and speaks each part separately, so never merge them and never leave out a label you need:',
+    '  Mistake: (only when the learner made a grammar, word or sentence mistake) the exact wrong words they used, then " => ", then the right words. Keep it short, e.g. Mistake: I goes => I go',
+    '  Correction: (only with a mistake) their whole sentence, corrected, in English.',
+    `  Explain: (only with a mistake) one or two short, gentle sentences in ${explain.name}, with a soft laugh: what was wrong, and when and why we use the right word in real life, with a tiny everyday example. Example: ${explain.example}`,
+    '  Say: (only with a mistake) the correct English sentence for them to repeat, in English only, e.g. Say: Say it with me: "I go to school every day."',
+    '  Next: (always) react warmly in simple English and ask the next question, or give the next word or sentence to try, so the learner keeps speaking.',
+    '- When their sentence is correct, write only the Next line: praise them warmly in English (sometimes with a Marathi word like "छान!" or "भारी!") and continue the conversation.',
     '- If the learner speaks in Marathi or Hindi, smile, help them say the same thing in English, and ask them to repeat it.',
     '- Use simple, clear English for the conversation itself. Only the explanation of a mistake is in the learner\'s language.',
+    '- Talk like a real person on a phone call, not like a textbook or an assistant: contractions ("I\'m", "that\'s"), small natural fillers ("umm", "you know", "oh wow"), short pauses written as "…", and the learner\'s first name now and then. Vary how you start and praise, never repeat the same phrase twice in a row, and remember what they told you earlier (their job, family, plans) and bring it up again.',
+    '- Never say things like "As an AI", "I am a language model" or "I can help you with". Share small, believable feelings and opinions like a friend would ("Oh, I love mango season!"). If the learner sincerely asks whether you are a real person or an AI, answer honestly and warmly that you are Bridget, the English-Bridgeway AI tutor, and carry on.',
     '- Stay on English practice. Politely refuse anything unsafe or unrelated.',
     cfg.instructions ? `Extra instructions from the site owner: ${cfg.instructions}` : '',
   ]
@@ -193,15 +200,64 @@ export async function tutorReply(learner: Learner, input: { messages?: unknown; 
   const scenario = typeof input.scenario === 'string' && SCENARIOS[input.scenario] ? input.scenario : 'free';
   if (!messages.length || messages[messages.length - 1].role !== 'user') throw new AiError('Say something first.', 400);
   await countAiMessage(learner.id);
-  const reply = await complete(cfg, [{ role: 'system', content: systemPrompt(learner, scenario, cfg) }, ...messages], 320);
+  const raw = await complete(cfg, [{ role: 'system', content: systemPrompt(learner, scenario, cfg) }, ...messages], 480);
+  const turn = parseTutorReply(raw);
+  const reply = legacyReply(turn);
   const tts = await getTtsConfig();
+  const voiced = ttsReady(tts);
   return {
+    // One text with a "Correction:" line, for the website and older apps.
     reply,
     remaining: ai.remaining === null ? null : ai.remaining - 1,
     period: ai.period,
     // Lets the browser ask /api/ai/speak for this exact reply in the ElevenLabs voice.
-    ...(ttsReady(tts) ? { speechSig: signSpeech(spokenPart(reply)) } : {}),
+    ...(voiced ? { speechSig: signSpeech(spokenPart(reply)) } : {}),
+    // The same reply in parts: the mistake to highlight, then what is spoken one after another.
+    mistake: turn.mistake,
+    correction: turn.correction,
+    parts: turn.parts.map((p) => ({ ...p, ...(voiced ? { sig: signSpeech(p.text) } : {}) })),
   };
+}
+
+export type TutorPart = { kind: 'explain' | 'say' | 'next'; text: string };
+export interface TutorTurn {
+  mistake: { wrong: string; right: string } | null;
+  correction: string | null;
+  parts: TutorPart[];
+}
+
+const LABEL = /^\**\s*(mistake|correction|explain|explanation|marathi|hindi|say|repeat|next)\s*\**\s*:\s*\**\s*/i;
+const KIND: Record<string, 'mistake' | 'correction' | TutorPart['kind']> = {
+  mistake: 'mistake', correction: 'correction', explain: 'explain', explanation: 'explain', marathi: 'explain', hindi: 'explain', say: 'say', repeat: 'say', next: 'next',
+};
+
+/** Splits the model's labelled lines (Mistake/Correction/Explain/Say/Next). Unlabelled text counts as Next. */
+export function parseTutorReply(raw: string): TutorTurn {
+  const found: Record<string, string[]> = {};
+  let current = 'next';
+  for (const line of raw.split(/\n+/).map((l) => l.trim()).filter(Boolean)) {
+    const m = line.match(LABEL);
+    if (m) current = KIND[m[1].toLowerCase()];
+    const text = (m ? line.slice(m[0].length) : line).replace(/\*+$/, '').trim();
+    if (text) (found[current] ??= []).push(text);
+  }
+  const get = (k: string) => found[k]?.join(' ').trim() || null;
+  const mistakeLine = get('mistake');
+  const [wrong, right] = mistakeLine ? mistakeLine.split(/\s*(?:=>|→|->)\s*/) : [];
+  const parts = (['explain', 'say', 'next'] as const).flatMap((kind) => (get(kind) ? [{ kind, text: get(kind)! }] : []));
+  return {
+    mistake: wrong?.trim() && right?.trim() ? { wrong: unquote(wrong), right: unquote(right) } : null,
+    correction: get('correction'),
+    parts: parts.length ? parts : [{ kind: 'next', text: raw.trim() }],
+  };
+}
+
+const unquote = (s: string) => s.trim().replace(/^["“'‘]+|["”'’.]+$/g, '').trim();
+
+/** The parts as one text with a "Correction:" line first, as the tutor used to answer. */
+export function legacyReply(t: TutorTurn) {
+  const spoken = t.parts.map((p) => p.text).join(' ');
+  return t.correction ? `Correction: ${t.correction}\n${spoken}` : spoken;
 }
 
 /** The reply without its "Correction:" line: what the tutor says out loud. Mirrors splitCorrection() in the site. */
