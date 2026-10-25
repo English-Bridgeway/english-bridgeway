@@ -1,0 +1,130 @@
+name: Mobile release
+
+# Publishes a GitHub Release with the Android APK attached: Actions → Mobile release → Run
+# workflow, and enter the version. The notes come from that version's section in
+# mobile/CHANGELOG.md, followed by install steps. The tag is app-v<version>-build<version code>;
+# the server's /api/app/version reads the latest release from it to offer the update in the app.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, like 1.0.0 (needs a section in mobile/CHANGELOG.md)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version
+        id: v
+        run: |
+          raw="${{ inputs.version }}"
+          version="${raw#v}"
+          if ! [[ "$version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "::error::Use a version like 1.0.0 (got '$raw')."
+            exit 1
+          fi
+          # Grows with every version, so a newer APK always installs over an older one.
+          code=$(( BASH_REMATCH[1] * 10000 + BASH_REMATCH[2] * 100 + BASH_REMATCH[3] ))
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+      - name: Release notes
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          awk -v v="$v" '
+            /^## / { on = ($2 == v || $2 == "v" v) ; next }
+            on { print }
+          ' CHANGELOG.md > notes.md
+          if ! grep -q '[^[:space:]]' notes.md; then
+            echo "::error::Add a '## $v' section to mobile/CHANGELOG.md first."
+            exit 1
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7
+          cache: true
+      - name: Write release keystore
+        id: sign
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::No ANDROID_KEYSTORE_* secrets: the APK is signed with a one-off debug key and won't install over other builds."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+          printf 'storeFile=upload-keystore.jks\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > android/key.properties
+          echo "signed=true" >> "$GITHUB_OUTPUT"
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: Build APK
+        run: >-
+          flutter build apk --release
+          --build-name=${{ steps.v.outputs.version }}
+          --build-number=${{ steps.v.outputs.code }}
+          --dart-define=API_BASE=https://englishbridgeway.com/api
+      - name: Name the APK and finish the notes
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          apk="english-bridgeway-v$v.apk"
+          mv build/app/outputs/flutter-apk/app-release.apk "$apk"
+          sha=$(sha256sum "$apk" | cut -d' ' -f1)
+          size=$(du -m "$apk" | cut -f1)
+          {
+            echo
+            echo "## Install on Android"
+            echo
+            echo "1. On your phone, open this page and tap **$apk** under Assets (about ${size} MB)."
+            echo "2. Open the downloaded file. If Android asks, allow installing apps from your browser."
+            if [ "${{ steps.sign.outputs.signed }}" = "true" ]; then
+              echo "3. It installs over an earlier release and keeps your login and progress."
+            else
+              echo "3. If Android says **App not installed**, uninstall the old English-Bridgeway app first. (This build isn't signed with the release key yet.)"
+            fi
+            echo
+            echo "Version $v (build ${{ steps.v.outputs.code }}) · talks to https://englishbridgeway.com · Android 7.0 or newer"
+            echo
+            echo "SHA-256: \`$sha\`"
+          } >> notes.md
+          echo "APK=mobile/$apk" >> "$GITHUB_ENV"
+      # Opens the APK on an emulator so a release that crashes at start is never published.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          working-directory: mobile
+          script: bash tool/smoke_test.sh ../${{ env.APK }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: app-v${{ steps.v.outputs.version }}-build${{ steps.v.outputs.code }}
+          target_commitish: ${{ github.sha }}
+          name: English-Bridgeway app v${{ steps.v.outputs.version }}
+          body_path: mobile/notes.md
+          files: ${{ env.APK }}
+          make_latest: true
