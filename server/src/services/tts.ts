@@ -153,7 +153,7 @@ export async function testTts(): Promise<{ ok: boolean; message: string; audio?:
   if (!cfg.apiKey) return { ok: false, message: 'Add an ElevenLabs API key first.' };
   try {
     const audio = await synthesize(
-      'Hmm, [laughs softly] अगं, छोटीशी चूक झाली! आपण "I goes" नाही, "I go" म्हणतो. Say it with me: I go to school every day. [excited] Ooh, perfect!',
+      '[chuckling] Hmm… अगं, छोटीशी चूक झाली! आपण "I goes" नाही, "I go" म्हणतो. [pause] [softly] Say it with me… [slowly] I go to school every day. [excited] Ooh, perfect!',
       { ...cfg, provider: 'elevenlabs' },
     );
     return { ok: true, message: `Connected. Voice ${cfg.voiceId} on ${cfg.model} is working.`, audio: `data:audio/mpeg;base64,${audio.toString('base64')}` };

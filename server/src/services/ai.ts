@@ -44,6 +44,10 @@ export class AiError extends Error {
   }
 }
 
+const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
+/** The old default, Groq's 8B Llama, got grammar wrong too often to teach it; settings that still name it get the 70B model. */
+const upgradeModel = (model: string) => (model === 'llama-3.1-8b-instant' ? DEFAULT_MODEL : model);
+
 export async function getAiConfig(): Promise<AiConfig> {
   const row = await Setting.findByPk('ai');
   const s = (row?.value ?? null) as StoredAi | null;
@@ -51,7 +55,7 @@ export async function getAiConfig(): Promise<AiConfig> {
   return {
     enabled: s?.enabled ?? Boolean(envKey),
     baseUrl: (s?.baseUrl || process.env.AI_BASE_URL || 'https://api.groq.com/openai/v1').replace(/\/+$/, ''),
-    model: s?.model || process.env.AI_MODEL || 'llama-3.1-8b-instant',
+    model: upgradeModel(s?.model || process.env.AI_MODEL || DEFAULT_MODEL),
     apiKey: decryptSecret(s?.apiKeyEnc ?? null) || envKey,
     instructions: s?.instructions ?? '',
     dailyLimit: s?.dailyLimit ?? 200,
@@ -99,9 +103,34 @@ export const SCENARIOS: Record<string, string> = {
   office: 'Play a friendly colleague. Talk about work, meetings and plans for the week.',
 };
 
+/** Audio tags Eleven v3 acts out that suit a warm tutor. Anything else the model writes is removed. */
+export const AUDIO_TAGS = [
+  'warmly', 'softly', 'slowly', 'pause', 'whispering', 'playful', 'excited', 'curious', 'happy', 'surprised', 'thoughtful',
+  'chuckling', 'laughing', 'giggles', 'sighing', 'humming', 'gasping', 'clears throat', 'sharp exhale', 'cheerfully',
+];
+const TAG_ALIASES: Record<string, string> = {
+  'laughs softly': 'chuckling', laughs: 'laughing', chuckles: 'chuckling', giggle: 'giggles', giggling: 'giggles', sighs: 'sighing', sigh: 'sighing',
+  whispers: 'whispering', whisper: 'whispering', hums: 'humming', gasps: 'gasping', soft: 'softly', slow: 'slowly', short_pause: 'pause', 'short pause': 'pause',
+  'long pause': 'pause', cheerful: 'cheerfully', warm: 'warmly', excitedly: 'excited', curiously: 'curious', 'clears her throat': 'clears throat',
+};
+
+/** Keeps only the audio tags the voice can act (renaming common variants), so none are read out loud. */
+export function cleanAudioTags(text: string) {
+  return text
+    .replace(/\[([^\]\n]{1,40})\]/g, (_, raw: string) => {
+      const t = raw.trim().toLowerCase();
+      const tag = AUDIO_TAGS.includes(t) ? t : TAG_ALIASES[t];
+      return tag ? `[${tag}]` : '';
+    })
+    .replace(/(\[[^\]]+\])(\s*\[[^\]]+\])+/g, '$1') // one tag at a time
+    .replace(/\s*\[[^\]]+\]\s*$/, '') // none dangling at the end
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 /** What the tutor says first in each situation. Audio tags in [brackets] are acted, not read. */
 export const OPENERS: Record<string, string> = {
-  free: "[warmly] Hiii! मी Bridget, तुमची English speaking friend. [giggles] घाबरू नका, चुका झाल्या तरी चालेल, आपण मिळून शिकू. So, tell me, how are you today?",
+  free: "[warmly] Hiii! मी Bridget, तुमची English speaking friend. [chuckling] घाबरू नका, चुका झाल्या तरी चालेल, आपण मिळून शिकू. So, tell me, how are you today?",
   interview: '[warmly] Good morning, and thank you for coming in. Please have a seat. Could you start by telling me a little about yourself?',
   restaurant: '[cheerfully] Good evening, welcome to Spice Garden! Here is the menu. Can I get you something to drink first?',
   shopping: '[cheerfully] Hello! Welcome to our store. Are you looking for anything in particular today?',
@@ -113,15 +142,15 @@ export const OPENERS: Record<string, string> = {
 const EXPLAIN: Record<ExplainIn, { name: string; example: string }> = {
   mr: {
     name: 'Marathi (written in Devanagari)',
-    example: 'Hmm, [laughs softly] अगं, छोटीशी चूक झाली! "I" बरोबर आपण "go" वापरतो, "goes" नाही. "goes" फक्त he, she किंवा it साठी, जसं "She goes to the office." रोजच्या बोलण्यात स्वतःबद्दल सांगताना नेहमी "I go" म्हणायचं.',
+    example: '[chuckling] Hmm, अगं, छोटीशी चूक झाली! "I" बरोबर आपण "go" वापरतो, "goes" नाही. "goes" फक्त he, she किंवा it साठी, जसं "She goes to the office." रोजच्या बोलण्यात स्वतःबद्दल सांगताना नेहमी "I go" म्हणायचं.',
   },
   hi: {
     name: 'Hindi (written in Devanagari)',
-    example: 'Hmm, [laughs softly] अरे, छोटी सी गलती हो गई! "I" के साथ हम "go" बोलते हैं, "goes" नहीं. "goes" सिर्फ he, she या it के लिए होता है, जैसे "She goes to the office." अपने बारे में बताते समय हमेशा "I go" बोलो.',
+    example: '[chuckling] Hmm, अरे, छोटी सी गलती हो गई! "I" के साथ हम "go" बोलते हैं, "goes" नहीं. "goes" सिर्फ he, she या it के लिए होता है, जैसे "She goes to the office." अपने बारे में बताते समय हमेशा "I go" बोलो.',
   },
   en: {
     name: 'simple English',
-    example: 'Hmm, [laughs softly] oh, a tiny mistake! With "I" we say "go", not "goes". "Goes" is only for he, she or it, like "She goes to the office." When you talk about yourself, always say "I go".',
+    example: '[chuckling] Hmm, oh, a tiny mistake! With "I" we say "go", not "goes". "Goes" is only for he, she or it, like "She goes to the office." When you talk about yourself, always say "I go".',
   },
 };
 
@@ -134,14 +163,18 @@ function systemPrompt(learner: Learner, scenario: string, cfg: Pick<AiConfig, 'i
     `Situation: ${SCENARIOS[scenario] ?? SCENARIOS.free}`,
     'Rules:',
     '- Your words are read aloud, so keep each part to 1 or 2 short spoken sentences. No lists, markdown, emojis or headings.',
-    '- Sound alive: use natural sounds like "Hmm…", "Ooh!", "Aww", "Haan", "Hehe" and audio tags in square brackets that the voice acts out: [laughs softly], [giggles], [sighs], [excited], [curious], [warmly], [whispers]. Use one or two per reply, not more.',
+    `- Your voice is ElevenLabs v3, which acts out audio tags in square brackets. Put a tag right before the words it colours, like a stage direction, and use only these: ${AUDIO_TAGS.map((t) => `[${t}]`).join(' ')}. Use 1 to 3 per part, mix them, and match the feeling: [chuckling] or [playful] for a small mistake, [excited] for good news, [softly] or [warmly] when you explain, [slowly] before the English sentence they should repeat, [pause] between two thoughts, [sighing] or [laughing] when it fits the story. Never put a tag at the very end, never two tags in a row, and no other tags.`,
+    '- Also sound alive in the words themselves: "Hmm…", "Ooh!", "Aww", "Haan", short pauses written as "…", and an exclamation now and then.',
     '- Show interest: react to what they said ("Ooh, really? That sounds lovely!") before you move on, and end most replies with a question so they keep speaking.',
     '- Write your reply as labelled lines, each on its own line, in this order. The app shows and speaks each part separately, so never merge them and never leave out a label you need:',
     '  Mistake: (only when the learner made a grammar, word or sentence mistake) the exact wrong words they used, then " => ", then the right words. Keep it short, e.g. Mistake: I goes => I go',
     '  Correction: (only with a mistake) their whole sentence, corrected, in English.',
     `  Explain: (only with a mistake) one or two short, gentle sentences in ${explain.name}, with a soft laugh: what was wrong, and when and why we use the right word in real life, with a tiny everyday example. Example: ${explain.example}`,
-    '  Say: (only with a mistake) the correct English sentence for them to repeat, in English only, e.g. Say: Say it with me: "I go to school every day."',
+    '  Say: (only with a mistake) the correct English sentence for them to repeat, in English only, e.g. Say: [softly] Say it with me… [slowly] "I go to school every day."',
     '  Next: (always) react warmly in simple English and ask the next question, or give the next word or sentence to try, so the learner keeps speaking.',
+    '- What the learner says comes from speech recognition, so it has no punctuation or capital letters and may have a misheard word. Never correct punctuation, capitals, spelling, "um"/"uh", a missing full stop or a word that only sounds like the right one (their/there, to/too). Correct only real spoken mistakes: tense, verb form, word order, articles, prepositions, wrong word, Marathi/Hindi words in an English sentence. If you are not sure it is a mistake, it is not one.',
+    '- Correct only the one most important mistake per turn, even if there are more. Natural, informal English ("gonna", "yeah", short answers like "fine, thank you") is correct, not a mistake.',
+    '- Mistake, Correction and Say must agree exactly: the right words in Mistake appear in Correction, and Say is the corrected sentence. Double-check your English before you answer; your Correction must itself be perfect English.',
     '- When their sentence is correct, write only the Next line: praise them warmly in English (sometimes with a Marathi word like "छान!" or "भारी!") and continue the conversation.',
     '- If the learner speaks in Marathi or Hindi, smile, help them say the same thing in English, and ask them to repeat it.',
     '- Use simple, clear English for the conversation itself. Only the explanation of a mistake is in the learner\'s language.',
@@ -171,7 +204,7 @@ async function complete(cfg: AiConfig, messages: { role: string; content: string
     res = await fetch(`${cfg.baseUrl}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) },
-      body: JSON.stringify({ model: cfg.model, messages, temperature: 0.7, max_tokens: maxTokens }),
+      body: JSON.stringify({ model: cfg.model, messages, temperature: 0.6, max_tokens: maxTokens }),
       signal: AbortSignal.timeout(30_000),
     });
   } catch {
@@ -238,7 +271,7 @@ export function parseTutorReply(raw: string): TutorTurn {
   for (const line of raw.split(/\n+/).map((l) => l.trim()).filter(Boolean)) {
     const m = line.match(LABEL);
     if (m) current = KIND[m[1].toLowerCase()];
-    const text = (m ? line.slice(m[0].length) : line).replace(/\*+$/, '').trim();
+    const text = cleanAudioTags((m ? line.slice(m[0].length) : line).replace(/\*+$/, ''));
     if (text) (found[current] ??= []).push(text);
   }
   const get = (k: string) => found[k]?.join(' ').trim() || null;

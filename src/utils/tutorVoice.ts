@@ -4,11 +4,11 @@
  */
 import { DEMO_TTS_DEFAULTS, readDemoDb } from "./demoStore";
 
-/** Audio tags like [laughs softly] are acted by eleven_v3; everywhere else they are hidden. */
+/** Audio tags like [chuckling] are acted by eleven_v3; everywhere else they are hidden. */
 export const stripAudioTags = (text: string) => text.replace(/\[[^\]\n]{1,40}\]/g, " ").replace(/\s{2,}/g, " ").replace(/\s+([,.!?])/g, "$1").trim();
 
 export const TTS_SAMPLE =
-  'Hmm, [laughs softly] अगं, छोटीशी चूक झाली! आपण "I goes" नाही, "I go" म्हणतो. Say it with me: I go to school every day. [excited] Ooh, perfect!';
+  '[chuckling] Hmm… अगं, छोटीशी चूक झाली! आपण "I goes" नाही, "I go" म्हणतो. [pause] [softly] Say it with me… [slowly] I go to school every day. [excited] Ooh, perfect!';
 
 type TtsConfig = typeof DEMO_TTS_DEFAULTS;
 

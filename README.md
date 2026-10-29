@@ -183,7 +183,7 @@ the browser voice takes over.
 
 | Provider | API base URL | Example model | Key |
 | --- | --- | --- | --- |
-| Groq (free tier) | `https://api.groq.com/openai/v1` | `llama-3.1-8b-instant` | console.groq.com/keys |
+| Groq (free tier) | `https://api.groq.com/openai/v1` | `llama-3.3-70b-versatile` | console.groq.com/keys |
 | Google Gemini (free tier) | `https://generativelanguage.googleapis.com/v1beta/openai` | `gemini-2.0-flash` | aistudio.google.com/apikey |
 | OpenRouter | `https://openrouter.ai/api/v1` | a `:free` model | openrouter.ai/keys |
 | OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` | platform.openai.com/api-keys |
