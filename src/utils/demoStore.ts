@@ -36,7 +36,7 @@ export type ExplainIn = "mr" | "hi" | "en";
 export const DEMO_ACCESS_DEFAULTS: AccessSettings = {
   trialHours: 24, freeLessons: 1, trialAiMessages: 100, trialCallMinutes: 2, paidAiPerDay: 1000, paidCallMinutesPerDay: 45,
 };
-export const DEMO_AI_DEFAULTS = { enabled: false, baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.1-8b-instant", apiKey: "", instructions: "", dailyLimit: 200, explainIn: "mr" as ExplainIn };
+export const DEMO_AI_DEFAULTS = { enabled: false, baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile", apiKey: "", instructions: "", dailyLimit: 200, explainIn: "mr" as ExplainIn };
 /** "Sarah", a soft and warm female voice from the ElevenLabs library, on eleven_v3 (reads Marathi, acts [laughs]). */
 export const DEMO_TTS_DEFAULTS = { provider: "browser" as "browser" | "elevenlabs", apiKey: "", voiceId: "EXAVITQu4vr4xnSDxMaL", model: "eleven_v3", stability: 0.5, style: 0.6 };
 

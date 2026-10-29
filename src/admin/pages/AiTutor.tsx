@@ -10,7 +10,7 @@ import { cn } from "../../utils/cn";
 
 // OpenAI-compatible providers. Model names change over time; check the provider's model list.
 const PRESETS = [
-  { name: "Groq (free tier)", baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.1-8b-instant", keys: "https://console.groq.com/keys" },
+  { name: "Groq (free tier)", baseUrl: "https://api.groq.com/openai/v1", model: "llama-3.3-70b-versatile", keys: "https://console.groq.com/keys" },
   { name: "Google Gemini (free tier)", baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai", model: "gemini-2.0-flash", keys: "https://aistudio.google.com/apikey" },
   { name: "OpenRouter", baseUrl: "https://openrouter.ai/api/v1", model: "meta-llama/llama-3.3-70b-instruct:free", keys: "https://openrouter.ai/keys" },
   { name: "OpenAI", baseUrl: "https://api.openai.com/v1", model: "gpt-4o-mini", keys: "https://platform.openai.com/api-keys" },
@@ -95,7 +95,8 @@ export default function AiTutor() {
                 <span className="mt-1 block text-xs text-muted">Any OpenAI-compatible API. The site calls <code>{form.baseUrl || "…"}/chat/completions</code>.</span>
               </label>
               <label className="text-sm"><span className="font-semibold">Model</span>
-                <input value={form.model} onChange={(e) => set("model", e.target.value)} placeholder="llama-3.1-8b-instant" className={cn(inputClass, "mt-1 font-mono")} />
+                <input value={form.model} onChange={(e) => set("model", e.target.value)} placeholder="llama-3.3-70b-versatile" className={cn(inputClass, "mt-1 font-mono")} />
+                <span className="mt-1 block text-xs text-muted">Use a large model (70B, GPT-4o mini, Gemini Flash). Small 8B models make grammar mistakes while teaching.</span>
               </label>
               <label className="text-sm"><span className="font-semibold">API key</span>
                 <input type="password" autoComplete="off" value={form.apiKey} onChange={(e) => set("apiKey", e.target.value)} placeholder={saved.apiKeyMasked ? `Saved: ${saved.apiKeyMasked}` : "Paste your key"} className={cn(inputClass, "mt-1 font-mono")} />
@@ -281,7 +282,7 @@ function TutorVoice() {
       <aside>
         <Panel title="About the voice">
           <ul className="list-disc space-y-2 pl-5 text-sm text-muted">
-            <li><b>Eleven v3</b> reads Marathi and English in the same sentence and acts out sounds like [laughs softly], [giggles] and [sighs] that Bridget adds to her replies.</li>
+            <li><b>Eleven v3</b> reads Marathi and English in the same sentence and acts out the emotion tags Bridget adds to her replies, like [chuckling], [excited], [softly], [slowly] and [pause]. The other models read without emotion.</li>
             <li>The sample uses saved settings, so press <b>Save voice</b> first.</li>
             <li>Each reply uses ElevenLabs characters from your plan (about 150 to 300 a reply). Openers are remembered, so they are paid for once.</li>
             <li>Without a key, or if ElevenLabs fails, learners hear their browser's voice instead.</li>
