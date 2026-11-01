@@ -6,7 +6,7 @@ import { Alert } from "../../components/Alert";
 import { Button } from "../../components/Button";
 import { UserAvatar } from "../Avatar";
 import { AccessBanner } from "../AccessBanner";
-import { askTutor, AiTutorError, canRecognizeSpeech, createRecognition, getAiStatus, SCENARIOS, splitCorrection, tutorAudio, type AiStatus, type ChatTurn, type ScenarioId } from "../../utils/aiTutor";
+import { askTutor, AiTutorError, canRecognizeSpeech, createRecognition, getAiStatus, SCENARIOS, splitCorrection, tutorAudio, type AiStatus, type ChatTurn, type ScenarioId, type TutorTurnParts } from "../../utils/aiTutor";
 import { canSpeak, makeUtterance } from "../../utils/speech";
 import { stripAudioTags } from "../../utils/tutorVoice";
 import { cn } from "../../utils/cn";
@@ -34,6 +34,8 @@ export default function SpeakAI() {
   statusRef.current = status;
   /** Speech signatures from the server, by turn index (needed to fetch the ElevenLabs audio). */
   const sigsRef = useRef<Record<number, string | undefined>>({});
+  /** Each reply's parts (mistake, explanation, sentence to say, next question), by turn index. */
+  const partsRef = useRef<Record<number, TutorTurnParts>>({});
   /** Fetched audio, by turn index, so Listen replays without paying again. */
   const audioUrlsRef = useRef<Record<number, string>>({});
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -154,9 +156,10 @@ export default function SpeakAI() {
     setThinking(true);
     setError(null);
     try {
-      const { reply, remaining, speechSig } = await askTutor(token, scenario, next, user?.name ?? "friend");
+      const { reply, remaining, speechSig, mistake, correction, parts } = await askTutor(token, scenario, next, user?.name ?? "friend");
       const all: ChatTurn[] = [...next, { role: "assistant", content: reply }];
       sigsRef.current[all.length - 1] = speechSig;
+      partsRef.current[all.length - 1] = { mistake, correction, parts };
       setTurns(all);
       setStatus((s) => (s ? { ...s, remaining } : s));
       void speakReply(splitCorrection(reply).text, all.length - 1, fromVoice);
@@ -180,6 +183,7 @@ export default function SpeakAI() {
     Object.values(audioUrlsRef.current).forEach((u) => URL.revokeObjectURL(u));
     audioUrlsRef.current = {};
     sigsRef.current = { 0: status?.openerSigs?.[id] };
+    partsRef.current = {};
     setScenario(id);
     setError(null);
     setTurns([{ role: "assistant", content: opener }]);
@@ -257,6 +261,9 @@ export default function SpeakAI() {
             {turns.map((t, i) => {
               const mine = t.role === "user";
               const { correction, text } = mine ? { correction: null, text: t.content } : splitCorrection(t.content);
+              const turn = mine ? undefined : partsRef.current[i];
+              const fix = mine ? partsRef.current[i + 1]?.mistake : undefined;
+              const at = fix ? text.toLowerCase().indexOf(fix.wrong.toLowerCase()) : -1;
               return (
                 <li key={i} className={cn("flex items-end gap-2.5", mine && "flex-row-reverse")}>
                   {mine ? <UserAvatar user={user} className="h-8 w-8 text-xs" /> : <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-primary text-white"><Bot className="h-4 w-4" aria-hidden="true" /></span>}
@@ -264,7 +271,31 @@ export default function SpeakAI() {
                     {correction && (
                       <p className="mb-1.5 rounded-lg bg-amber-100 px-2.5 py-1.5 text-sm text-amber-900"><span className="font-semibold">Better: </span>{stripAudioTags(correction)}</p>
                     )}
-                    <p className="leading-relaxed">{mine ? text : stripAudioTags(text)}</p>
+                    {turn?.mistake && (
+                      <p className="mb-1.5 flex flex-wrap items-center gap-1.5 text-sm font-semibold">
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-red-700 line-through">{turn.mistake.wrong}</span>
+                        <span aria-hidden="true">→</span>
+                        <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-800">{turn.mistake.right}</span>
+                      </p>
+                    )}
+                    {turn?.parts?.length ? (
+                      <div className="space-y-1.5">
+                        {turn.parts.map((p, k) => (
+                          <p key={k} className={cn("leading-relaxed", p.kind === "say" && "rounded-lg bg-green-50 px-2.5 py-1.5 font-semibold text-green-900")}>
+                            {p.kind === "explain" && <span className="mr-1 text-xs font-bold uppercase tracking-wide text-ink-600">Why: </span>}
+                            {stripAudioTags(p.text)}
+                          </p>
+                        ))}
+                      </div>
+                    ) : mine && at >= 0 && fix ? (
+                      <p className="leading-relaxed">
+                        {text.slice(0, at)}
+                        <mark className="rounded bg-red-100 px-0.5 text-red-700 line-through">{text.slice(at, at + fix.wrong.length)}</mark>
+                        {text.slice(at + fix.wrong.length)}
+                      </p>
+                    ) : (
+                      <p className="leading-relaxed">{mine ? text : stripAudioTags(text)}</p>
+                    )}
                     {!mine && (canSpeak() || status?.voice === "elevenlabs") && (
                       <button type="button" onClick={() => (speakingIndex === i ? (stopSpeaking(), setSpeakingIndex(null)) : void speakReply(text, i, false))}
                         className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-ink-600 hover:text-ink-900">

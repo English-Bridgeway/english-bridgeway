@@ -146,7 +146,8 @@ docker compose --profile turn up -d --build     # same, plus the TURN relay (rec
   Nginx already does), e.g. inside the `server { }` block for englishbridgeway.com:
 
   ```nginx
-  location /api/admin/ebooks/ {
+  # No trailing slash: with one, Nginx answers /api/admin/ebooks (the list) with a 301 to http://, which the browser blocks.
+  location ^~ /api/admin/ebooks {
     client_max_body_size 200m;
     proxy_request_buffering off;
     proxy_read_timeout 10m;

@@ -53,7 +53,14 @@ export async function getAiStatus(token: string, demoAllowed: boolean): Promise<
   return apiFetch<AiStatus>("/ai/status", { token });
 }
 
-export async function askTutor(token: string, scenario: ScenarioId, messages: ChatTurn[], learnerName: string): Promise<{ reply: string; remaining: number | null; period?: AiStatus["period"]; speechSig?: string }> {
+/** A reply in parts (live server): the mistake to mark, then what is said one after another. */
+export interface TutorTurnParts {
+  mistake?: { wrong: string; right: string } | null;
+  correction?: string | null;
+  parts?: { kind: "explain" | "say" | "next"; text: string }[];
+}
+
+export async function askTutor(token: string, scenario: ScenarioId, messages: ChatTurn[], learnerName: string): Promise<{ reply: string; remaining: number | null; period?: AiStatus["period"]; speechSig?: string } & TutorTurnParts> {
   if (!isLive) return demoAsk(scenario, messages, learnerName);
   try {
     return await apiFetch("/ai/chat", { method: "POST", token, json: { scenario, messages: messages.slice(-16) } });

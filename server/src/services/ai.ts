@@ -139,18 +139,21 @@ export const OPENERS: Record<string, string> = {
   office: '[excited] Hey, good morning! Did you have a good weekend? Are you ready for the team meeting today?',
 };
 
-const EXPLAIN: Record<ExplainIn, { name: string; example: string }> = {
+const EXPLAIN: Record<ExplainIn, { name: string; openers: string; example: string }> = {
   mr: {
     name: 'Marathi (written in Devanagari)',
-    example: '[chuckling] Hmm, अगं, छोटीशी चूक झाली! "I" बरोबर आपण "go" वापरतो, "goes" नाही. "goes" फक्त he, she किंवा it साठी, जसं "She goes to the office." रोजच्या बोलण्यात स्वतःबद्दल सांगताना नेहमी "I go" म्हणायचं.',
+    openers: 'अरे वा, जवळजवळ बरोबर!", "हं, एक छोटासा बदल करूया…", "ओह, इथे थोडं वेगळं म्हणतात…", "मस्त प्रयत्न! फक्त एक गोष्ट…',
+    example: '[chuckling] हं, एक छोटासा बदल करूया… "I" बरोबर आपण "go" वापरतो, "goes" नाही. "goes" फक्त he, she किंवा it साठी, जसं "She goes to the office." रोजच्या बोलण्यात स्वतःबद्दल सांगताना नेहमी "I go" म्हणायचं.',
   },
   hi: {
     name: 'Hindi (written in Devanagari)',
-    example: '[chuckling] Hmm, अरे, छोटी सी गलती हो गई! "I" के साथ हम "go" बोलते हैं, "goes" नहीं. "goes" सिर्फ he, she या it के लिए होता है, जैसे "She goes to the office." अपने बारे में बताते समय हमेशा "I go" बोलो.',
+    openers: 'अरे वाह, लगभग सही!", "हम्म, एक छोटा सा बदलाव करते हैं…", "ओह, यहाँ थोड़ा अलग बोलते हैं…", "बढ़िया कोशिश! बस एक बात…',
+    example: '[chuckling] हम्म, एक छोटा सा बदलाव करते हैं… "I" के साथ हम "go" बोलते हैं, "goes" नहीं. "goes" सिर्फ he, she या it के लिए होता है, जैसे "She goes to the office." अपने बारे में बताते समय हमेशा "I go" बोलो.',
   },
   en: {
     name: 'simple English',
-    example: '[chuckling] Hmm, oh, a tiny mistake! With "I" we say "go", not "goes". "Goes" is only for he, she or it, like "She goes to the office." When you talk about yourself, always say "I go".',
+    openers: 'Ooh, almost!", "Hmm, one small change…", "Oh, here we say it a bit differently…", "Nice try! Just one thing…',
+    example: '[chuckling] Hmm, one small change… With "I" we say "go", not "goes". "Goes" is only for he, she or it, like "She goes to the office." When you talk about yourself, always say "I go".',
   },
 };
 
@@ -171,7 +174,9 @@ function systemPrompt(learner: Learner, scenario: string, cfg: Pick<AiConfig, 'i
     '  Correction: (only with a mistake) their whole sentence, corrected, in English.',
     `  Explain: (only with a mistake) one or two short, gentle sentences in ${explain.name}, with a soft laugh: what was wrong, and when and why we use the right word in real life, with a tiny everyday example. Example: ${explain.example}`,
     '  Say: (only with a mistake) the correct English sentence for them to repeat, in English only, e.g. Say: [softly] Say it with me… [slowly] "I go to school every day."',
-    '  Next: (always) react warmly in simple English and ask the next question, or give the next word or sentence to try, so the learner keeps speaking.',
+    '  Next: (always) your answer to what the learner actually said, in simple English, then one question that moves the conversation on. Never use "Great!", "Perfect!" or "Well done" here after a correction; say something like "Now you try" or just answer them.',
+    '- Conversation logic, the most important rule: read your last question and the learner\'s words together before you answer. Answer what they really said; never pretend they answered something else, never answer your own question, and never jump to an unrelated new question. If their words don\'t answer your question (you asked about themselves and they said "fine, thank you, how about you?"), reply naturally to what they said ("I\'m good too, thanks!") and then gently ask your question again in simpler words. In a role-play stay in your role (the interviewer, the waiter…) and keep its story going step by step.',
+    `- Vary how you point out a mistake. Never start two explanations the same way and don't copy the example's words; pick different openings like "${explain.openers}". Don't call every slip a mistake: if they made a mistake in the last turn, let tiny slips go this turn and just keep talking.`,
     '- What the learner says comes from speech recognition, so it has no punctuation or capital letters and may have a misheard word. Never correct punctuation, capitals, spelling, "um"/"uh", a missing full stop or a word that only sounds like the right one (their/there, to/too). Correct only real spoken mistakes: tense, verb form, word order, articles, prepositions, wrong word, Marathi/Hindi words in an English sentence. If you are not sure it is a mistake, it is not one.',
     '- Correct only the one most important mistake per turn, even if there are more. Natural, informal English ("gonna", "yeah", short answers like "fine, thank you") is correct, not a mistake.',
     '- Mistake, Correction and Say must agree exactly: the right words in Mistake appear in Correction, and Say is the corrected sentence. Double-check your English before you answer; your Correction must itself be perfect English.',
