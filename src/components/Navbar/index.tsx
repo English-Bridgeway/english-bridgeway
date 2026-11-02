@@ -9,7 +9,6 @@ import { useAuth } from "../../context/AuthContext";
 import { cn } from "../../utils/cn";
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const { pathname } = useLocation();
@@ -19,13 +18,6 @@ export function Navbar() {
     signOut();
     navigate("/");
   };
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -44,7 +36,7 @@ export function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn("block whitespace-nowrap rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
-      isActive ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-muted hover:bg-ink-50 hover:text-ink-900");
+      isActive ? "font-bold text-brand-primary" : "font-semibold text-muted hover:text-ink-900");
 
   // Desktop: the logo already goes home, and the less-used pages sit under "More" so the
   // row fits on one line.
@@ -55,11 +47,11 @@ export function Navbar() {
     <header
       className={cn(
         "sticky top-0 z-40 border-b transition-[background-color,box-shadow,border-color] duration-200",
-        scrolled || menuOpen ? "border-transparent bg-surface/80 shadow-[0_1px_8px_rgb(107_0_157/0.06)] backdrop-blur-xl" : "border-transparent bg-surface/80 backdrop-blur-xl",
+        "border-transparent bg-white shadow-[0_1px_8px_rgb(0_0_0/0.04)]",
       )}
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
-      <div className="container-page flex h-16 items-center justify-between gap-3 lg:h-18">
+      <div className="container-page flex h-16 items-center justify-between gap-3 lg:h-20">
         <Logo />
         <nav aria-label="Main" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
@@ -123,7 +115,7 @@ export function Navbar() {
                   <NavLink
                     to={item.to}
                     end={item.to === "/"}
-                    className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-ink-900 hover:bg-ink-50")}
+                    className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-surface-low font-bold text-brand-primary" : "text-ink-900 hover:bg-surface-low")}
                   >
                     {item.label}
                   </NavLink>
@@ -131,7 +123,7 @@ export function Navbar() {
               ))}
               {user && (
                 <li>
-                  <NavLink to="/learn" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-ink-900 hover:bg-ink-50")}>
+                  <NavLink to="/learn" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-surface-low font-bold text-brand-primary" : "text-ink-900 hover:bg-surface-low")}>
                     My learning
                   </NavLink>
                 </li>
@@ -179,7 +171,7 @@ function MoreMenu({ items, active }: { items: readonly { label: string; to: stri
         aria-expanded={open}
         aria-haspopup="true"
         className={cn("flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
-          active ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-muted hover:bg-ink-50 hover:text-ink-900")}
+          active ? "font-bold text-brand-primary" : "font-semibold text-muted hover:text-ink-900")}
       >
         More <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} aria-hidden="true" />
       </button>

@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
-/* English BridgeWay palette: deep violet + magenta on a soft lavender surface (Material 3
-   style tokens, from the "FluentBloom" design). Shared by every route and component. */
+/* English BridgeWay palette: deep purple on clean light-grey surfaces (Material 3 tokens from
+   the "EnglishBridgeway" design, Nov 2026). Shared by every route and component. */
 :root {
-  --primary-color: #6B009D;   /* primary container: buttons, links, brand */
-  --primary-deep: #4A006E;    /* primary: hover, deep text */
-  --primary-ink: #30004A;     /* on-primary-fixed: dark sections */
-  --primary-tint: #8A32BB;    /* surface tint: focus rings, soft accents */
-  --primary-soft: #F5D9FF;    /* primary fixed */
-  --primary-dim: #E6B4FF;     /* primary fixed dim */
-  --secondary: #A400B7;       /* magenta: success ticks, highlights */
-  --secondary-soft: #FFD6FB;  /* secondary fixed */
-  --secondary-dim: #FDA9FF;   /* secondary fixed dim */
-  --tertiary: #004A57;
-  --tertiary-dim: #4CD7F6;
-  --surface: #FEF7FF;
-  --surface-low: #FAF0FF;
-  --surface-container: #F4EBF9;
-  --surface-high: #EEE5F4;
-  --surface-variant: #E8DFEE;
-  --on-surface: #1E1A24;
-  --on-surface-variant: #4E4352;
-  --outline-variant: #D1C2D4;
+  --primary-color: #5F259F;   /* primary container: buttons, links, brand */
+  --primary-deep: #470085;    /* primary: hover, deep accents */
+  --primary-ink: #2A0053;     /* on-primary-fixed: dark sections */
+  --primary-tint: #7841B9;    /* surface tint: ticks, focus rings */
+  --primary-soft: #EEDBFF;    /* primary fixed */
+  --primary-dim: #DAB9FF;     /* primary fixed dim */
+  --secondary: #575E70;       /* slate */
+  --secondary-soft: #DCE2F7;
+  --tertiary: #693C00;        /* warm accent: highlights, chips */
+  --tertiary-soft: #FFDCBD;
+  --tertiary-dim: #FCB975;
+  --surface: #F8F9FA;
+  --surface-low: #F3F4F5;
+  --surface-container: #EDEEEF;
+  --surface-high: #E7E8E9;
+  --surface-variant: #E1E3E4;
+  --on-surface: #191C1D;
+  --on-surface-variant: #4B4452;
+  --outline-variant: #CDC3D4;
   --error: #BA1A1A;
   --white: #FFFFFF;
 }
@@ -29,14 +29,19 @@
 @theme {
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Tighter corners, as in the design. */
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1rem;
 
   --color-brand-primary: var(--primary-color);
   --color-brand-deep: var(--primary-deep);
-  --color-brand-sky: var(--secondary);
+  --color-brand-sky: var(--primary-tint);
   --color-brand-navy: var(--primary-ink);
   --color-brand-soft: var(--primary-soft);
-  --color-brand-teal: var(--tertiary);
+  --color-brand-slate: var(--secondary);
+  --color-brand-warm: var(--tertiary);
   --color-danger: var(--error);
   --color-surface: var(--surface);
   --color-surface-low: var(--surface-low);
@@ -51,24 +56,25 @@
   --color-ink-500: var(--primary-color);
   --color-ink-600: var(--primary-color);
   --color-ink-700: var(--primary-deep);
-  --color-ink-800: #332E39;
+  --color-ink-800: #2E3132;
   --color-ink-900: var(--on-surface);
 
-  --color-amber-50: color-mix(in srgb, var(--secondary-soft) 40%, var(--white));
-  --color-amber-100: var(--secondary-soft);
-  --color-amber-200: color-mix(in srgb, var(--secondary-dim) 60%, var(--white));
-  --color-amber-300: var(--secondary-dim);
-  --color-amber-400: var(--secondary-dim);
-  --color-amber-600: #7D008C;
-  --color-amber-800: #5C0068;
+  --color-amber-50: color-mix(in srgb, var(--tertiary-soft) 35%, var(--white));
+  --color-amber-100: var(--tertiary-soft);
+  --color-amber-200: color-mix(in srgb, var(--tertiary-dim) 55%, var(--white));
+  --color-amber-300: var(--tertiary-dim);
+  --color-amber-400: var(--tertiary-dim);
+  --color-amber-600: var(--tertiary);
+  --color-amber-800: #4A2800;
 
   --color-canvas: var(--surface);
   --color-line: var(--surface-variant);
+  --color-outline: var(--outline-variant);
   --color-muted: var(--on-surface-variant);
   --color-body: var(--on-surface);
 
-  --shadow-card: 0 1px 2px rgb(107 0 157 / 0.05), 0 6px 20px -8px rgb(107 0 157 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(107 0 157 / 0.06), 0 16px 36px -12px rgb(107 0 157 / 0.22);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px -8px rgb(25 28 29 / 0.10);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.05), 0 14px 32px -12px rgb(71 0 133 / 0.18);
 
   --animate-fade-in: fade-in 0.25s ease-out both;
   @keyframes fade-in {
@@ -81,7 +87,10 @@
   :root { color-scheme: light; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    @apply bg-canvas text-body font-sans antialiased;
+    @apply text-body font-sans antialiased;
+    /* Soft lavender wash behind every page (white cards sit on top of it). */
+    background: linear-gradient(180deg, #F9F6FE 0%, #FBF9FF 25%, #F5F0FB 55%, #FBF9FE 85%, #F4EFFA 100%) fixed;
+    background-color: var(--surface);
     font-size: 1rem;
     line-height: 1.6;
   }
@@ -102,13 +111,26 @@
 }
 
 @layer components {
+  /* Hero and page-header backdrop: lavender and peach glows on white. */
+  .bg-hero {
+    background:
+      radial-gradient(circle at 10% 20%, rgb(222 203 255 / 0.35) 0%, transparent 45%),
+      radial-gradient(circle at 90% 30%, rgb(190 160 240 / 0.28) 0%, transparent 50%),
+      radial-gradient(circle at 50% 90%, rgb(254 222 195 / 0.25) 0%, transparent 45%),
+      linear-gradient(180deg, #FFFFFF 0%, #F9F5FF 100%);
+  }
+  /* Deep purple banner (calls to action, word of the day). */
+  .bg-cta {
+    background: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary-color) 50%, var(--primary-tint) 100%);
+    box-shadow: 0 20px 45px -10px rgb(95 37 159 / 0.38);
+  }
   .container-page { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
   .prose-lesson p { @apply text-[1.0625rem] leading-relaxed text-body/90; }
   .prose-lesson p + p { @apply mt-4; }
   .highlight {
     border-radius: 0.12em;
-    background: var(--secondary-soft);
-    color: var(--primary-ink);
+    background: var(--tertiary-soft);
+    color: var(--tertiary);
     padding: 0 0.12em;
   }
 }

@@ -38,16 +38,13 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-surface">
-        {/* Soft violet and magenta glows behind the hero. */}
-        <div className="pointer-events-none absolute -left-20 -top-32 h-96 w-96 rounded-full bg-ink-200/20 blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute -right-24 top-1/3 h-[32rem] w-[32rem] rounded-full bg-amber-100/30 blur-[100px]" aria-hidden="true" />
+      <section className="bg-hero relative overflow-hidden">
         <div className="container-page relative grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-20">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-surface-high px-3 py-1 font-mono text-[0.7rem] font-medium uppercase tracking-widest text-brand-primary shadow-sm">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-brand-sky" aria-hidden="true" /> Free lessons for every level
+            <p className="inline-flex items-center gap-2 rounded-lg bg-surface-container px-3 py-1 text-xs font-bold uppercase tracking-wider text-ink-900">
+              <span className="h-2 w-2 rounded-full bg-brand-primary" aria-hidden="true" /> Free lessons for every level
             </p>
-            <h1 className="mt-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
               Improve Your English. <span className="text-brand-primary">Speak With Confidence.</span>
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted sm:text-xl">
@@ -109,12 +106,12 @@ export default function Home() {
 
       {/* Final CTA */}
       <section className="container-page mt-20">
-        <div className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-line bg-white p-8 shadow-card sm:p-12 md:flex-row md:items-center">
+        <div className="bg-cta flex flex-col items-start justify-between gap-6 rounded-2xl p-8 text-white sm:p-12 md:flex-row md:items-center">
           <div>
-            <h2 className="text-3xl font-bold sm:text-4xl">Ready to improve your English?</h2>
-            <p className="mt-2 max-w-lg text-lg text-muted">Start with a 10-minute lesson today. Your progress is saved automatically.</p>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Ready to improve your English?</h2>
+            <p className="mt-2 max-w-lg text-lg text-white/90">Start with a 10-minute lesson today. Your progress is saved automatically.</p>
           </div>
-          <Button to={start.to} size="lg">
+          <Button to={start.to} size="lg" variant="light">
             {start.resume ? "Continue Learning" : "Start Learning Free"} <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>

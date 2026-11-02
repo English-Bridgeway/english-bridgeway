@@ -15,7 +15,7 @@ const columns = [
 export function Footer() {
   const biz = businessInfo();
   return (
-    <footer className="mt-20 bg-surface-low text-body shadow-[0_-1px_8px_rgb(107_0_157/0.03)]">
+    <footer className="mt-20 bg-surface-low text-body shadow-[0_-1px_8px_rgb(0_0_0/0.04)]">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.5fr_repeat(4,1fr)]">
         <div className="max-w-sm sm:col-span-2 md:col-span-3 lg:col-span-1">
           <Logo />
@@ -28,10 +28,10 @@ export function Footer() {
         </div>
         {columns.map((c) => (
           <nav key={c.title} aria-label={c.title}>
-            <h2 className="font-display text-sm font-semibold text-ink-900">{c.title}</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-ink-900">{c.title}</h2>
             <ul className="mt-4 space-y-2.5 text-sm">
               {c.links.map(([label, to]) => (
-                <li key={to}><Link to={to} className="text-muted transition-colors hover:text-brand-primary">{label}</Link></li>
+                <li key={to}><Link to={to} className="text-muted transition-colors hover:text-ink-900">{label}</Link></li>
               ))}
             </ul>
           </nav>

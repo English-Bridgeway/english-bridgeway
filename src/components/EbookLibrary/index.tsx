@@ -99,7 +99,7 @@ export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
               <h2 className="mt-1.5 font-semibold leading-snug text-ink-900">{b.title}</h2>
               {b.author && <p className="text-sm text-muted">by {b.author}</p>}
               {b.description && <p className="mt-1 line-clamp-3 text-sm text-body">{b.description}</p>}
-              <p className="mt-1 font-mono text-[0.7rem] uppercase tracking-wide text-muted">
+              <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-muted">
                 PDF{b.fileSize ? ` · ${formatBytes(b.fileSize)}` : ""}{b.courseTitle ? ` · with ${b.courseTitle}` : ""}
               </p>
               <div className="mt-auto pt-3">
@@ -143,10 +143,10 @@ export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
 function Tag({ tone, children }: { tone: "owned" | "price" | "locked"; children: React.ReactNode }) {
   return (
     <span className={cn(
-      "inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-[0.7rem] font-medium uppercase tracking-wide",
+      "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[0.7rem] font-bold uppercase tracking-wider",
       tone === "owned" && "bg-amber-100 text-amber-800",
       tone === "price" && "bg-brand-primary text-white",
-      tone === "locked" && "bg-surface-high text-muted",
+      tone === "locked" && "bg-surface-container text-muted",
     )}>
       {children}
     </span>

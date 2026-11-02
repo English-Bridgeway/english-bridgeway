@@ -4,8 +4,8 @@
   "description": "Learn grammar, build vocabulary, practise spoken English and test your knowledge with simple, practical lessons.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FEF7FF",
-  "theme_color": "#6B009D",
+  "background_color": "#F8F9FA",
+  "theme_color": "#5F259F",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
