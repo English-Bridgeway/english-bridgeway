@@ -7,7 +7,7 @@ export default function EbooksPage() {
     <>
       <PageHeader
         crumbs={[{ label: "E-books" }]}
-        eyebrow={<span className="font-mono text-xs font-medium uppercase tracking-widest text-brand-primary">PDF e-books</span>}
+        eyebrow={<span className="text-xs font-bold uppercase tracking-wider text-brand-primary">PDF e-books</span>}
         title="English e-books"
         description="Buy any e-book on its own, then read it online or download the PDF. Your e-books stay in your account."
       />
