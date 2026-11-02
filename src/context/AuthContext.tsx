@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { LearnerAccess, LearnerOffer, UsageSummary, User } from "../types";
 import { HttpError } from "../utils/backend";
-import { clearLearnerSession, fetchMe, getLearnerSession, login, register, saveSession } from "../utils/account";
+import { clearLearnerSession, fetchMe, getLearnerSession, login, register, saveSession, type LearnerSession } from "../utils/account";
 import { offerPrice } from "../utils/access";
 
 /**
@@ -33,8 +33,9 @@ interface AuthContextValue {
   /** Replaces the signed-in user's details after a profile change. */
   setUser: (user: User) => void;
   refresh: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string) => Promise<void>;
+  /** Both return the new session, so a caller can use its token straight away. */
+  signIn: (email: string, password: string) => Promise<LearnerSession>;
+  signUp: (name: string, email: string, password: string) => Promise<LearnerSession>;
   signOut: () => void;
 }
 
@@ -108,11 +109,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const s = await login(email, password);
         setReady(false);
         setSession(s);
+        return s;
       },
       signUp: async (name, email, password) => {
         const s = await register(name, email, password);
         setReady(false);
         setSession(s);
+        return s;
       },
       signOut,
     };

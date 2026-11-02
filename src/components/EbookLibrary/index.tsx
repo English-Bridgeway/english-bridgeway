@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { BookOpen, CircleCheck, Download, Eye, Lock, ShoppingCart } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { buttonClasses } from "../Button";
@@ -17,9 +17,7 @@ import { cn } from "../../utils/cn";
  * course or plan. Owned e-books can be read online or downloaded as a PDF.
  */
 export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
-  const { token, user } = useAuth();
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { token } = useAuth();
   const [books, setBooks] = useState<Ebook[] | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
@@ -63,13 +61,6 @@ export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
     }
   };
 
-  const buy = (book: Ebook) => {
-    if (!user) {
-      navigate(`/login?next=${encodeURIComponent(pathname)}`);
-      return;
-    }
-    setBuying(book);
-  };
 
   const unlocked = books?.filter((b) => b.unlocked) ?? [];
   const forSale = books?.filter((b) => !b.unlocked && b.forSale) ?? [];
@@ -123,7 +114,7 @@ export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
                   </div>
                 ) : b.forSale ? (
                   <div>
-                    <button type="button" className={buttonClasses("primary", "sm")} disabled={paymentsOff} onClick={() => buy(b)}>
+                    <button type="button" className={buttonClasses("primary", "sm")} disabled={paymentsOff} onClick={() => setBuying(b)}>
                       <ShoppingCart className="h-4 w-4" aria-hidden="true" /> Buy for {formatPrice(b.price)}
                     </button>
                     {b.courseTitle && <p className="mt-1.5 text-xs text-muted">Free with the course “{b.courseTitle}”.</p>}
@@ -142,6 +133,7 @@ export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
           onClose={() => setBuying(null)}
           item={{ kind: "ebook", id: buying.id, title: buying.title, price: buying.price }}
           config={payments}
+          allowGuest
         />
       )}
     </>
