@@ -65,7 +65,7 @@ export default function Contact() {
       <div className="container-page grid gap-8 py-10 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <aside className="space-y-4">
           <Card className="flex items-start gap-4 p-5">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink-50 text-ink-700"><Building2 className="h-5 w-5" aria-hidden="true" /></span>
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-surface-container text-brand-primary"><Building2 className="h-5 w-5" aria-hidden="true" /></span>
             <div className="min-w-0">
               <p className="text-sm font-semibold">Business</p>
               <p className="text-muted">{biz.name}</p>
@@ -74,7 +74,7 @@ export default function Contact() {
           </Card>
           {channels.map((c) => (
             <Card key={c.label} className="flex items-start gap-4 p-5">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink-50 text-ink-700"><c.icon className="h-5 w-5" aria-hidden="true" /></span>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-surface-container text-brand-primary"><c.icon className="h-5 w-5" aria-hidden="true" /></span>
               <div className="min-w-0">
                 <p className="text-sm font-semibold">{c.label}</p>
                 {c.href ? (
@@ -83,9 +83,9 @@ export default function Contact() {
               </div>
             </Card>
           ))}
-          <div className="rounded-2xl bg-brand-primary p-5 text-white">
+          <div className="bg-cta rounded-xl p-5 text-white">
             <p className="font-semibold">Follow us</p>
-            <p className="mt-1 text-sm text-ink-200">Daily phrases and quick grammar tips.</p>
+            <p className="mt-1 text-sm text-white/80">Daily phrases and quick grammar tips.</p>
             <SocialIcons className="mt-4" />
           </div>
           <nav aria-label="Policies" className="px-1 text-sm">

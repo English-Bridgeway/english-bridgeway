@@ -60,16 +60,16 @@ export function QuizRunner({ questions, title, onSubmit, resultActions }: Props)
     const percent = Math.round((score / total) * 100);
     return (
       <section aria-labelledby="quiz-result" className="animate-fade-in">
-        <div className="rounded-2xl bg-brand-primary p-6 text-white sm:p-8">
-          <p className="text-sm font-semibold uppercase tracking-wider text-ink-200">{title ? `${title} · ` : ""}Results</p>
-          <h2 id="quiz-result" ref={headingRef} tabIndex={-1} className="mt-2 text-3xl font-bold text-amber-400 sm:text-4xl">
+        <div className="bg-cta rounded-2xl p-6 text-white sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-wider text-white/80">{title ? `${title} · ` : ""}Results</p>
+          <h2 id="quiz-result" ref={headingRef} tabIndex={-1} className="mt-2 text-3xl font-extrabold text-white sm:text-4xl">
             Your score: <span className="tabular-nums">{score}/{total}</span>
           </h2>
-          <p className="mt-2 text-lg text-ink-100">{scoreMessage(percent)}</p>
+          <p className="mt-2 text-lg text-white/85">{scoreMessage(percent)}</p>
           <dl className="mt-6 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-xl bg-white/10 p-3"><dt className="text-xs text-ink-200">Correct</dt><dd className="font-display text-2xl font-semibold tabular-nums">{score}</dd></div>
-            <div className="rounded-xl bg-white/10 p-3"><dt className="text-xs text-ink-200">Wrong</dt><dd className="font-display text-2xl font-semibold tabular-nums">{total - score}</dd></div>
-            <div className="rounded-xl bg-white/10 p-3"><dt className="text-xs text-ink-200">Percentage</dt><dd className="font-display text-2xl font-semibold tabular-nums">{percent}%</dd></div>
+            <div className="rounded-xl bg-white/10 p-3"><dt className="text-xs text-white/80">Correct</dt><dd className="font-display text-2xl font-semibold tabular-nums">{score}</dd></div>
+            <div className="rounded-xl bg-white/10 p-3"><dt className="text-xs text-white/80">Wrong</dt><dd className="font-display text-2xl font-semibold tabular-nums">{total - score}</dd></div>
+            <div className="rounded-xl bg-white/10 p-3"><dt className="text-xs text-white/80">Percentage</dt><dd className="font-display text-2xl font-semibold tabular-nums">{percent}%</dd></div>
           </dl>
         </div>
 
@@ -193,7 +193,7 @@ export function QuizRunner({ questions, title, onSubmit, resultActions }: Props)
             aria-current={i === index ? "step" : undefined}
             className={cn(
               "h-8 w-8 rounded-lg text-xs font-semibold tabular-nums transition-colors",
-              i === index ? "bg-ink-800 text-white" : answers[x.id]?.trim() ? "bg-ink-100 text-ink-800" : "bg-white text-muted ring-1 ring-line hover:ring-ink-300",
+              i === index ? "bg-brand-primary text-white" : answers[x.id]?.trim() ? "bg-ink-100 text-ink-800" : "bg-white text-muted ring-1 ring-line hover:ring-ink-300",
             )}
           >
             {i + 1}

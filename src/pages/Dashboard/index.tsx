@@ -58,14 +58,14 @@ export default function Dashboard() {
       )}
 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        <div className="relative overflow-hidden rounded-3xl bg-brand-primary p-6 text-white sm:p-8">
-          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-ink-600/50" aria-hidden="true" />
-          <p className="relative text-sm font-semibold text-amber-300">Welcome back</p>
-          <h1 className="relative mt-1 text-3xl font-bold text-amber-400 sm:text-4xl">Welcome back, {user?.name ?? "Student"}!</h1>
-          <p className="relative mt-3 text-lg text-ink-100">You're {Math.round(coursePercent)}% through {course.title}.</p>
+        <div className="bg-cta relative overflow-hidden rounded-2xl p-6 text-white sm:p-8">
+          <div className="absolute -right-12 -top-12 h-48 w-48 rounded-full bg-white/10" aria-hidden="true" />
+          <p className="relative text-xs font-bold uppercase tracking-wider text-white/80">Welcome back</p>
+          <h1 className="relative mt-1 text-3xl font-extrabold text-white sm:text-4xl">Welcome back, {user?.name ?? "Student"}!</h1>
+          <p className="relative mt-3 text-lg text-white/85">You're {Math.round(coursePercent)}% through {course.title}.</p>
           <ProgressBar value={coursePercent} label={`${course.title} progress`} tone="amber" className="relative mt-5 max-w-md" />
           <div className="relative mt-6 flex flex-wrap gap-3">
-            <Button to={`/learn/courses/${course.id}`} variant="accent"><PlayCircle className="h-4 w-4" aria-hidden="true" /> {start.resume ? "Continue course" : "Start a course"}</Button>
+            <Button to={`/learn/courses/${course.id}`} variant="light"><PlayCircle className="h-4 w-4" aria-hidden="true" /> {start.resume ? "Continue course" : "Start a course"}</Button>
             <Button to="/quiz" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30">Take a quiz</Button>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function Dashboard() {
       <section aria-label="Your stats" className="mt-6 grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.label} className="flex items-center gap-4 p-5">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700"><s.icon className="h-5 w-5" aria-hidden="true" /></span>
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-surface-container text-brand-primary"><s.icon className="h-5 w-5" aria-hidden="true" /></span>
             <div><p className="font-display text-2xl font-semibold tabular-nums">{s.value}</p><p className="text-sm text-muted">{s.label}</p></div>
           </Card>
         ))}

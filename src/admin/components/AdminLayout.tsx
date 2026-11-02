@@ -64,12 +64,12 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     <nav aria-label="Admin" className="flex-1 overflow-y-auto px-3 pb-6">
       {sections.map((s, i) => (
         <div key={i} className="mt-5 first:mt-2">
-          {s.title && <p className="px-3 pb-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-ink-300">{s.title}</p>}
+          {s.title && <p className="px-3 pb-1.5 text-[0.7rem] font-semibold uppercase tracking-wider text-brand-primary">{s.title}</p>}
           <ul className="space-y-0.5">
             {s.items.filter((it) => !it.ownerOnly || isOwner).map((it) => (
               <li key={it.to}>
                 <NavLink to={it.to} end={it.end}
-                  className={({ isActive }) => cn("flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors", isActive ? "bg-white/12 text-white" : "text-ink-100 hover:bg-white/8 hover:text-white")}>
+                  className={({ isActive }) => cn("flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors", isActive ? "bg-brand-soft font-bold text-brand-deep" : "text-muted hover:bg-surface-low hover:text-ink-900")}>
                   <it.icon className="h-4 w-4 shrink-0" aria-hidden="true" /> {it.label}
                 </NavLink>
               </li>
@@ -81,24 +81,24 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   );
 
   const brand = (
-    <Link to="/admin" className="flex items-center gap-2.5 px-6 py-5 text-white">
-      <ShieldCheck className="h-6 w-6 text-amber-400" aria-hidden="true" />
+    <Link to="/admin" className="flex items-center gap-2.5 px-6 py-5 text-ink-900">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-primary text-white"><ShieldCheck className="h-5 w-5" aria-hidden="true" /></span>
       <span className="min-w-0">
-        <span className="block truncate font-display text-base font-semibold">{site.name}</span>
-        <span className="block text-xs text-ink-200">Admin panel{adminApi.mode === "demo" ? " · demo" : ""}</span>
+        <span className="block truncate font-display text-base font-bold">{site.name}</span>
+        <span className="block text-xs text-muted">Admin panel{adminApi.mode === "demo" ? " · demo" : ""}</span>
       </span>
     </Link>
   );
 
   return (
-    <div className="min-h-screen bg-canvas lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-screen flex-col bg-ink-900 lg:flex">{brand}{nav}</aside>
+    <div className="min-h-screen lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-screen flex-col border-r border-line bg-white lg:flex">{brand}{nav}</aside>
 
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Admin menu">
           <button type="button" className="absolute inset-0 bg-black/40" aria-label="Close menu" onClick={() => setOpen(false)} />
-          <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-ink-900">
-            <button type="button" onClick={() => setOpen(false)} className="absolute right-3 top-4 grid h-9 w-9 place-items-center rounded-lg text-white hover:bg-white/10" aria-label="Close menu">
+          <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-white">
+            <button type="button" onClick={() => setOpen(false)} className="absolute right-3 top-4 grid h-9 w-9 place-items-center rounded-lg text-ink-800 hover:bg-surface-low" aria-label="Close menu">
               <X className="h-5 w-5" aria-hidden="true" />
             </button>
             {brand}{nav}
@@ -107,7 +107,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       )}
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-white/95 px-4 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 bg-white/95 px-4 shadow-[0_1px_8px_rgb(0_0_0/0.04)] backdrop-blur sm:px-6">
           <button type="button" onClick={() => setOpen(true)} className="grid h-9 w-9 place-items-center rounded-lg text-ink-800 hover:bg-ink-50 lg:hidden" aria-label="Open menu">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>

@@ -55,7 +55,7 @@ function IncomingCall({ inv, vc, onAnswer }: { inv: Invite; vc: VoiceChat; onAns
   const onCall = Boolean(vc.room);
   const direct = inv.room.kind === "direct";
   return (
-    <div role="alertdialog" aria-label={`Call from ${inv.from.name}`} className="overflow-hidden rounded-3xl bg-brand-navy text-white shadow-2xl ring-1 ring-white/10">
+    <div role="alertdialog" aria-label={`Call from ${inv.from.name}`} className="overflow-hidden bg-cta rounded-2xl text-white shadow-2xl ring-1 ring-white/10">
       <div className="flex items-center gap-3 p-4">
         <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-amber-300 font-display text-lg font-bold text-brand-navy">
           <span className="absolute inset-0 animate-ping rounded-full bg-amber-300/40" aria-hidden="true" />
@@ -91,7 +91,7 @@ function MiniCallBar({ vc }: { vc: VoiceChat }) {
   const seconds = useElapsed(vc.connectedAt);
   const state = vc.callState;
   return (
-    <div className="flex items-center gap-3 rounded-3xl bg-brand-navy p-2.5 pl-4 text-white shadow-2xl ring-1 ring-white/10">
+    <div className="flex items-center gap-3 bg-cta rounded-2xl p-2.5 pl-4 text-white shadow-2xl ring-1 ring-white/10">
       <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", state === "connected" ? "bg-emerald-400" : "animate-pulse bg-amber-300")} aria-hidden="true" />
       <Link to="/learn/live" className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold">{vc.room?.kind === "direct" && vc.peers[0] ? vc.peers[0].name : vc.room?.name}</p>

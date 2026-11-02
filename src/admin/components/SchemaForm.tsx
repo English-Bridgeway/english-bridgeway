@@ -88,7 +88,7 @@ function Control({ field: f, id, value, onChange, options }: { field: Field; id:
     case "icon":
       return (
         <div className="flex gap-2">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-ink-50 text-ink-700"><Icon name={str} className="h-5 w-5" /></span>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-line bg-surface-container text-brand-primary"><Icon name={str} className="h-5 w-5" /></span>
           <input id={id} className={inputClass} value={str} onChange={(e) => onChange(e.target.value)} required={f.required} />
         </div>
       );

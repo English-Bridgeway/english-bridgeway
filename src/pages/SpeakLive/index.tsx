@@ -81,7 +81,7 @@ function CallStage({ copyLink, copied }: { copyLink: () => void; copied: boolean
   const calleeInitials = calleeName.split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
   return (
-    <section aria-label="Your call" className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-navy via-brand-navy to-brand-primary p-6 text-white shadow-2xl sm:p-10">
+    <section aria-label="Your call" className="relative overflow-hidden bg-cta rounded-2xl p-6 text-white shadow-2xl sm:p-10">
       <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-sky/20 blur-3xl" aria-hidden="true" />
       <div className="relative text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">{direct ? "One-to-one call" : room.isPrivate ? "Private group call" : "Team room"}</p>
@@ -249,7 +249,7 @@ export default function SpeakLive() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       {!vc.room && (
-        <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-brand-navy to-brand-primary p-6 text-white sm:p-8">
+        <section className="relative overflow-hidden bg-cta rounded-2xl p-6 text-white sm:p-8">
           <div className="pointer-events-none absolute -bottom-20 -right-16 h-64 w-64 rounded-full bg-amber-300/20 blur-3xl" aria-hidden="true" />
           <div className="relative flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-xl">

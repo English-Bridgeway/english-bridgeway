@@ -48,27 +48,27 @@ export default function CourseDetail() {
 
   return (
     <>
-      <header className="bg-brand-primary text-white">
+      <header className="bg-hero">
         <div className="container-page grid gap-10 py-10 sm:py-14 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="min-w-0 [&_nav_a]:text-ink-200 [&_nav_a:hover]:text-white [&_nav_span[aria-current]]:text-white [&_ol]:text-ink-300">
+          <div className="min-w-0">
             <Breadcrumbs items={[{ label: "Courses", to: "/courses" }, { label: course.title }]} />
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <LevelBadge level={course.level} />
               <Badge tone="amber">{price ? formatPrice(price) : "Free"}</Badge>
             </div>
-            <h1 className="mt-4 text-3xl font-bold text-amber-400 sm:text-5xl">{course.title}</h1>
-            <p className="mt-4 max-w-2xl text-lg text-ink-100">{course.description}</p>
-            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-100">
+            <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-brand-deep sm:text-5xl">{course.title}</h1>
+            <p className="mt-4 max-w-2xl text-lg text-muted">{course.description}</p>
+            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-muted">
               <li className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-amber-500 text-amber-500" aria-hidden="true" /> {course.rating} rating</li>
               <li className="flex items-center gap-1.5"><Users className="h-4 w-4" aria-hidden="true" /> {formatNumber(course.students)} students</li>
               <li className="flex items-center gap-1.5"><Clock className="h-4 w-4" aria-hidden="true" /> {course.duration}</li>
               <li className="flex items-center gap-1.5"><BookOpen className="h-4 w-4" aria-hidden="true" /> {course.lessons} lessons</li>
             </ul>
-            <p className="mt-6 text-sm text-ink-200">Instructor: <span className="font-semibold text-white">{course.instructor.name}</span>, {course.instructor.title}</p>
+            <p className="mt-6 text-sm text-muted">Instructor: <span className="font-semibold text-ink-900">{course.instructor.name}</span>, {course.instructor.title}</p>
           </div>
 
           <Card className="self-start p-6 text-body">
-            <div className="grid h-32 place-items-center rounded-xl bg-brand-primary text-white">
+            <div className="bg-cta grid h-32 place-items-center rounded-xl text-white">
               <Icon name={course.icon} className="h-12 w-12" />
             </div>
             <div className="mt-5">

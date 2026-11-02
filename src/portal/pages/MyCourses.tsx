@@ -37,8 +37,8 @@ export default function MyCourses() {
           const p = progressFor(c);
           const state = hasCourse(c.id) ? "Bought" : open ? (paid ? "Open with your access" : "Free") : free > 0 ? `${free} free lesson${free > 1 ? "s" : ""}` : "Locked";
           return (
-            <li key={c.id} className="flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-card">
-              <div className="relative flex h-28 items-end bg-brand-primary p-4">
+            <li key={c.id} className="flex flex-col overflow-hidden rounded-xl bg-white shadow-card">
+              <div className="bg-cta relative flex h-28 items-end p-4">
                 <Icon name={c.icon} className="absolute right-4 top-4 h-14 w-14 text-white/15" strokeWidth={1.5} />
                 <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/15 text-white"><Icon name={c.icon} className="h-6 w-6" /></span>
                 <span className={`absolute left-4 top-4 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${open ? "bg-white text-ink-900" : "bg-ink-900/60 text-white"}`}>
@@ -46,7 +46,7 @@ export default function MyCourses() {
                 </span>
               </div>
               <div className="flex flex-1 flex-col p-5">
-                <LevelBadge level={c.level} />
+                <div><LevelBadge level={c.level} /></div>
                 <h2 className="mt-2 text-lg font-semibold"><Link to={`/learn/courses/${c.id}`} className="hover:text-ink-600">{c.title}</Link></h2>
                 <p className="mt-1 line-clamp-2 text-sm text-muted">{c.description}</p>
                 <p className="mt-3 flex gap-4 text-xs text-muted">

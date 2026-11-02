@@ -29,11 +29,11 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="grid min-h-screen place-items-center bg-gradient-to-br from-ink-900 via-ink-800 to-ink-700 px-4 py-10">
+    <div className="grid min-h-screen place-items-center bg-hero px-4 py-10">
       <title>{`Admin sign in | ${site.name}`}</title>
-      <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-xl sm:p-8">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl bg-white p-6 shadow-lift sm:p-8">
         <div className="flex items-center gap-2.5">
-          <ShieldCheck className="h-7 w-7 text-ink-700" aria-hidden="true" />
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-brand-primary text-white"><ShieldCheck className="h-5 w-5" aria-hidden="true" /></span>
           <div>
             <h1 className="text-lg font-bold">{site.name} admin</h1>
             <p className="text-xs text-muted">Staff only. Every change is logged.</p>
