@@ -38,25 +38,28 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-brand-primary text-white">
-        <div className="container-page grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-20">
+      <section className="relative overflow-hidden bg-surface">
+        {/* Soft violet and magenta glows behind the hero. */}
+        <div className="pointer-events-none absolute -left-20 -top-32 h-96 w-96 rounded-full bg-ink-200/20 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -right-24 top-1/3 h-[32rem] w-[32rem] rounded-full bg-amber-100/30 blur-[100px]" aria-hidden="true" />
+        <div className="container-page relative grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-20">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1 text-sm font-medium text-ink-700 shadow-card">
-              <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" /> Free lessons for every level
+            <p className="inline-flex items-center gap-2 rounded-full bg-surface-high px-3 py-1 font-mono text-[0.7rem] font-medium uppercase tracking-widest text-brand-primary shadow-sm">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand-sky" aria-hidden="true" /> Free lessons for every level
             </p>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.1] text-amber-400 sm:text-5xl lg:text-6xl">
-              Improve Your English. <span className="highlight">Speak With Confidence.</span>
+            <h1 className="mt-6 text-4xl font-extrabold leading-[1.1] tracking-tight text-ink-900 sm:text-5xl lg:text-6xl">
+              Improve Your English. <span className="text-brand-primary">Speak With Confidence.</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-white/80 sm:text-xl">
+            <p className="mt-6 max-w-xl text-lg text-muted sm:text-xl">
               Learn grammar, build vocabulary, practice spoken English, and test your knowledge with simple, practical lessons.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={whatsappChatUrl()} target="_blank" rel="noopener noreferrer" className={buttonClasses("accent", "lg")}>
+              <a href={whatsappChatUrl()} target="_blank" rel="noopener noreferrer" className={buttonClasses("primary", "lg")}>
                 <WhatsAppIcon className="h-5 w-5" /> Chat on WhatsApp
               </a>
-              <Button to="/courses" size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white">Explore Courses</Button>
+              <Button to="/courses" size="lg" variant="secondary">Explore Courses</Button>
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80">
+            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
               {["No sign-up needed", "Listen to every word", "Instant quiz feedback"].map((t) => (
                 <li key={t} className="flex items-center gap-1.5"><CircleCheck className="h-4 w-4 text-brand-sky" aria-hidden="true" />{t}</li>
               ))}
@@ -111,7 +114,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold sm:text-4xl">Ready to improve your English?</h2>
             <p className="mt-2 max-w-lg text-lg text-muted">Start with a 10-minute lesson today. Your progress is saved automatically.</p>
           </div>
-          <Button to={start.to} size="lg" variant="accent">
+          <Button to={start.to} size="lg">
             {start.resume ? "Continue Learning" : "Start Learning Free"} <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>

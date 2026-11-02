@@ -59,7 +59,7 @@ export default function CourseDetail() {
             <h1 className="mt-4 text-3xl font-bold text-amber-400 sm:text-5xl">{course.title}</h1>
             <p className="mt-4 max-w-2xl text-lg text-ink-100">{course.description}</p>
             <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-100">
-              <li className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden="true" /> {course.rating} rating</li>
+              <li className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-amber-500 text-amber-500" aria-hidden="true" /> {course.rating} rating</li>
               <li className="flex items-center gap-1.5"><Users className="h-4 w-4" aria-hidden="true" /> {formatNumber(course.students)} students</li>
               <li className="flex items-center gap-1.5"><Clock className="h-4 w-4" aria-hidden="true" /> {course.duration}</li>
               <li className="flex items-center gap-1.5"><BookOpen className="h-4 w-4" aria-hidden="true" /> {course.lessons} lessons</li>
@@ -158,7 +158,7 @@ export default function CourseDetail() {
                           <li key={l.title} className="flex items-center gap-3 px-4 py-3">
                             <button type="button" onClick={() => toggleLessonComplete(k)} aria-pressed={done}
                               aria-label={done ? `Mark “${l.title}” as not done` : `Mark “${l.title}” as done`}
-                              className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border", done ? "border-brand-sky bg-brand-sky text-white" : "border-line hover:border-ink-400")}>
+                              className={cn("grid h-6 w-6 shrink-0 place-items-center rounded-full border", done ? "border-brand-primary bg-brand-primary text-white" : "border-line hover:border-ink-400")}>
                               {done && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
                             </button>
                             {l.href && !locked ? <Link to={inCourse(l.href, course.id)} className="min-w-0 flex-1 text-[0.95rem] hover:text-ink-600">{l.title}</Link> : <span className="min-w-0 flex-1">{l.title}</span>}

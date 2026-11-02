@@ -132,10 +132,10 @@ export function QuizRunner({ questions, title, onSubmit, resultActions }: Props)
                   onClick={() => setAnswer(opt)}
                   className={cn(
                     "flex items-center gap-3 rounded-xl border p-3.5 text-left transition-colors",
-                    selected ? "border-brand-sky bg-ink-50 ring-1 ring-brand-sky" : "border-line bg-white hover:border-ink-300",
+                    selected ? "border-brand-primary bg-ink-50 ring-1 ring-brand-primary" : "border-line bg-white hover:border-ink-300",
                   )}
                 >
-                  <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg text-sm font-bold", selected ? "bg-brand-sky text-white" : "bg-ink-50 text-ink-700")}>
+                  <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg text-sm font-bold", selected ? "bg-brand-primary text-white" : "bg-ink-50 text-ink-700")}>
                     {String.fromCharCode(65 + i)}
                   </span>
                   <span>{opt}</span>

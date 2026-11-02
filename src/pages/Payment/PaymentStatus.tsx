@@ -18,6 +18,7 @@ export default function PaymentStatus() {
   const [checks, setChecks] = useState(0);
   const { refresh, access } = useAuth();
   const plan = order?.kind === "plan";
+  const ebook = order?.kind === "ebook";
 
   useEffect(() => {
     if (!orderId) { setError("No order was given."); return; }
@@ -47,10 +48,12 @@ export default function PaymentStatus() {
       : order.status === "paid"
         ? {
             icon: <CircleCheck className="h-12 w-12 text-emerald-600" />,
-            title: plan ? "Subscription active" : "Payment successful",
+            title: plan ? "Subscription active" : ebook ? "E-book purchased" : "Payment successful",
             body: plan
               ? `${formatPrice(order.amount)} paid. Every course and Speak with AI are open${access?.until ? ` until ${formatDate(access.until)}` : ""}.`
-              : `You're enrolled in ${order.courseTitle}. ${formatPrice(order.amount)} paid.`,
+              : ebook
+                ? `${order.courseTitle.replace(/^E-book: /, "")} is yours. ${formatPrice(order.amount)} paid. Read it online or download the PDF from E-books.`
+                : `You're enrolled in ${order.courseTitle}. ${formatPrice(order.amount)} paid.`,
           }
         : order.status === "pending"
           ? { icon: <Clock3 className="h-12 w-12 text-amber-600" />, title: "Payment not finished yet", body: checks >= 6 ? "We haven't received the payment. If money left your account, it will be confirmed or refunded automatically." : "Waiting for confirmation from your bank…" }
@@ -64,7 +67,9 @@ export default function PaymentStatus() {
         <p className="mt-3 text-muted">{view.body}</p>
         {orderId && <p className="mt-4 text-xs text-muted">Order {orderId}</p>}
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {order && (plan
+          {order && (ebook
+            ? <Button to="/ebooks">{order.status === "paid" ? "Open my e-books" : "Back to e-books"}</Button>
+            : plan
             ? <Button to={order.status === "paid" ? "/learn/courses" : "/learn/billing"}>{order.status === "paid" ? "Go to my courses" : "Back to plans"}</Button>
             : <Button to={`/courses/${order.courseId}`}>{order.status === "paid" ? "Start the course" : "Back to the course"}</Button>)}
           <Button to="/contact" variant="outline">Contact {site.name}</Button>

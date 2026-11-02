@@ -99,7 +99,7 @@ export default function CoursePlayer() {
                   <button type="button" onClick={() => go(i)} aria-current={i === index ? "step" : undefined}
                     aria-label={lessonOpen ? undefined : `${l.title} (locked)`}
                     className={cn("flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-sm", i === index ? "bg-ink-50 font-semibold text-ink-900" : "text-body hover:bg-ink-50/60", !lessonOpen && "text-muted")}>
-                    <span className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[0.65rem]", isDone && lessonOpen ? "border-brand-sky bg-brand-sky text-white" : "border-line")}>
+                    <span className={cn("grid h-5 w-5 shrink-0 place-items-center rounded-full border text-[0.65rem]", isDone && lessonOpen ? "border-brand-primary bg-brand-primary text-white" : "border-line")}>
                       {!lessonOpen ? <Lock className="h-3 w-3" aria-hidden="true" /> : isDone ? <Check className="h-3 w-3" aria-hidden="true" /> : i + 1}
                     </span>
                     <span className="min-w-0 flex-1">{l.title}</span>
@@ -178,7 +178,7 @@ export default function CoursePlayer() {
                 </button>
                 <div className="flex flex-wrap gap-2">
                   <button type="button" onClick={() => toggleLessonComplete(step.key)} aria-pressed={done}
-                    className={cn("inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold", done ? "border-brand-sky bg-brand-sky text-ink-900" : "border-line bg-white text-ink-900 hover:bg-ink-50")}>
+                    className={cn("inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold", done ? "border-brand-sky bg-brand-sky text-white" : "border-line bg-white text-ink-900 hover:bg-ink-50")}>
                     <Check className="h-4 w-4" aria-hidden="true" /> {done ? "Done" : "Mark as done"}
                   </button>
                   {next >= 0 ? (

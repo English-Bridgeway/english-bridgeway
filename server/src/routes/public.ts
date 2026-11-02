@@ -3,7 +3,7 @@ import { Message, Order } from '../db';
 import { asyncHandler, rateLimit, requireLearner } from '../middleware';
 import { publicBundle } from '../services/content';
 import { getPaymentConfig } from '../services/settings';
-import { createCourseOrder, createPlanOrder, publicOrderDto, syncOrder } from '../services/orders';
+import { createCourseOrder, createEbookOrder, createPlanOrder, publicOrderDto, syncOrder } from '../services/orders';
 import { activePlans, publicPlan } from '../services/plans';
 
 export const publicRouter = Router();
@@ -43,8 +43,12 @@ publicRouter.post(
   rateLimit({ windowMs: 10 * 60_000, max: 20 }),
   asyncHandler(async (req, res) => {
     const body = req.body ?? {};
-    // { planId } buys a subscription; { courseId } buys one course.
-    res.status(201).json(body.planId ? await createPlanOrder(req.learner!, body) : await createCourseOrder(req.learner!, body));
+    // { planId } buys a subscription; { ebookId } buys one e-book; { courseId } buys one course.
+    res.status(201).json(
+      body.planId ? await createPlanOrder(req.learner!, body)
+        : body.ebookId ? await createEbookOrder(req.learner!, body)
+          : await createCourseOrder(req.learner!, body),
+    );
   }),
 );
 

@@ -7,7 +7,7 @@ import { Button } from "../../components/Button";
 import { Alert } from "../../components/Alert";
 import { formatBytes, formatDate } from "../../utils/format";
 
-const blank: EbookInput = { title: "", author: "", description: "", courseId: null, published: true };
+const blank: EbookInput = { title: "", author: "", description: "", courseId: null, price: 0, published: true };
 
 function Cover({ book, className = "h-20 w-14" }: { book: Pick<AdminEbook, "coverUrl" | "title">; className?: string }) {
   return book.coverUrl ? (
@@ -22,7 +22,7 @@ function Editor({ book, courses, onDone, onCancel }: {
   book: AdminEbook | null; courses: { id: string; title: string; price: number }[]; onDone: () => void; onCancel: () => void;
 }) {
   const { toast } = useAdmin();
-  const [form, setForm] = useState<EbookInput>(book ? { title: book.title, author: book.author, description: book.description, courseId: book.courseId, published: book.published } : blank);
+  const [form, setForm] = useState<EbookInput>(book ? { title: book.title, author: book.author, description: book.description, courseId: book.courseId, price: book.price ?? 0, published: book.published } : blank);
   const [pdf, setPdf] = useState<File | null>(null);
   const [cover, setCover] = useState<File | null>(null);
   const [progress, setProgress] = useState<number | null>(null);
@@ -67,12 +67,22 @@ function Editor({ book, courses, onDone, onCancel }: {
           <input className={`${inputClass} mt-1.5 font-normal`} value={form.author} onChange={(e) => set({ author: e.target.value })} maxLength={120} />
         </label>
         <label className="block text-sm font-semibold">
-          Who can read it
+          Price (₹)
+          <input type="number" min={0} step={1} inputMode="numeric" className={`${inputClass} mt-1.5 font-normal`} value={form.price || ""} placeholder="0"
+            onChange={(e) => set({ price: Math.max(0, Math.floor(Number(e.target.value) || 0)) })} />
+          <span className="mt-1 block text-xs font-normal text-muted">
+            {form.price > 0 ? "Sold on its own: learners buy it on the E-books page, then read and download it." : "0 = not sold separately; it comes with paid courses and plans."}
+          </span>
+        </label>
+        <label className="block text-sm font-semibold sm:col-span-2">
+          {form.price > 0 ? "Also free for" : "Who can read it"}
           <select className={`${inputClass} mt-1.5 font-normal`} value={form.courseId ?? ""} onChange={(e) => set({ courseId: e.target.value || null })}>
-            <option value="">Every learner with a paid course or plan</option>
-            {courses.map((c) => <option key={c.id} value={c.id}>Only buyers of “{c.title}”{c.price > 0 ? "" : " (free course)"}</option>)}
+            <option value="">{form.price > 0 ? "Nobody else: only people who buy this e-book" : "Every learner with a paid course or plan"}</option>
+            {courses.map((c) => <option key={c.id} value={c.id}>{form.price > 0 ? "Buyers of" : "Only buyers of"} “{c.title}”{c.price > 0 ? "" : " (free course)"}</option>)}
           </select>
-          <span className="mt-1 block text-xs font-normal text-muted">Learners with a subscription or access you granted can always read it. Free-trial learners can't.</span>
+          <span className="mt-1 block text-xs font-normal text-muted">
+            {form.price > 0 ? "Subscriptions don't include e-books that have a price." : "Learners with a subscription or access you granted can always read it. Free-trial learners can't."}
+          </span>
         </label>
         <label className="block text-sm font-semibold sm:col-span-2">
           Description <span className="font-normal text-muted">(optional)</span>
@@ -147,7 +157,7 @@ export default function EbooksPage() {
     <>
       <PageTitle
         title="E-books"
-        description="Upload PDF e-books. Learners who have paid for a course (or have a subscription) can read them online and download them on the website and in the app."
+        description="Upload PDF e-books. Give one a price to sell it on its own on the E-books page; with no price it comes with paid courses and subscriptions. Learners read them online or download them on the website and in the app."
         actions={editing === null && <Button onClick={() => setEditing("new")}><Plus className="h-4 w-4" aria-hidden="true" /> Add e-book</Button>}
       />
       {adminApi.mode === "demo" && (
@@ -177,7 +187,9 @@ export default function EbooksPage() {
                 </div>
                 {b.author && <p className="text-sm text-muted">by {b.author}</p>}
                 <p className="mt-1 text-sm text-body">
-                  {b.courseId ? <>Only buyers of <strong>{b.courseTitle ?? b.courseId}</strong></> : "Every learner with a paid course or plan"}
+                  {b.price > 0
+                    ? <>Sold for <strong>₹{b.price.toLocaleString("en-IN")}</strong> · {b.sold ?? 0} sold{b.courseId && <> · free with <strong>{b.courseTitle ?? b.courseId}</strong></>}</>
+                    : b.courseId ? <>Only buyers of <strong>{b.courseTitle ?? b.courseId}</strong></> : "Every learner with a paid course or plan"}
                 </p>
                 <p className="mt-1 text-xs text-muted">
                   {b.fileName ? `${b.fileName}${b.fileSize ? ` · ${formatBytes(b.fileSize)}` : ""} · updated ${formatDate(b.updatedAt.slice(0, 10))}` : "Upload the PDF to show it to learners."}
@@ -197,7 +209,7 @@ export default function EbooksPage() {
       <Confirm
         open={removing !== null}
         title="Delete this e-book?"
-        body={`“${removing?.title}” and its PDF will be deleted. Learners will no longer see it.`}
+        body={`“${removing?.title}” and its PDF will be deleted. Learners will no longer see it.${removing?.sold ? ` ${removing.sold} learner(s) bought it and will lose access, so you may want to unpublish it instead.` : ""}`}
         onClose={() => setRemoving(null)}
         onConfirm={async () => {
           try {

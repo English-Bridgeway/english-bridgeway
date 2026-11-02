@@ -326,6 +326,8 @@ export class Ebook extends Model<InferAttributes<Ebook>, InferCreationAttributes
   declare description: CreationOptional<string>;
   /** Only learners who bought this course (or have full access) can open it; null = any paid learner. */
   declare courseId: CreationOptional<string | null>;
+  /** Price in rupees when the e-book is sold on its own; 0 = not sold separately (comes with paid courses). */
+  declare price: CreationOptional<number>;
   declare published: CreationOptional<boolean>;
   declare position: CreationOptional<number>;
   /** The uploaded PDF's original name and size; null until a PDF is uploaded. */
@@ -345,6 +347,7 @@ Ebook.init(
     author: { type: DataTypes.STRING(120), allowNull: false, defaultValue: '' },
     description: { type: DataTypes.TEXT, allowNull: false, defaultValue: '' },
     courseId: { type: DataTypes.STRING(160), allowNull: true },
+    price: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     published: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     position: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     fileName: { type: DataTypes.STRING(200), allowNull: true },
@@ -384,6 +387,10 @@ export async function initDatabase(): Promise<void> {
         ADD COLUMN IF NOT EXISTS admin_note TEXT`);
     // Accounts made before the free trial existed get one too, starting now.
     await sequelize.query("UPDATE learners SET trial_ends_at = now() + interval '24 hours' WHERE trial_ends_at IS NULL");
+  }
+  const ebooks = await sequelize.getQueryInterface().describeTable('ebooks').catch(() => null);
+  if (ebooks && !ebooks.price) {
+    await sequelize.query('ALTER TABLE ebooks ADD COLUMN IF NOT EXISTS price INTEGER NOT NULL DEFAULT 0');
   }
   await sequelize.sync();
 }

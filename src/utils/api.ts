@@ -55,8 +55,8 @@ export interface CheckoutCustomer {
 
 export interface PublicOrder {
   orderId: string;
-  /** "plan" for a subscription. */
-  kind?: "course" | "plan";
+  /** "plan" for a subscription, "ebook" for one e-book (courseId is then "ebook:<id>"). */
+  kind?: "course" | "plan" | "ebook";
   planMonths?: number | null;
   courseId: string;
   courseTitle: string;
@@ -72,7 +72,7 @@ export async function getPlans(): Promise<SubscriptionPlan[]> {
 
 /** What is being bought: one course, or a subscription plan (months of access to every course). */
 export interface CheckoutItem {
-  kind: "course" | "plan";
+  kind: "course" | "plan" | "ebook";
   id: string;
   title: string;
   /** What this learner pays, after any special offer. */
@@ -96,7 +96,7 @@ export async function startPayment(
     const { paymentSessionId, mode } = await apiFetch<{ orderId: string; paymentSessionId: string; mode: "sandbox" | "production" }>("/orders", {
       method: "POST",
       token: account.token ?? undefined,
-      json: { ...(item.kind === "plan" ? { planId: item.id } : { courseId: item.id }), name: customer.name, phone: customer.phone },
+      json: { ...(item.kind === "plan" ? { planId: item.id } : item.kind === "ebook" ? { ebookId: item.id } : { courseId: item.id }), name: customer.name, phone: customer.phone },
     });
     const { load } = await import("@cashfreepayments/cashfree-js");
     const cashfree = await load({ mode });
@@ -111,7 +111,9 @@ export async function startPayment(
   const plan = item.kind === "plan";
   updateDemoDb((db) => {
     db.orders.unshift({
-      orderId, userId: account.userId, courseId: plan ? `plan:${item.id}` : item.id, courseTitle: plan ? `Subscription: ${item.title}` : item.title,
+      orderId, userId: account.userId,
+      courseId: plan ? `plan:${item.id}` : item.kind === "ebook" ? `ebook:${item.id}` : item.id,
+      courseTitle: plan ? `Subscription: ${item.title}` : item.kind === "ebook" ? `E-book: ${item.title}` : item.title,
       kind: item.kind, planId: plan ? item.id : null, planMonths: plan ? (item.months ?? 1) : null, amount: item.price, currency: "INR",
       customerName: customer.name, customerEmail: customer.email.toLowerCase(), customerPhone: customer.phone.replace(/\D/g, "").slice(-10),
       status: "paid", gateway: "demo", gatewayPaymentId: `demo_${newId()}`, bankReference: null, refundId: null, paidAt: now, createdAt: now,

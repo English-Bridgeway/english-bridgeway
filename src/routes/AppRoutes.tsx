@@ -17,6 +17,7 @@ const QuizCategory = lazy(() => import("../pages/Quiz/QuizCategory"));
 const QuizPlay = lazy(() => import("../pages/Quiz/QuizPlay"));
 const Courses = lazy(() => import("../pages/Courses"));
 const CourseDetail = lazy(() => import("../pages/Courses/CourseDetail"));
+const Ebooks = lazy(() => import("../pages/Ebooks"));
 const Blog = lazy(() => import("../pages/Blog"));
 const BlogDetail = lazy(() => import("../pages/Blog/BlogDetail"));
 const Contact = lazy(() => import("../pages/Contact"));
@@ -57,6 +58,7 @@ export function AppRoutes() {
         <Route path="quiz/:category/:quizId" element={<QuizPlay />} />
         <Route path="courses" element={<Courses />} />
         <Route path="courses/:courseId" element={<CourseDetail />} />
+        <Route path="ebooks" element={<Ebooks />} />
         <Route path="blog" element={<Blog />} />
         <Route path="blog/:slug" element={<BlogDetail />} />
         <Route path="contact" element={<Contact />} />

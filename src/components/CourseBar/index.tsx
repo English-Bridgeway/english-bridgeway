@@ -77,7 +77,7 @@ export function CourseBar({ compact }: { compact?: boolean }) {
               onClick={() => toggleLessonComplete(step.key)}
               aria-pressed={done}
               className={cn("inline-flex h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold",
-                done ? "border-brand-sky bg-brand-sky text-ink-900" : "border-line bg-white text-ink-900 hover:bg-ink-50")}
+                done ? "border-brand-sky bg-brand-sky text-white" : "border-line bg-white text-ink-900 hover:bg-ink-50")}
             >
               <Check className="h-4 w-4" aria-hidden="true" /> {done ? "Done" : "Mark as done"}
             </button>
