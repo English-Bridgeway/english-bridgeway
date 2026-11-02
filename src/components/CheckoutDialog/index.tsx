@@ -37,6 +37,7 @@ export function CheckoutDialog({ open, onClose, item, config, listPrice }: {
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState("");
   const plan = item.kind === "plan";
+  const ebook = item.kind === "ebook";
 
   const set = (k: keyof CheckoutCustomer) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues((v) => ({ ...v, [k]: e.target.value }));
@@ -61,7 +62,7 @@ export function CheckoutDialog({ open, onClose, item, config, listPrice }: {
   };
 
   return (
-    <Modal open={open} onClose={busy ? () => {} : onClose} title={plan ? `Subscribe: ${item.title}` : `Buy ${item.title}`}>
+    <Modal open={open} onClose={busy ? () => {} : onClose} title={plan ? `Subscribe: ${item.title}` : ebook ? `Buy e-book: ${item.title}` : `Buy ${item.title}`}>
       <form onSubmit={submit} noValidate className="space-y-4 p-5">
         <div className="rounded-xl bg-ink-50 p-4">
           <div className="flex items-baseline justify-between gap-3">
@@ -74,7 +75,9 @@ export function CheckoutDialog({ open, onClose, item, config, listPrice }: {
           <p className="mt-1 text-sm text-muted">
             {plan
               ? `Every course and Speak with AI for ${monthsLabel(item.months ?? 1)}. One-time payment, no auto-renewal.`
-              : "One-time payment. The course stays in your account for good."}
+              : ebook
+                ? "One-time payment. Read it online or download the PDF any time from E-books."
+                : "One-time payment. The course stays in your account for good."}
           </p>
         </div>
         {config.demo && (

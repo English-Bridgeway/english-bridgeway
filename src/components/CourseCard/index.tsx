@@ -23,7 +23,7 @@ export function CourseCard({ course, progress }: { course: Course; index?: numbe
         <div className="flex flex-wrap items-center gap-2">
           <LevelBadge level={course.level} />
           <span className="inline-flex items-center gap-1 text-sm font-semibold text-ink-900">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden="true" /> {course.rating.toFixed(1)}
+            <Star className="h-4 w-4 fill-amber-500 text-amber-500" aria-hidden="true" /> {course.rating.toFixed(1)}
             <span className="sr-only">out of 5</span>
           </span>
         </div>

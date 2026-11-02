@@ -6,6 +6,7 @@ import { getPublishedItem } from './content';
 import * as cashfree from './cashfree';
 import { addMonths, priceFor } from './access';
 import { getActivePlan, planPriceFor } from './plans';
+import { canOpen, ebookAccessFor, findEbook, isForSale } from './ebooks';
 
 export class OrderError extends Error {
   constructor(
@@ -16,13 +17,18 @@ export class OrderError extends Error {
   }
 }
 
+/** "course", "plan" or "ebook". Plans keep "plan:<id>" and e-books "ebook:<id>" in course_id. */
+export function orderKind(o: Pick<Order, 'planId' | 'courseId'>) {
+  return o.planId ? ('plan' as const) : o.courseId.startsWith('ebook:') ? ('ebook' as const) : ('course' as const);
+}
+
 export function orderDto(o: Order) {
   return {
     orderId: o.orderId,
     userId: o.userId,
     courseId: o.courseId,
     courseTitle: o.courseTitle,
-    kind: o.planId ? ('plan' as const) : ('course' as const),
+    kind: orderKind(o),
     planId: o.planId,
     planMonths: o.planMonths,
     amount: o.amountPaise / 100,
@@ -44,7 +50,7 @@ export function orderDto(o: Order) {
 export function publicOrderDto(o: Order) {
   return {
     orderId: o.orderId,
-    kind: o.planId ? ('plan' as const) : ('course' as const),
+    kind: orderKind(o),
     courseId: o.courseId,
     courseTitle: o.courseTitle,
     planMonths: o.planMonths,
@@ -149,6 +155,26 @@ export async function createCourseOrder(learner: Learner, input: BuyerInput & { 
     price,
     note: `English-Bridgeway course: ${title}`,
     tags: { course_id: course.key.slice(0, 255) },
+  });
+}
+
+/**
+ * Starts a Cashfree checkout for one e-book sold on its own. When it is paid, the e-book opens
+ * for this learner (services/ebooks.ts canOpen looks for a paid "ebook:<id>" order).
+ */
+export async function createEbookOrder(learner: Learner, input: BuyerInput & { ebookId?: unknown }) {
+  const buyer = buyerDetails(learner, input);
+  await ensurePaymentsOn();
+  const book = typeof input.ebookId === 'string' ? await findEbook(input.ebookId) : null;
+  if (!book || !book.published || !book.fileName) throw new OrderError('This e-book is not available.', 404);
+  if (!isForSale(book)) throw new OrderError('This e-book is not sold on its own.', 400);
+  if (canOpen(book, await ebookAccessFor(learner))) throw new OrderError('You already have this e-book. Open it from E-books.', 409);
+  return startCheckout(learner, buyer, {
+    courseId: `ebook:${book.id}`,
+    title: `E-book: ${book.title}`,
+    price: book.price,
+    note: `English-Bridgeway e-book: ${book.title}`,
+    tags: { ebook_id: book.id },
   });
 }
 

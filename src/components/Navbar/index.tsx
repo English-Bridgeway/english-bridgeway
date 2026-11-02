@@ -44,7 +44,7 @@ export function Navbar() {
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     cn("block whitespace-nowrap rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
-      isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10 hover:text-amber-300");
+      isActive ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-muted hover:bg-ink-50 hover:text-ink-900");
 
   // Desktop: the logo already goes home, and the less-used pages sit under "More" so the
   // row fits on one line.
@@ -55,12 +55,12 @@ export function Navbar() {
     <header
       className={cn(
         "sticky top-0 z-40 border-b transition-[background-color,box-shadow,border-color] duration-200",
-        scrolled || menuOpen ? "border-white/10 bg-brand-primary/95 shadow-[0_4px_20px_-12px_rgb(79_95_245/0.35)] backdrop-blur" : "border-transparent bg-brand-primary",
+        scrolled || menuOpen ? "border-transparent bg-surface/80 shadow-[0_1px_8px_rgb(107_0_157/0.06)] backdrop-blur-xl" : "border-transparent bg-surface/80 backdrop-blur-xl",
       )}
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
       <div className="container-page flex h-16 items-center justify-between gap-3 lg:h-18">
-        <Logo light />
+        <Logo />
         <nav aria-label="Main" className="hidden xl:block">
           <ul className="flex items-center gap-0.5">
             {primary.map((item) => (
@@ -76,30 +76,30 @@ export function Navbar() {
           </ul>
         </nav>
         <div className="flex shrink-0 items-center gap-1.5">
-          <button type="button" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10" aria-label="Search (press /)">
+          <button type="button" onClick={() => setSearchOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl text-muted hover:bg-ink-50 hover:text-ink-900" aria-label="Search (press /)">
             <Search className="h-5 w-5" aria-hidden="true" />
           </button>
           {user ? (
             <>
-              <Link to="/learn" className="hidden h-10 w-10 place-items-center rounded-full bg-amber-300 font-display text-sm font-bold text-ink-900 hover:bg-amber-200 sm:grid" aria-label={`My learning (${user.name})`} title={user.name}>
+              <Link to="/learn" className="hidden h-10 w-10 place-items-center rounded-full bg-brand-deep font-display text-sm font-bold text-white hover:bg-brand-primary sm:grid" aria-label={`My learning (${user.name})`} title={user.name}>
                 {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" /> : user.avatarInitials}
               </Link>
-              <button type="button" onClick={logOut} className="hidden h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 sm:grid" aria-label="Log out" title="Log out">
+              <button type="button" onClick={logOut} className="hidden h-10 w-10 place-items-center rounded-xl text-muted hover:bg-ink-50 hover:text-ink-900 sm:grid" aria-label="Log out" title="Log out">
                 <LogOut className="h-5 w-5" aria-hidden="true" />
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hidden items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[0.92rem] font-medium text-white hover:bg-white/10 sm:flex">
+              <Link to="/login" className="hidden items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[0.92rem] font-medium text-ink-900 hover:bg-ink-50 hover:text-brand-primary sm:flex">
                 <LogIn className="h-4 w-4" aria-hidden="true" /> Log in
               </Link>
-              <span className="hidden whitespace-nowrap sm:block"><Button to="/register" size="sm" variant="accent">Sign up free</Button></span>
+              <span className="hidden whitespace-nowrap sm:block"><Button to="/register" size="sm">Sign up free</Button></span>
             </>
           )}
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            className="grid h-10 w-10 place-items-center rounded-xl text-white hover:bg-white/10 xl:hidden"
+            className="grid h-10 w-10 place-items-center rounded-xl text-ink-900 hover:bg-ink-50 xl:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -116,14 +116,14 @@ export function Navbar() {
         inert={!menuOpen}
       >
         <div className="min-h-0">
-          <nav aria-label="Mobile" className="container-page border-t border-white/15 pb-6 pt-3">
+          <nav aria-label="Mobile" className="container-page border-t border-line pb-6 pt-3">
             <ul className="grid gap-1 sm:grid-cols-2">
               {mainNav.map((item) => (
                 <li key={item.to}>
                   <NavLink
                     to={item.to}
                     end={item.to === "/"}
-                    className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}
+                    className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-ink-900 hover:bg-ink-50")}
                   >
                     {item.label}
                   </NavLink>
@@ -131,20 +131,20 @@ export function Navbar() {
               ))}
               {user && (
                 <li>
-                  <NavLink to="/learn" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10")}>
+                  <NavLink to="/learn" className={({ isActive }) => cn("block rounded-xl px-4 py-3 text-base font-medium", isActive ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-ink-900 hover:bg-ink-50")}>
                     My learning
                   </NavLink>
                 </li>
               )}
             </ul>
             {user ? (
-              <Button onClick={logOut} className="mt-4 w-full border-white/20 bg-white/10 text-white hover:bg-white/20" variant="outline">
+              <Button onClick={logOut} className="mt-4 w-full" variant="outline">
                 <LogOut className="h-4 w-4" aria-hidden="true" /> Log out ({user.name})
               </Button>
             ) : (
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <Button to="/login" variant="outline" className="border-white/20 bg-white/10 text-white hover:bg-white/20">Log in</Button>
-                <Button to="/register" variant="accent">Sign up free</Button>
+                <Button to="/login" variant="outline">Log in</Button>
+                <Button to="/register">Sign up free</Button>
               </div>
             )}
           </nav>
@@ -179,7 +179,7 @@ function MoreMenu({ items, active }: { items: readonly { label: string; to: stri
         aria-expanded={open}
         aria-haspopup="true"
         className={cn("flex items-center gap-1 whitespace-nowrap rounded-lg px-3 py-2 text-[0.92rem] font-medium transition-colors",
-          active ? "bg-white/10 text-amber-300" : "text-white hover:bg-white/10 hover:text-amber-300")}
+          active ? "bg-brand-soft/60 font-semibold text-brand-primary" : "text-muted hover:bg-ink-50 hover:text-ink-900")}
       >
         More <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} aria-hidden="true" />
       </button>

@@ -8,6 +8,12 @@ export interface Ebook {
   description: string;
   courseId: string | null;
   courseTitle: string | null;
+  /** Price in rupees when sold on its own; 0 = comes with paid courses and plans. */
+  price: number;
+  /** Sold on its own (price > 0). */
+  forSale: boolean;
+  /** This learner bought it. */
+  owned: boolean;
   fileSize: number | null;
   coverUrl: string | null;
   updatedAt: string;

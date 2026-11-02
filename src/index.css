@@ -1,48 +1,74 @@
 @import "tailwindcss";
 
-/* English BridgeWay brand palette, shared by every route and component. */
+/* English BridgeWay palette: deep violet + magenta on a soft lavender surface (Material 3
+   style tokens, from the "FluentBloom" design). Shared by every route and component. */
 :root {
-  --primary-color: #4F5FF5;
-  --accent-yellow: #FFD93D;
+  --primary-color: #6B009D;   /* primary container: buttons, links, brand */
+  --primary-deep: #4A006E;    /* primary: hover, deep text */
+  --primary-ink: #30004A;     /* on-primary-fixed: dark sections */
+  --primary-tint: #8A32BB;    /* surface tint: focus rings, soft accents */
+  --primary-soft: #F5D9FF;    /* primary fixed */
+  --primary-dim: #E6B4FF;     /* primary fixed dim */
+  --secondary: #A400B7;       /* magenta: success ticks, highlights */
+  --secondary-soft: #FFD6FB;  /* secondary fixed */
+  --secondary-dim: #FDA9FF;   /* secondary fixed dim */
+  --tertiary: #004A57;
+  --tertiary-dim: #4CD7F6;
+  --surface: #FEF7FF;
+  --surface-low: #FAF0FF;
+  --surface-container: #F4EBF9;
+  --surface-high: #EEE5F4;
+  --surface-variant: #E8DFEE;
+  --on-surface: #1E1A24;
+  --on-surface-variant: #4E4352;
+  --outline-variant: #D1C2D4;
+  --error: #BA1A1A;
   --white: #FFFFFF;
-  --accent-sky-blue: #63C7FF;
-  --dark-blue: #172F83;
 }
 
 @theme {
-  --font-display: "Lexend", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-  --font-sans: "Figtree", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   --color-brand-primary: var(--primary-color);
-  --color-brand-sky: var(--accent-sky-blue);
-  --color-brand-navy: var(--dark-blue);
-  --color-danger: var(--dark-blue);
+  --color-brand-deep: var(--primary-deep);
+  --color-brand-sky: var(--secondary);
+  --color-brand-navy: var(--primary-ink);
+  --color-brand-soft: var(--primary-soft);
+  --color-brand-teal: var(--tertiary);
+  --color-danger: var(--error);
+  --color-surface: var(--surface);
+  --color-surface-low: var(--surface-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-high: var(--surface-high);
 
-  --color-ink-50: color-mix(in srgb, var(--accent-sky-blue) 12%, var(--white));
-  --color-ink-100: color-mix(in srgb, var(--accent-sky-blue) 24%, var(--white));
-  --color-ink-200: var(--accent-sky-blue);
-  --color-ink-300: color-mix(in srgb, var(--accent-sky-blue) 72%, var(--dark-blue));
-  --color-ink-400: var(--accent-sky-blue);
+  --color-ink-50: var(--surface-low);
+  --color-ink-100: var(--surface-high);
+  --color-ink-200: var(--primary-dim);
+  --color-ink-300: color-mix(in srgb, var(--primary-tint) 45%, var(--white));
+  --color-ink-400: var(--primary-tint);
   --color-ink-500: var(--primary-color);
   --color-ink-600: var(--primary-color);
-  --color-ink-700: var(--dark-blue);
-  --color-ink-800: var(--dark-blue);
-  --color-ink-900: var(--dark-blue);
+  --color-ink-700: var(--primary-deep);
+  --color-ink-800: #332E39;
+  --color-ink-900: var(--on-surface);
 
-  --color-amber-50: color-mix(in srgb, var(--accent-yellow) 18%, var(--white));
-  --color-amber-100: color-mix(in srgb, var(--accent-yellow) 38%, var(--white));
-  --color-amber-300: var(--accent-yellow);
-  --color-amber-400: var(--accent-yellow);
-  --color-amber-600: var(--dark-blue);
-  --color-amber-800: var(--dark-blue);
+  --color-amber-50: color-mix(in srgb, var(--secondary-soft) 40%, var(--white));
+  --color-amber-100: var(--secondary-soft);
+  --color-amber-200: color-mix(in srgb, var(--secondary-dim) 60%, var(--white));
+  --color-amber-300: var(--secondary-dim);
+  --color-amber-400: var(--secondary-dim);
+  --color-amber-600: #7D008C;
+  --color-amber-800: #5C0068;
 
-  --color-canvas: var(--white);
-  --color-line: var(--accent-sky-blue);
-  --color-muted: var(--dark-blue);
-  --color-body: var(--dark-blue);
+  --color-canvas: var(--surface);
+  --color-line: var(--surface-variant);
+  --color-muted: var(--on-surface-variant);
+  --color-body: var(--on-surface);
 
-  --shadow-card: 0 1px 2px rgb(23 47 131 / 0.05), 0 6px 20px -8px rgb(23 47 131 / 0.12);
-  --shadow-lift: 0 2px 4px rgb(23 47 131 / 0.06), 0 16px 36px -12px rgb(23 47 131 / 0.22);
+  --shadow-card: 0 1px 2px rgb(107 0 157 / 0.05), 0 6px 20px -8px rgb(107 0 157 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(107 0 157 / 0.06), 0 16px 36px -12px rgb(107 0 157 / 0.22);
 
   --animate-fade-in: fade-in 0.25s ease-out both;
   @keyframes fade-in {
@@ -65,7 +91,7 @@
     letter-spacing: -0.015em;
   }
   :focus-visible {
-    outline: 3px solid var(--accent-sky-blue);
+    outline: 3px solid var(--primary-tint);
     outline-offset: 2px;
     border-radius: 6px;
   }
@@ -81,8 +107,8 @@
   .prose-lesson p + p { @apply mt-4; }
   .highlight {
     border-radius: 0.12em;
-    background: var(--accent-yellow);
-    color: var(--dark-blue);
+    background: var(--secondary-soft);
+    color: var(--primary-ink);
     padding: 0 0.12em;
   }
 }

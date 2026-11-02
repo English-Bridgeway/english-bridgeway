@@ -41,7 +41,7 @@ export interface Order {
   courseId: string;
   courseTitle: string;
   /** "plan" for subscriptions (courseId is then "plan:<id>"). Missing on older demo orders. */
-  kind?: "course" | "plan";
+  kind?: "course" | "plan" | "ebook";
   planId?: string | null;
   planMonths?: number | null;
   amount: number; // rupees
@@ -218,6 +218,10 @@ export interface AdminEbook {
   /** Only buyers of this course (or learners with full access) can open it; null = any paid learner. */
   courseId: string | null;
   courseTitle: string | null;
+  /** Price in rupees when sold on its own; 0 = comes with paid courses and plans. */
+  price: number;
+  /** Paid copies sold on their own. */
+  sold?: number;
   published: boolean;
   position: number;
   fileName: string | null;
@@ -232,6 +236,7 @@ export interface EbookInput {
   author: string;
   description: string;
   courseId: string | null;
+  price: number;
   published: boolean;
 }
 

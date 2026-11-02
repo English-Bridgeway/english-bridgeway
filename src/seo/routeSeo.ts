@@ -195,6 +195,14 @@ function draftFor(path: string, search: string): Draft {
     };
   }
 
+  if (section === "ebooks" && parts.length === 1) {
+    return {
+      title: "English E-books (PDF)",
+      description: `Buy ${site.name} English e-books one by one in Indian Rupees, then read them online or download the PDF.`,
+      crumbs: [{ name: "E-books", path: "/ebooks" }],
+      schema: [{ "@type": "CollectionPage", url: absoluteUrl("/ebooks"), name: `${site.name} e-books`, about: { "@id": orgId() } }],
+    };
+  }
   if (section === "pricing" && parts.length === 1) {
     const paid = courses.filter((c) => Number(c.price) > 0);
     const offers = [

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
 import { config } from '../config';
 import { Learner, LearnerAvatar, Order, type LearnerProfile } from '../db';
 import { getAccessSettings } from './access';
@@ -176,9 +177,16 @@ export async function loginLearner(input: { email?: unknown; password?: unknown 
 }
 
 /** Course ids this learner has paid for (refunded orders no longer count). */
+/** Courses this learner bought. E-book orders ("ebook:<id>") are left out: buying one e-book unlocks only that e-book. */
 export async function purchasedCourseIds(learnerId: string): Promise<string[]> {
-  const rows = await Order.findAll({ where: { userId: learnerId, status: 'paid', planId: null }, attributes: ['courseId'] });
+  const rows = await Order.findAll({ where: { userId: learnerId, status: 'paid', planId: null, courseId: { [Op.notLike]: 'ebook:%' } }, attributes: ['courseId'] });
   return [...new Set(rows.map((r) => r.courseId))];
+}
+
+/** Ids of the e-books this learner bought on their own. */
+export async function purchasedEbookIds(learnerId: string): Promise<string[]> {
+  const rows = await Order.findAll({ where: { userId: learnerId, status: 'paid', courseId: { [Op.like]: 'ebook:%' } }, attributes: ['courseId'] });
+  return [...new Set(rows.map((r) => r.courseId.slice('ebook:'.length)))];
 }
 
 export async function hasPurchased(learnerId: string, courseId: string): Promise<boolean> {

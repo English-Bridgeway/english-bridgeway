@@ -4,14 +4,17 @@ import path from 'path';
 import { pipeline } from 'stream/promises';
 import { Transform, type Readable } from 'stream';
 import { config } from '../config';
-import { ContentItem, Ebook, Learner } from '../db';
+import { col, fn, Op } from 'sequelize';
+import { ContentItem, Ebook, Learner, Order } from '../db';
 import { accessState } from './access';
-import { purchasedCourseIds } from './learners';
+import { purchasedCourseIds, purchasedEbookIds } from './learners';
 
-// E-books: PDFs the admin uploads. Only learners with a paid course (a bought course, a
-// subscription or access the admin granted) can read or download them; the free trial can't.
-// An e-book can also be tied to one course, and then only that course's buyers (or learners
-// with full access) can open it.
+// E-books: PDFs the admin uploads. Each e-book is either
+//  - sold on its own (price > 0): a learner buys it (an order with course_id "ebook:<id>") and
+//    can then read and download it. If it is also tied to a course, that course's buyers get it free.
+//  - included (price 0): learners with a paid course (a bought course, a subscription or access
+//    the admin granted) can open it; the free trial can't. Tied to a course, only that course's
+//    buyers (or learners with full access) can open it.
 //
 // The PDF never has a public URL. A signed-in learner asks for a link (POST /api/ebooks/:id/link),
 // the server checks their access and answers with a short-lived signed URL for that learner,
@@ -49,24 +52,40 @@ export interface EbookAccess {
   /** True when the learner has full access (subscription, granted or unlimited). */
   full: boolean;
   purchased: string[];
+  /** E-books bought on their own. */
+  ebooks: string[];
   blocked: boolean;
 }
 
 export async function ebookAccessFor(learner: Learner | null | undefined): Promise<EbookAccess | null> {
   if (!learner) return null;
   const state = accessState(learner);
-  return { full: state.full, purchased: await purchasedCourseIds(learner.id), blocked: state.status === 'blocked' };
+  const [purchased, ebooks] = await Promise.all([purchasedCourseIds(learner.id), purchasedEbookIds(learner.id)]);
+  return { full: state.full, purchased, ebooks, blocked: state.status === 'blocked' };
 }
+
+/** Whether the e-book is sold on its own. */
+export const isForSale = (book: Ebook) => book.price > 0;
+
+/** Whether this learner bought the e-book itself. */
+export const ownsEbook = (book: Ebook, access: EbookAccess | null) => Boolean(access && access.ebooks.includes(book.id));
 
 export function canOpen(book: Ebook, access: EbookAccess | null): boolean {
   if (!access || access.blocked) return false;
+  if (ownsEbook(book, access)) return true;
+  // A priced e-book must be bought, unless it also comes with a course the learner bought.
+  if (isForSale(book)) return Boolean(book.courseId && access.purchased.includes(book.courseId));
   if (access.full) return true;
   return book.courseId ? access.purchased.includes(book.courseId) : access.purchased.length > 0;
 }
 
 function lockedMessage(book: Ebook, courseTitle: string | undefined, access: EbookAccess | null): string {
+  if (access?.blocked) return 'Your account is blocked. Please contact us.';
+  if (isForSale(book)) {
+    const price = `₹${book.price.toLocaleString('en-IN')}`;
+    return book.courseId ? `Buy this e-book for ${price}, or get it free with the course “${courseTitle ?? book.courseId}”.` : `Buy this e-book for ${price} to read and download it.`;
+  }
   if (!access) return 'Log in to read e-books.';
-  if (access.blocked) return 'Your account is blocked. Please contact us.';
   if (book.courseId) return `This e-book comes with the course “${courseTitle ?? book.courseId}”. Buy the course or a subscription to read it.`;
   return 'E-books are for learners with a paid course. Buy a course or a subscription to read them.';
 }
@@ -81,6 +100,7 @@ function base(b: Ebook, titles: Map<string, string>) {
     description: b.description,
     courseId: b.courseId,
     courseTitle: b.courseId ? (titles.get(b.courseId) ?? null) : null,
+    price: b.price,
     fileSize: b.fileSize,
     // Covers are not secret (they show on the locked card too). The version busts caches.
     coverUrl: b.coverMime && b.coverUpdatedAt ? `/ebooks/${b.id}/cover?v=${b.coverUpdatedAt.getTime()}` : null,
@@ -99,13 +119,24 @@ export async function listForLearner(learner: Learner | null | undefined) {
     .filter((b) => b.fileName)
     .map((b) => {
       const unlocked = canOpen(b, access);
-      return { ...base(b, titles), unlocked, lockedReason: unlocked ? null : lockedMessage(b, titles.get(b.courseId ?? ''), access) };
+      return { ...base(b, titles), unlocked, owned: ownsEbook(b, access), forSale: isForSale(b), lockedReason: unlocked ? null : lockedMessage(b, titles.get(b.courseId ?? ''), access) };
     });
 }
 
+/** How many paid copies of each e-book were sold, by e-book id. */
+async function salesCounts(): Promise<Map<string, number>> {
+  const rows = (await Order.findAll({
+    where: { status: 'paid', courseId: { [Op.like]: 'ebook:%' } },
+    attributes: ['courseId', [fn('COUNT', col('order_id')), 'sold']],
+    group: ['courseId'],
+    raw: true,
+  })) as unknown as { courseId: string; sold: string | number }[];
+  return new Map(rows.map((r) => [r.courseId.slice('ebook:'.length), Number(r.sold)]));
+}
+
 export async function listForAdmin() {
-  const [books, titles] = await Promise.all([Ebook.findAll({ order: [['position', 'ASC'], ['createdAt', 'DESC']] }), courseTitles()]);
-  return books.map((b) => adminDto(b, titles));
+  const [books, titles, sold] = await Promise.all([Ebook.findAll({ order: [['position', 'ASC'], ['createdAt', 'DESC']] }), courseTitles(), salesCounts()]);
+  return books.map((b) => ({ ...adminDto(b, titles), sold: sold.get(b.id) ?? 0 }));
 }
 
 export function adminDto(b: Ebook, titles: Map<string, string>) {
@@ -126,6 +157,8 @@ export async function saveEbook(id: string | null, input: Record<string, unknown
   const title = str(input.title, 200);
   if (!title) throw new EbookError('Please give the e-book a title.');
   const courseId = str(input.courseId, 160) || null;
+  const price = input.price === undefined || input.price === null || input.price === '' ? 0 : Number(input.price);
+  if (!Number.isInteger(price) || price < 0 || price > 1_000_000) throw new EbookError('The price must be a whole number of rupees (0 for no price).');
   const titles = await courseTitles();
   if (courseId && !titles.has(courseId)) throw new EbookError('That course does not exist.');
   const fields = {
@@ -133,6 +166,7 @@ export async function saveEbook(id: string | null, input: Record<string, unknown
     author: str(input.author, 120),
     description: str(input.description, 4000),
     courseId,
+    price,
     published: input.published === true,
   };
   let book: Ebook;

@@ -68,10 +68,9 @@ export function whatsappChatUrl(message = site.whatsappMessage): string {
 export const mainNav = [
   { label: "Home", to: "/" },
   { label: "Grammar", to: "/grammar" },
-  { label: "Vocabulary", to: "/vocabulary" },
   { label: "Spoken English", to: "/spoken-english" },
-  { label: "Quiz", to: "/quiz" },
   { label: "Courses", to: "/courses" },
+  { label: "E-books", to: "/ebooks" },
   { label: "Speak Live", to: "/learn/live" },
   { label: "Pricing", to: "/pricing" },
   { label: "Blog", to: "/blog" },

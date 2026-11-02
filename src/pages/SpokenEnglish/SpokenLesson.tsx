@@ -71,7 +71,7 @@ export default function SpokenLesson() {
               <div role="group" aria-label="Practice mode" className="inline-flex rounded-xl bg-ink-50 p-1">
                 {(["read", "repeat"] as const).map((m) => (
                   <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
-                    className={cn("rounded-lg px-3.5 py-1.5 text-sm font-semibold", mode === m ? "bg-brand-sky text-white shadow-card" : "text-muted hover:text-ink-900")}>
+                    className={cn("rounded-lg px-3.5 py-1.5 text-sm font-semibold", mode === m ? "bg-brand-primary text-white shadow-card" : "text-muted hover:text-ink-900")}>
                     {m === "read" ? "Conversation" : "Repeat practice"}
                   </button>
                 ))}
