@@ -15,7 +15,7 @@ export default function QuizCategory() {
   return (
     <>
       <PageHeader crumbs={[{ label: "Quiz", to: "/quiz" }, { label: cat.title }]}
-        eyebrow={<span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700"><Icon name={cat.icon} className="h-5 w-5" /></span>}
+        eyebrow={<span className="grid h-11 w-11 place-items-center rounded-xl bg-surface-container text-brand-primary"><Icon name={cat.icon} className="h-5 w-5" /></span>}
         title={`${cat.title} quizzes`} description={cat.description} />
       <section className="container-page py-10">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

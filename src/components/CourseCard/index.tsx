@@ -12,7 +12,7 @@ export function CourseCard({ course, progress }: { course: Course; index?: numbe
   const free = !course.price;
   return (
     <Card interactive className="flex h-full flex-col overflow-hidden">
-      <div className="relative flex h-36 items-end bg-brand-primary p-5">
+      <div className="bg-cta relative flex h-36 items-end p-5">
         <Icon name={course.icon} className="absolute right-5 top-5 h-16 w-16 text-white/15" strokeWidth={1.5} />
         <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/15 text-white backdrop-blur">
           <Icon name={course.icon} className="h-6 w-6" />

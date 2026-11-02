@@ -22,7 +22,7 @@ export default function GrammarTopic() {
         crumbs={[{ label: "Grammar", to: "/grammar" }, { label: topic.title }]}
         eyebrow={
           <div className="flex items-center gap-3">
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700"><Icon name={topic.icon} className="h-5 w-5" /></span>
+            <span className="grid h-11 w-11 place-items-center rounded-xl bg-surface-container text-brand-primary"><Icon name={topic.icon} className="h-5 w-5" /></span>
             <LevelBadge level={topic.level} />
           </div>
         }

@@ -13,7 +13,7 @@ export function TopicCard({ to, icon, title, summary, level, lessons, cta = "Sta
   return (
     <Card interactive className="group flex h-full flex-col p-6">
       <div className="flex items-start justify-between gap-3">
-        <span className="grid h-12 w-12 place-items-center rounded-xl bg-ink-50 text-ink-700 transition-colors group-hover:bg-ink-800 group-hover:text-white">
+        <span className="grid h-12 w-12 place-items-center rounded-xl bg-surface-container text-brand-primary transition-colors group-hover:bg-brand-primary group-hover:text-white">
           <Icon name={icon} className="h-6 w-6" />
         </span>
         {level && <LevelBadge level={level} />}

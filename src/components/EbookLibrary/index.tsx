@@ -83,11 +83,11 @@ export function EbookLibrary({ coursesLink }: { coursesLink: string }) {
       )}
       <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {[...unlocked, ...forSale, ...included].map((b) => (
-          <li key={b.id} className="flex gap-4 rounded-2xl bg-white p-4 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift">
+          <li key={b.id} className="flex gap-4 rounded-xl bg-white p-4 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift">
             {b.coverUrl ? (
               <img src={b.coverUrl} alt="" className="h-40 w-28 shrink-0 rounded-xl object-cover shadow-sm" loading="lazy" />
             ) : (
-              <span className="grid h-40 w-28 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-primary to-brand-navy text-white shadow-sm"><BookOpen className="h-8 w-8" aria-hidden="true" /></span>
+              <span className="grid h-40 w-28 shrink-0 place-items-center bg-cta rounded-xl text-white shadow-sm"><BookOpen className="h-8 w-8" aria-hidden="true" /></span>
             )}
             <div className="flex min-w-0 flex-1 flex-col">
               <div className="flex flex-wrap items-center gap-1.5">

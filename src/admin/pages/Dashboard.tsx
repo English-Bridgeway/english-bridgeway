@@ -27,7 +27,7 @@ export default function Dashboard() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((c) => (
           <Link key={c.label} to={c.to} className="rounded-2xl border border-line bg-white p-5 shadow-card transition-shadow hover:shadow-lift">
-            <c.icon className="h-5 w-5 text-ink-500" aria-hidden="true" />
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-surface-container text-brand-primary"><c.icon className="h-5 w-5" aria-hidden="true" /></span>
             <p className="mt-3 font-display text-2xl font-bold text-ink-900">{c.value}</p>
             <p className="text-sm text-muted">{c.label}</p>
           </Link>

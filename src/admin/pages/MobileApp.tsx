@@ -115,7 +115,7 @@ function Current({ release, onDone }: { release: AppRelease; onDone: (r: AppRele
   return (
     <Panel title="Published version" className="mb-6">
       <div className="mb-4 flex items-center gap-3">
-        <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700"><Smartphone className="h-5 w-5" aria-hidden="true" /></span>
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-surface-container text-brand-primary"><Smartphone className="h-5 w-5" aria-hidden="true" /></span>
         <div>
           <p className="font-semibold">Version {release.versionName} <span className="font-normal text-muted">(build {release.buildNumber})</span></p>
           <p className="text-xs text-muted">{formatBytes(release.fileSize)} · published {formatDateTime(release.uploadedAt)}</p>
@@ -143,7 +143,7 @@ function GithubPanel({ github, uploaded }: { github: GithubAppRelease; uploaded:
   return (
     <Panel title="Latest GitHub Release" className="mb-6">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="grid h-11 w-11 place-items-center rounded-xl bg-ink-50 text-ink-700"><Package className="h-5 w-5" aria-hidden="true" /></span>
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-surface-container text-brand-primary"><Package className="h-5 w-5" aria-hidden="true" /></span>
         <div className="min-w-0 flex-1">
           <p className="font-semibold">Version {github.versionName} <span className="font-normal text-muted">(build {github.buildNumber})</span></p>
           <p className="text-xs text-muted">

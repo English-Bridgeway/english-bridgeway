@@ -85,8 +85,8 @@ export default function GrammarLesson() {
           <section key={s.heading} id={anchor(s.heading)} className="mt-10 scroll-mt-24">
             <h2 className="text-xl font-semibold">{s.heading}</h2>
             {s.structure && (
-              <p className="mt-3 overflow-x-auto rounded-xl bg-ink-800 px-4 py-3 font-mono text-sm text-white">
-                <span className="mr-2 text-xs uppercase tracking-wider text-amber-300">Structure</span>{s.structure}
+              <p className="mt-3 overflow-x-auto rounded-xl bg-brand-soft px-4 py-3 font-mono text-sm font-semibold text-brand-deep">
+                <span className="mr-2 text-xs font-bold uppercase tracking-wider text-brand-primary">Structure</span>{s.structure}
               </p>
             )}
             {s.body && <div className="prose-lesson mt-3"><p>{s.body}</p></div>}

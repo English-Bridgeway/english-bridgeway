@@ -58,7 +58,7 @@ export default function Orders() {
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap gap-1 rounded-xl border border-line bg-white p-1" role="group" aria-label="Filter by status">
           {FILTERS.map((f) => (
-            <button key={f} type="button" onClick={() => setFilter(f)} aria-pressed={filter === f} className={`rounded-lg px-3 py-1.5 text-sm font-medium capitalize ${filter === f ? "bg-ink-800 text-white" : "text-ink-700 hover:bg-ink-50"}`}>{f}</button>
+            <button key={f} type="button" onClick={() => setFilter(f)} aria-pressed={filter === f} className={`rounded-lg px-3 py-1.5 text-sm font-medium capitalize ${filter === f ? "bg-brand-primary text-white" : "text-ink-700 hover:bg-ink-50"}`}>{f}</button>
           ))}
         </div>
         <div className="relative w-full max-w-xs">

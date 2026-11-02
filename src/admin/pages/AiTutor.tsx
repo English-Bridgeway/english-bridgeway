@@ -84,7 +84,7 @@ export default function AiTutor() {
             <div className="mt-2 flex flex-wrap gap-2">
               {PRESETS.map((p) => (
                 <button key={p.name} type="button" onClick={() => setForm((f) => ({ ...f, baseUrl: p.baseUrl, model: p.model }))}
-                  className={cn("rounded-full px-3 py-1 text-xs font-semibold ring-1", form.baseUrl === p.baseUrl ? "bg-ink-900 text-white ring-ink-900" : "bg-white text-ink-800 ring-line hover:bg-ink-50")}>
+                  className={cn("rounded-full px-3 py-1 text-xs font-semibold ring-1", form.baseUrl === p.baseUrl ? "bg-brand-primary text-white ring-brand-primary" : "bg-white text-ink-800 ring-line hover:bg-ink-50")}>
                   {p.name}
                 </button>
               ))}
@@ -229,7 +229,7 @@ function TutorVoice() {
           <div className="mt-2 flex flex-wrap gap-2">
             {VOICES.map((v) => (
               <button key={v.id} type="button" onClick={() => set("voiceId", v.id)}
-                className={cn("rounded-full px-3 py-1 text-xs font-semibold ring-1", form.voiceId === v.id ? "bg-ink-900 text-white ring-ink-900" : "bg-white text-ink-800 ring-line hover:bg-ink-50")}>
+                className={cn("rounded-full px-3 py-1 text-xs font-semibold ring-1", form.voiceId === v.id ? "bg-brand-primary text-white ring-brand-primary" : "bg-white text-ink-800 ring-line hover:bg-ink-50")}>
                 {v.name}
               </button>
             ))}

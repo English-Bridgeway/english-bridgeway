@@ -122,7 +122,7 @@ export default function Learners() {
             <div className="flex flex-wrap gap-1.5">
               {FILTERS.map((f) => (
                 <button key={f.id} type="button" onClick={() => setFilter(f.id)}
-                  className={cn("rounded-full px-3 py-1 text-xs font-semibold", filter === f.id ? "bg-ink-900 text-white" : "bg-white text-ink-800 ring-1 ring-line hover:bg-ink-50")}>
+                  className={cn("rounded-full px-3 py-1 text-xs font-semibold", filter === f.id ? "bg-brand-primary text-white" : "bg-white text-ink-800 ring-1 ring-line hover:bg-ink-50")}>
                   {f.label} <span className="opacity-60">{data.filter((l) => matches(l, f.id)).length}</span>
                 </button>
               ))}
