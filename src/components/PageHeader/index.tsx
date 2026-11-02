@@ -9,7 +9,7 @@ export function PageHeader({ title, description, crumbs, eyebrow, children }: {
   children?: ReactNode;
 }) {
   return (
-    <header className="bg-white">
+    <header className="bg-hero">
       <div className="container-page py-10 sm:py-14">
         {crumbs && <Breadcrumbs items={crumbs} />}
         {eyebrow && <div className="mt-5">{eyebrow}</div>}

@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-white">
+      <section className="bg-hero relative overflow-hidden">
         <div className="container-page relative grid items-center gap-12 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:py-20">
           <div>
             <p className="inline-flex items-center gap-2 rounded-lg bg-surface-container px-3 py-1 text-xs font-bold uppercase tracking-wider text-ink-900">
@@ -106,12 +106,12 @@ export default function Home() {
 
       {/* Final CTA */}
       <section className="container-page mt-20">
-        <div className="flex flex-col items-start justify-between gap-6 rounded-3xl border border-line bg-white p-8 shadow-card sm:p-12 md:flex-row md:items-center">
+        <div className="bg-cta flex flex-col items-start justify-between gap-6 rounded-2xl p-8 text-white sm:p-12 md:flex-row md:items-center">
           <div>
-            <h2 className="text-3xl font-bold sm:text-4xl">Ready to improve your English?</h2>
-            <p className="mt-2 max-w-lg text-lg text-muted">Start with a 10-minute lesson today. Your progress is saved automatically.</p>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Ready to improve your English?</h2>
+            <p className="mt-2 max-w-lg text-lg text-white/90">Start with a 10-minute lesson today. Your progress is saved automatically.</p>
           </div>
-          <Button to={start.to} size="lg">
+          <Button to={start.to} size="lg" variant="light">
             {start.resume ? "Continue Learning" : "Start Learning Free"} <ArrowRight className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>

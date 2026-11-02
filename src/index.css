@@ -87,7 +87,10 @@
   :root { color-scheme: light; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    @apply bg-canvas text-body font-sans antialiased;
+    @apply text-body font-sans antialiased;
+    /* Soft lavender wash behind every page (white cards sit on top of it). */
+    background: linear-gradient(180deg, #F9F6FE 0%, #FBF9FF 25%, #F5F0FB 55%, #FBF9FE 85%, #F4EFFA 100%) fixed;
+    background-color: var(--surface);
     font-size: 1rem;
     line-height: 1.6;
   }
@@ -108,6 +111,19 @@
 }
 
 @layer components {
+  /* Hero and page-header backdrop: lavender and peach glows on white. */
+  .bg-hero {
+    background:
+      radial-gradient(circle at 10% 20%, rgb(222 203 255 / 0.35) 0%, transparent 45%),
+      radial-gradient(circle at 90% 30%, rgb(190 160 240 / 0.28) 0%, transparent 50%),
+      radial-gradient(circle at 50% 90%, rgb(254 222 195 / 0.25) 0%, transparent 45%),
+      linear-gradient(180deg, #FFFFFF 0%, #F9F5FF 100%);
+  }
+  /* Deep purple banner (calls to action, word of the day). */
+  .bg-cta {
+    background: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary-color) 50%, var(--primary-tint) 100%);
+    box-shadow: 0 20px 45px -10px rgb(95 37 159 / 0.38);
+  }
   .container-page { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
   .prose-lesson p { @apply text-[1.0625rem] leading-relaxed text-body/90; }
   .prose-lesson p + p { @apply mt-4; }

@@ -5,7 +5,7 @@ export function HeroIllustration() {
   return (
     <div className="relative mx-auto aspect-[5/4] w-full max-w-lg select-none" aria-hidden="true">
       {/* backdrop */}
-      <div className="absolute inset-[6%] rounded-[2.5rem] bg-ink-100" />
+      <div className="absolute inset-[6%] rounded-[2.5rem] bg-brand-soft/60" />
       <div className="absolute left-[12%] top-[10%] font-display text-[7rem] font-bold leading-none text-ink-200/70 sm:text-[9rem]">Aa</div>
 
       {/* lesson card */}

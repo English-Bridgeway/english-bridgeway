@@ -2,13 +2,15 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "../../utils/cn";
 
-type Variant = "primary" | "secondary" | "outline" | "ghost" | "accent" | "danger" | "danger-ghost";
+type Variant = "primary" | "light" | "secondary" | "outline" | "ghost" | "accent" | "danger" | "danger-ghost";
 type Size = "sm" | "md" | "lg";
 
 const base =
   "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 const variants: Record<Variant, string> = {
   primary: "bg-brand-primary text-white hover:bg-brand-deep shadow-sm",
+  /** White button for purple banners. */
+  light: "bg-white text-brand-primary shadow-md hover:bg-surface-low",
   secondary: "bg-surface-container text-ink-900 hover:bg-surface-variant",
   outline: "border border-outline bg-white text-ink-900 hover:bg-surface-low hover:text-brand-primary",
   ghost: "text-ink-700 hover:bg-ink-50",
